@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Git-Pass — Setup Instructions{% endblock %}
+{% block title %}Git-Vault — Setup Instructions{% endblock %}
 
 {% block content %}
 <div class="instructions-wrapper">
@@ -11,7 +11,7 @@
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
       <span>Back to Login & Connect</span>
     </a>
-    <h1 class="instructions-title">Git-Pass Setup Instructions</h1>
+    <h1 class="instructions-title">Git-Vault Setup Instructions</h1>
     <p class="instructions-subtitle">
       Follow these 5 straightforward steps to configure your private GitHub repository for zero-knowledge password storage.
     </p>
@@ -42,7 +42,7 @@
       <div class="step-body">
         <h2 class="step-title">Generate a Personal Access Token (PAT)</h2>
         <p class="step-text">
-          Generate a Personal Access Token on GitHub to authorize Git-Pass to read and write your encrypted file:
+          Generate a Personal Access Token on GitHub to authorize Git-Vault to read and write your encrypted file:
         </p>
         <div class="token-btn-row">
           <a href="https://github.com/settings/tokens/new?scopes=repo,delete_repo" target="_blank" rel="noopener noreferrer" class="btn-token-link">
@@ -54,7 +54,7 @@
           <p class="callout-heading">Important scopes to select:</p>
           <ul class="callout-list">
             <li><strong>repo</strong>: Gives full control of repositories to read and write your encrypted file.</li>
-            <li><strong>delete_repo</strong> (optional): Only needed if you want the option to delete the entire repo from Git-Pass settings.</li>
+            <li><strong>delete_repo</strong> (optional): Only needed if you want the option to delete the entire repo from Git-Vault settings.</li>
           </ul>
           <p class="callout-note">Copy and save your token immediately — GitHub will only show it to you once!</p>
         </div>
@@ -69,7 +69,7 @@
       <div class="step-body">
         <h2 class="step-title">Create a Dedicated GitHub Repository</h2>
         <p class="step-text">
-          Create a new repository on GitHub (e.g. <code>my-passwords-vault</code> or <code>gitpass-data</code>).
+          Create a new repository on GitHub (e.g. <code>my-passwords-vault</code> or <code>git-vault-data</code>).
         </p>
         <p class="step-subtext">
           We recommend setting the repository visibility to <strong>Private</strong> for maximum confidentiality, though your password data is strongly encrypted with AES-256-GCM either way.
@@ -102,7 +102,7 @@
           </div>
         </div>
         <p class="step-subtext">
-          The file can be completely empty initially. Git-Pass will automatically format and store your encrypted ciphertext in this file upon first connect.
+          The file can be completely empty initially. Git-Vault will automatically format and store your encrypted ciphertext in this file upon first connect.
         </p>
       </div>
     </div>
@@ -138,7 +138,7 @@
       <div class="step-body">
         <h2 class="step-title">Browser WebExtension (Chrome, Edge & Brave)</h2>
         <p class="step-text">
-          Want to access and save credentials directly from your browser toolbar while browsing? Use the included <strong>Git-Pass WebExtension</strong>:
+          Want to access and save credentials directly from your browser toolbar while browsing? Use the included <strong>Git-Vault WebExtension</strong>:
         </p>
         <div class="credentials-checklist mt-2">
           <li>Open <code>chrome://extensions</code> or <code>edge://extensions</code> in your browser.</li>

@@ -1,4 +1,4 @@
-// Git-Pass Interactive Engine
+// Git-Vault Interactive Engine
 
 // 1. Toast Notification system
 function showToast(message, type = 'success') {

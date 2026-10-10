@@ -1,5 +1,5 @@
 """
-GitHub REST API integration client for Git-Pass.
+GitHub REST API integration client for Git-Vault.
 Handles zero-server storage: all user encrypted files are read from
 and written directly to the user's personal GitHub repository.
 """
@@ -41,7 +41,7 @@ def _headers(token: str) -> dict:
     return {
         "Authorization": f"Bearer {token.strip()}",
         "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "Git-Pass-App",
+        "User-Agent": "Git-Vault-App",
     }
 
 

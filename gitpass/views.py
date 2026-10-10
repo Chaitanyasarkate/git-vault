@@ -38,7 +38,7 @@ from .totp import generate_totp_code
 
 
 def require_session(view_func):
-    """Decorator to protect views requiring an active Git-Pass session."""
+    """Decorator to protect views requiring an active Git-Vault session."""
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         if not request.session.get("is_authenticated"):
@@ -121,7 +121,7 @@ def login_view(request):
             request.session["is_authenticated"] = True
             request.session["is_demo"] = True
             request.session["github_username"] = "demo-user"
-            request.session["github_repo"] = "git-pass-demo-vault"
+            request.session["github_repo"] = "git-vault-demo-vault"
             request.session["github_filename"] = "passwords.txt"
             request.session["master_password"] = "DemoMasterPass123!"
             request.session["demo_vault"] = [
@@ -166,21 +166,21 @@ def login_view(request):
                 {
                     "sha": "a1b2c3d4e5f678901234567890abcdef12345678",
                     "short_sha": "a1b2c3d",
-                    "message": "Git-Pass: Update ProtonMail 2FA secret",
+                    "message": "Git-Vault: Update ProtonMail 2FA secret",
                     "author": "demo-user",
                     "date": (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=15)).isoformat(),
                 },
                 {
                     "sha": "f9e8d7c6b5a432109876543210fedcba87654321",
                     "short_sha": "f9e8d7c",
-                    "message": "Git-Pass: Add Google Workspace credentials",
+                    "message": "Git-Vault: Add Google Workspace credentials",
                     "author": "demo-user",
                     "date": (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=2)).isoformat(),
                 },
                 {
                     "sha": "0123456789abcdef0123456789abcdef01234567",
                     "short_sha": "0123456",
-                    "message": "Git-Pass: Initialize encrypted password vault",
+                    "message": "Git-Vault: Initialize encrypted password vault",
                     "author": "demo-user",
                     "date": (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=1)).isoformat(),
                 },
@@ -216,7 +216,7 @@ def login_view(request):
                     except CorruptedVaultError as e:
                         messages.error(
                             request,
-                            f"Vault file error: {e}. Check that '{filename}' is formatted by Git-Pass."
+                            f"Vault file error: {e}. Check that '{filename}' is formatted by Git-Vault."
                         )
                         return render(request, "gitpass/login.html", {"form": form})
                 else:
@@ -228,7 +228,7 @@ def login_view(request):
                         repo=repo_name,
                         file_path=filename,
                         content=initial_encrypted,
-                        commit_message="Git-Pass: Initialize encrypted password vault",
+                        commit_message="Git-Vault: Initialize encrypted password vault",
                         sha=file_sha,
                     )
 
@@ -259,7 +259,7 @@ def login_view(request):
 
 
 def instructions_view(request):
-    """Step-by-step setup guide for GitHub repo, PAT, and Git-Pass."""
+    """Step-by-step setup guide for GitHub repo, PAT, and Git-Vault."""
     return render(request, "gitpass/instructions.html")
 
 
@@ -361,7 +361,7 @@ def add_item_view(request):
                 _save_active_vault(
                     request,
                     items,
-                    commit_msg=f"Git-Pass: Add credential for {new_item['title']}"
+                    commit_msg=f"Git-Vault: Add credential for {new_item['title']}"
                 )
                 messages.success(request, f"Saved credential '{new_item['title']}' to your GitHub repository.")
             except Exception as e:
@@ -399,7 +399,7 @@ def edit_item_view(request, item_id: str):
                 _save_active_vault(
                     request,
                     items,
-                    commit_msg=f"Git-Pass: Update credential for {target_item['title']}"
+                    commit_msg=f"Git-Vault: Update credential for {target_item['title']}"
                 )
                 messages.success(request, f"Updated '{target_item['title']}' on GitHub.")
             except Exception as e:
@@ -423,7 +423,7 @@ def delete_item_view(request, item_id: str):
                 _save_active_vault(
                     request,
                     items,
-                    commit_msg=f"Git-Pass: Remove credential for {target.get('title', 'item')}"
+                    commit_msg=f"Git-Vault: Remove credential for {target.get('title', 'item')}"
                 )
                 messages.success(request, f"Deleted '{target.get('title')}' from your repository.")
             else:
@@ -453,7 +453,7 @@ def change_master_password_view(request):
                 _save_active_vault(
                     request,
                     items,
-                    commit_msg="Git-Pass: Re-encrypt vault with new master password"
+                    commit_msg="Git-Vault: Re-encrypt vault with new master password"
                 )
                 messages.success(request, "Master password changed! Vault was re-encrypted on GitHub.")
             except Exception as e:
@@ -711,7 +711,7 @@ def api_time_machine_rollback(request):
         new_sha = _save_active_vault(
             request,
             restored_items,
-            commit_msg=f"Git-Pass: Rollback vault to commit {commit_sha[:7]}"
+            commit_msg=f"Git-Vault: Rollback vault to commit {commit_sha[:7]}"
         )
 
         return JsonResponse({
@@ -737,5 +737,5 @@ def logout_view(request):
 
 def health_view(request):
     """Health check endpoint for Render."""
-    return JsonResponse({"status": "healthy", "service": "Git-Pass", "zero_server_storage": True})
+    return JsonResponse({"status": "healthy", "service": "Git-Vault", "zero_server_storage": True})
 

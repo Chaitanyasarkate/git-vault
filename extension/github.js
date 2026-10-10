@@ -1,5 +1,5 @@
 /**
- * Git-Pass WebExtension GitHub API Client
+ * Git-Vault WebExtension GitHub API Client
  * Direct Zero-Server connection to private GitHub repositories
  */
 
@@ -21,7 +21,7 @@ async function verifyAccess(token, owner, repo) {
     headers: {
       'Authorization': `Bearer ${token}`,
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'GitPass-WebExtension'
+      'User-Agent': 'GitVault-WebExtension'
     }
   });
 
@@ -43,7 +43,7 @@ async function fetchRepoFile(token, owner, repo, filePath = 'passwords.txt') {
     headers: {
       'Authorization': `Bearer ${token}`,
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'GitPass-WebExtension'
+      'User-Agent': 'GitVault-WebExtension'
     }
   });
 
@@ -62,7 +62,7 @@ async function fetchRepoFile(token, owner, repo, filePath = 'passwords.txt') {
 async function commitRepoFile(token, owner, repo, filePath, newContent, message, sha) {
   const url = `${GITHUB_API_BASE}/repos/${owner}/${repo}/contents/${filePath}`;
   const payload = {
-    message: message || `Update ${filePath} via Git-Pass WebExtension`,
+    message: message || `Update ${filePath} via Git-Vault WebExtension`,
     content: utf8ToBase64(newContent)
   };
 
@@ -76,7 +76,7 @@ async function commitRepoFile(token, owner, repo, filePath, newContent, message,
       'Authorization': `Bearer ${token}`,
       'Accept': 'application/vnd.github.v3+json',
       'Content-Type': 'application/json',
-      'User-Agent': 'GitPass-WebExtension'
+      'User-Agent': 'GitVault-WebExtension'
     },
     body: JSON.stringify(payload)
   });
@@ -91,9 +91,10 @@ async function commitRepoFile(token, owner, repo, filePath, newContent, message,
 }
 
 if (typeof window !== 'undefined') {
-  window.GitPassGitHub = {
+  window.GitVaultGitHub = {
     verifyAccess,
     fetchRepoFile,
     commitRepoFile
   };
+  window.GitPassGitHub = window.GitVaultGitHub;
 }

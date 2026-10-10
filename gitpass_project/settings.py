@@ -59,7 +59,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "gitpass_project.wsgi.application"
 
 # Database: SQLite is used solely for Django internals (contenttypes/admin if needed),
-# but Git-Pass stores NO user passwords or credentials in any database.
+# but Git-Vault stores NO user passwords or credentials in any database.
 # All user passwords are encrypted with master password and saved directly to the user's GitHub repo.
 DATABASES = {
     "default": {
@@ -107,6 +107,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CSRF_TRUSTED_ORIGINS = [
     "https://*.onrender.com",
     "https://*.render.com",
+    "https://git-vault.onrender.com",
     "https://git-pass.onrender.com",
     "http://localhost:8000",
     "http://127.0.0.1:8000",

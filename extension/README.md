@@ -1,13 +1,13 @@
-# Git-Pass Browser WebExtension (Manifest V3)
+# Git-Vault Browser WebExtension (Manifest V3)
 
-A privacy-focused browser extension for **Git-Pass** that enables you to save, view, and generate passwords with zero server retention, directly synced with your private GitHub repository.
+A privacy-focused browser extension for **Git-Vault** that enables you to save, view, and generate passwords with zero server retention, directly synced with your private GitHub repository.
 
 ---
 
 ## Key Features
 
 1. **Zero Server Storage**: Directly communicates with GitHub's REST API (`api.github.com`) using your Personal Access Token (PAT).
-2. **Client-Side AES-256-GCM Encryption**: Data is encrypted using PBKDF2HMAC-SHA256 (120,000 rounds) and AES-256-GCM via the native Web Crypto API. Fully interoperable with the Git-Pass web dashboard.
+2. **Client-Side AES-256-GCM Encryption**: Data is encrypted using PBKDF2HMAC-SHA256 (120,000 rounds) and AES-256-GCM via the native Web Crypto API. Fully interoperable with the Git-Vault web dashboard.
 3. **Current Site Detection**: Automatically detects the domain of the active tab (e.g. `github.com`, `google.com`) and pins matching credentials to the top.
 4. **1-Click Quick Save**: Auto-fills the current site domain and URL with a single click.
 5. **Cryptographic Password Generator**: Built-in high-entropy password generator with customizable length, symbols, and character sets.
@@ -26,7 +26,7 @@ This extension uses **Manifest V3** and works on all Chromium-based browsers (**
 3. Click the **Load unpacked** button in the top left corner.
 4. Select the `extension` folder inside this project:
    `c:\Users\chaitanya sarkate\OneDrive\Desktop\Projects\vaultx\extension`
-5. The **Git-Pass** extension icon will appear in your browser toolbar! Click the Extensions puzzle piece icon and pin Git-Pass for easy access.
+5. The **Git-Vault** extension icon will appear in your browser toolbar! Click the Extensions puzzle piece icon and pin Git-Vault for easy access.
 
 ### Microsoft Edge
 1. Navigate to `edge://extensions/`.
@@ -43,7 +43,7 @@ This extension uses **Manifest V3** and works on all Chromium-based browsers (**
 
 ## How to Use
 
-1. Click the **Git-Pass** icon in your browser toolbar.
+1. Click the **Git-Vault** icon in your browser toolbar.
 2. Enter your **GitHub Username**, **Repository Name**, **Personal Access Token (PAT)**, and **Master Password**.
    - Or click **⚡ Quick Instant Demo** to test immediately.
 3. Once unlocked:

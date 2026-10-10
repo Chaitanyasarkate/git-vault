@@ -1,5 +1,5 @@
 """
-Git-Pass Built-in 2FA / TOTP Authenticator Engine.
+Git-Vault Built-in 2FA / TOTP Authenticator Engine.
 Implements RFC 6238 (TOTP) and RFC 4226 (HOTP) using HMAC-SHA1.
 Generates live rolling 6-digit two-factor authentication codes.
 """

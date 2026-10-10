@@ -1,7 +1,7 @@
 /**
- * Git-Pass WebExtension Cryptographic Engine
+ * Git-Vault WebExtension Cryptographic Engine
  * Zero-Knowledge Client-Side AES-256-GCM + PBKDF2HMAC-SHA256
- * 100% Interoperable with Git-Pass Python Backend
+ * 100% Interoperable with Git-Vault Python Backend
  */
 
 const PBKDF2_ITERATIONS = 120000;
@@ -54,7 +54,7 @@ async function deriveKey(masterPassword, saltBuffer) {
 }
 
 /**
- * Encrypts an array of credential objects into the Git-Pass JSON envelope.
+ * Encrypts an array of credential objects into the Git-Vault JSON envelope.
  */
 async function encryptVault(data, masterPassword) {
   const salt = crypto.getRandomValues(new Uint8Array(SALT_BYTES));
@@ -74,7 +74,7 @@ async function encryptVault(data, masterPassword) {
   );
 
   const envelope = {
-    format: 'git-pass-aes256gcm',
+    format: 'git-vault-aes256gcm',
     version: 1,
     kdf: 'PBKDF2HMAC-SHA256',
     iterations: PBKDF2_ITERATIONS,
@@ -98,7 +98,7 @@ async function decryptVault(rawContent, masterPassword) {
   try {
     envelope = JSON.parse(rawContent.trim());
   } catch (err) {
-    throw new Error('Vault file is not valid JSON. Ensure it contains Git-Pass encrypted data.');
+    throw new Error('Vault file is not valid JSON. Ensure it contains Git-Vault encrypted data.');
   }
 
   if (Array.isArray(envelope)) {
@@ -156,9 +156,10 @@ function generatePassword({ length = 20, upper = true, lower = true, numbers = t
 
 // Export for extension modules or window
 if (typeof window !== 'undefined') {
-  window.GitPassCrypto = {
+  window.GitVaultCrypto = {
     encryptVault,
     decryptVault,
     generatePassword
   };
+  window.GitPassCrypto = window.GitVaultCrypto;
 }

@@ -1,5 +1,5 @@
 /**
- * Git-Pass Content Script
+ * Git-Vault Content Script
  * 1. 1-Click Credential Autofill
  * 2. Intelligent Auto-Capture for Form Submissions
  */
@@ -145,7 +145,7 @@ function showAutoCaptureBanner(cred) {
     </style>
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
       <div style="display: flex; align-items: center; gap: 7px; font-weight: 700; color: #34d399; font-size: 12px;">
-        <span style="font-size: 15px;">🛡️</span> Git-Pass Auto-Capture
+        <span style="font-size: 15px;">🛡️</span> Git-Vault Auto-Capture
       </div>
       <button id="gp-close-x" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px; padding: 0 4px;">&times;</button>
     </div>
@@ -173,13 +173,13 @@ function showAutoCaptureBanner(cred) {
   document.getElementById('gp-btn-save')?.addEventListener('click', () => {
     // Send to extension storage
     try {
-      chrome.storage.local.get(['gitpass_pending_captures'], (res) => {
-        const captures = res.gitpass_pending_captures || [];
+      chrome.storage.local.get(['gitvault_pending_captures', 'gitpass_pending_captures'], (res) => {
+        const captures = res.gitvault_pending_captures || res.gitpass_pending_captures || [];
         captures.push(cred);
-        chrome.storage.local.set({ gitpass_pending_captures: captures }, () => {
+        chrome.storage.local.set({ gitvault_pending_captures: captures, gitpass_pending_captures: captures }, () => {
           banner.innerHTML = `
             <div style="display: flex; align-items: center; gap: 8px; color: #34d399; font-weight: 700; padding: 6px 0;">
-              <span>✓</span> Saved to Git-Pass queue!
+              <span>✓</span> Saved to Git-Vault queue!
             </div>
           `;
           setTimeout(removeBanner, 1800);

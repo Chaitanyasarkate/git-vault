@@ -1,5 +1,5 @@
 """
-Cryptographic module for Git-Pass.
+Cryptographic module for Git-Vault.
 Implements zero-knowledge client/server encryption using AES-256-GCM
 and PBKDF2HMAC key derivation with 120,000 rounds of SHA-256.
 """
@@ -59,7 +59,7 @@ def encrypt_vault(data: list, master_password: str) -> str:
     ciphertext = aesgcm.encrypt(nonce, plaintext_bytes, None)
 
     envelope = {
-        "format": "git-pass-aes256gcm",
+        "format": "git-vault-aes256gcm",
         "version": 1,
         "kdf": "PBKDF2HMAC-SHA256",
         "iterations": PBKDF2_ITERATIONS,
@@ -83,7 +83,7 @@ def decrypt_vault(raw_content: str, master_password: str) -> list:
         envelope = json.loads(raw_content)
     except json.JSONDecodeError:
         # Check if file has legacy or corrupt format
-        raise CorruptedVaultError("Vault file is not valid JSON. Ensure the file contains Git-Pass encrypted data.")
+        raise CorruptedVaultError("Vault file is not valid JSON. Ensure the file contains Git-Vault encrypted data.")
 
     if not isinstance(envelope, dict) or "ciphertext" not in envelope:
         # If it was an empty or uninitialized JSON array

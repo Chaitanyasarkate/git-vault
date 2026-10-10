@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Sign In — Git-Pass{% endblock %}
+{% block title %}Sign In — Git-Vault{% endblock %}
 
 {% block content %}
 <div class="auth-page-wrapper">
@@ -155,11 +155,11 @@
     
     // Auto-populate from previous sessions if input is empty
     if (userInput && !userInput.value) {
-      const savedUser = localStorage.getItem('gitpass_saved_user');
+      const savedUser = localStorage.getItem('gitvault_saved_user') || localStorage.getItem('gitpass_saved_user');
       if (savedUser) userInput.value = savedUser;
     }
     if (repoInput && !repoInput.value) {
-      const savedRepo = localStorage.getItem('gitpass_saved_repo');
+      const savedRepo = localStorage.getItem('gitvault_saved_repo') || localStorage.getItem('gitpass_saved_repo');
       if (savedRepo) repoInput.value = savedRepo;
     }
 
@@ -168,10 +168,10 @@
     if (form) {
       form.addEventListener('submit', function() {
         if (userInput && userInput.value) {
-          localStorage.setItem('gitpass_saved_user', userInput.value.trim());
+          localStorage.setItem('gitvault_saved_user', userInput.value.trim());
         }
         if (repoInput && repoInput.value) {
-          localStorage.setItem('gitpass_saved_repo', repoInput.value.trim());
+          localStorage.setItem('gitvault_saved_repo', repoInput.value.trim());
         }
       });
     }

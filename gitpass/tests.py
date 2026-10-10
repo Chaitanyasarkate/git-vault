@@ -46,7 +46,7 @@ class CryptoTests(TestCase):
     def test_encrypt_decrypt_round_trip(self):
         encrypted_envelope = encrypt_vault(self.sample_items, self.master_pwd)
         self.assertIsInstance(encrypted_envelope, str)
-        self.assertIn("git-pass-aes256gcm", encrypted_envelope)
+        self.assertIn("git-vault-aes256gcm", encrypted_envelope)
 
         decrypted = decrypt_vault(encrypted_envelope, self.master_pwd)
         self.assertEqual(len(decrypted), 2)
@@ -121,13 +121,13 @@ class ViewsTests(TestCase):
     def test_login_page_renders(self):
         resp = self.client.get(reverse("gitpass:login"))
         self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, "Git-Pass")
+        self.assertContains(resp, "Git-Vault")
         self.assertContains(resp, "Zero Server Storage")
 
     def test_instructions_page_renders(self):
         resp = self.client.get(reverse("gitpass:instructions"))
         self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, "Git-Pass Setup Instructions")
+        self.assertContains(resp, "Git-Vault Setup Instructions")
 
     def test_health_check(self):
         resp = self.client.get(reverse("gitpass:health"))

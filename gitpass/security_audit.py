@@ -1,6 +1,6 @@
 """
-Git-Pass Security Audit & Breach Detection Module.
-Uses the k-Anonymity model (HaveIBeenPwned API) to check breached passwords
+Git-Vault Security Audit & Breach Detection Module.
+Implements the k-Anonymity model (HaveIBeenPwned API) to check breached passwords
 without ever exposing the actual password to third-party servers.
 """
 
@@ -26,7 +26,7 @@ def check_pwned_password(password: str, timeout: float = 2.5) -> int:
 
     url = f"https://api.pwnedpasswords.com/range/{prefix}"
     headers = {
-        "User-Agent": "GitPass-ZeroKnowledge-Auditor",
+        "User-Agent": "GitVault-ZeroKnowledge-Auditor",
         "Add-Padding": "true"  # Prevents response size analysis
     }
 

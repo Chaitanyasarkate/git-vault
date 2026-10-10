@@ -1,5 +1,5 @@
 /**
- * Git-Pass WebExtension Popup Controller
+ * Git-Vault WebExtension Popup Controller
  * Features:
  * - AES-256-GCM + PBKDF2 Zero-Knowledge Local Decryption
  * - WebAuthn Biometric Unlock (Touch ID, Windows Hello, Fingerprint)
@@ -211,16 +211,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       // 1. Verify GitHub Access
-      await window.GitPassGitHub.verifyAccess(token, username, repo);
+      await window.GitVaultGitHub.verifyAccess(token, username, repo);
 
       // 2. Fetch File from Repo
       const filename = stored.gitpass_filename || 'passwords.txt';
-      const fileData = await window.GitPassGitHub.fetchRepoFile(token, username, repo, filename);
+      const fileData = await window.GitVaultGitHub.fetchRepoFile(token, username, repo, filename);
 
       // 3. Decrypt Vault with Master Password
       let items = [];
       if (fileData.content) {
-        items = await window.GitPassCrypto.decryptVault(fileData.content, masterPass);
+        items = await window.GitVaultCrypto.decryptVault(fileData.content, masterPass);
       }
 
       // 4. Save session config
@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (assertion) {
           // Decrypt master password using stored biometric key
-          const rawItems = await window.GitPassCrypto.decryptVault(
+          const rawItems = await window.GitVaultCrypto.decryptVault(
             credConfig.gitpass_biometric_payload,
             credConfig.gitpass_biometric_id
           );
@@ -348,11 +348,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const cred = await navigator.credentials.create({
           publicKey: {
             challenge: challenge,
-            rp: { name: 'Git-Pass Vault' },
+            rp: { name: 'Git-Vault' },
             user: {
               id: userId,
               name: activeSession.username || 'vault-user',
-              displayName: activeSession.username || 'Git-Pass User'
+              displayName: activeSession.username || 'Git-Vault User'
             },
             pubKeyCredParams: [
               { alg: -7, type: 'public-key' },  // ES256
@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (cred) {
           const credIdB64 = arrayBufferToBase64(cred.rawId);
           // Protect master password with credential ID key
-          const encryptedMaster = await window.GitPassCrypto.encryptVault(
+          const encryptedMaster = await window.GitVaultCrypto.encryptVault(
             [activeSession.masterPassword],
             credIdB64
           );
@@ -395,7 +395,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       isUnlocked: true,
       isDemo: true,
       username: 'demo-user',
-      repo: 'git-pass-demo-vault',
+      repo: 'git-vault-demo-vault',
       token: 'demo_token',
       filename: 'passwords.txt',
       masterPassword: 'DemoMasterPass123!',
@@ -481,7 +481,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         url: first.url,
         totp_secret: '',
         category: 'Logins',
-        notes: 'Auto-captured by Git-Pass extension',
+        notes: 'Auto-captured by Git-Vault extension',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -491,8 +491,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       if (!activeSession.isDemo) {
         try {
-          const encrypted = await window.GitPassCrypto.encryptVault(activeSession.items, activeSession.masterPassword);
-          await window.GitPassGitHub.commitRepoFile(
+          const encrypted = await window.GitVaultCrypto.encryptVault(activeSession.items, activeSession.masterPassword);
+          await window.GitVaultGitHub.commitRepoFile(
             activeSession.token,
             activeSession.username,
             activeSession.repo,
@@ -694,7 +694,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   btnQuickGenInAdd.addEventListener('click', () => {
-    const pwd = window.GitPassCrypto.generatePassword({ length: 20 });
+    const pwd = window.GitVaultCrypto.generatePassword({ length: 20 });
     addPassword.value = pwd;
     addPassword.type = 'text';
     showToast('Strong password generated!');
@@ -728,7 +728,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       // 1. Fetch latest file to prevent SHA mismatch
-      const latestFile = await window.GitPassGitHub.fetchRepoFile(
+      const latestFile = await window.GitVaultGitHub.fetchRepoFile(
         activeSession.token,
         activeSession.username,
         activeSession.repo,
@@ -737,23 +737,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       let currentItems = [];
       if (latestFile.content) {
-        currentItems = await window.GitPassCrypto.decryptVault(latestFile.content, activeSession.masterPassword);
+        currentItems = await window.GitVaultCrypto.decryptVault(latestFile.content, activeSession.masterPassword);
       }
 
       // 2. Prepend new item
       currentItems.unshift(newItem);
 
       // 3. Encrypt payload
-      const encryptedPayload = await window.GitPassCrypto.encryptVault(currentItems, activeSession.masterPassword);
+      const encryptedPayload = await window.GitVaultCrypto.encryptVault(currentItems, activeSession.masterPassword);
 
       // 4. Commit to GitHub
-      const newSha = await window.GitPassGitHub.commitRepoFile(
+      const newSha = await window.GitVaultGitHub.commitRepoFile(
         activeSession.token,
         activeSession.username,
         activeSession.repo,
         activeSession.filename,
         encryptedPayload,
-        `Add credential for ${newItem.title} via Git-Pass WebExtension`,
+        `Add credential for ${newItem.title} via Git-Vault WebExtension`,
         latestFile.sha
       );
 
@@ -782,7 +782,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const len = parseInt(genLength.value, 10);
     genLengthVal.textContent = len;
 
-    const pwd = window.GitPassCrypto.generatePassword({
+    const pwd = window.GitVaultCrypto.generatePassword({
       length: len,
       upper: genUpper.checked,
       lower: genLower.checked,
