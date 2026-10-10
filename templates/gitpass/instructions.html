@@ -130,13 +130,34 @@
       </div>
     </div>
 
+    <!-- Step 6: Browser Extension (Optional) -->
+    <div class="card-glass step-card">
+      <div class="step-badge-col">
+        <div class="step-number-badge">6</div>
+      </div>
+      <div class="step-body">
+        <h2 class="step-title">Browser WebExtension (Chrome, Edge & Brave)</h2>
+        <p class="step-text">
+          Want to access and save credentials directly from your browser toolbar while browsing? Use the included <strong>Git-Pass WebExtension</strong>:
+        </p>
+        <div class="credentials-checklist mt-2">
+          <li>Open <code>chrome://extensions</code> or <code>edge://extensions</code> in your browser.</li>
+          <li>Turn on <strong>Developer Mode</strong> in the top right.</li>
+          <li>Click <strong>Load unpacked</strong> and select the <code>extension</code> folder in this project directory.</li>
+        </div>
+        <p class="step-subtext" style="margin-top: 0.75rem;">
+          Features 1-click active site detection, 1-click password copy, instant strong password generator, and direct AES-256-GCM encryption synced with your GitHub repo!
+        </p>
+      </div>
+    </div>
+
   </div>
 
   <!-- Bottom CTA -->
-  <div class="cta-bottom-row">
-    <a href="{% url 'gitpass:login' %}" class="btn-primary-large cta-btn">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-      <span>Ready? Go to Login & Connect</span>
+  <div class="cta-bottom-row" style="margin-top: 2.5rem; display: flex; justify-content: center;">
+    <a href="{% url 'gitpass:login' %}" class="btn-stark-white" style="max-width: 22rem; text-decoration: none;">
+      <svg width="18" height="18" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+      <span>Ready? Go to Sign In & Connect</span>
     </a>
   </div>
 
