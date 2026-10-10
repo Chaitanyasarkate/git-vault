@@ -1,5 +1,11 @@
 /**
  * Git-Pass WebExtension Popup Controller
+ * Features:
+ * - AES-256-GCM + PBKDF2 Zero-Knowledge Local Decryption
+ * - WebAuthn Biometric Unlock (Touch ID, Windows Hello, Fingerprint)
+ * - Built-in 2FA / TOTP Authenticator with Live Rolling Codes
+ * - Browser Auto-Capture Sync Queue
+ * - Password Generator & 1-Click Autofill
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -11,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   const headerActions = document.getElementById('headerActions');
   const headerRepoTag = document.getElementById('headerRepoTag');
+  const btnToggleBiometrics = document.getElementById('btnToggleBiometrics');
   const btnLockVault = document.getElementById('btnLockVault');
   const btnOpenWeb = document.getElementById('btnOpenWeb');
   
@@ -24,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const unlockSubtitle = document.getElementById('unlockSubtitle');
   const btnToggleSettings = document.getElementById('btnToggleSettings');
   const btnQuickDemo = document.getElementById('btnQuickDemo');
+  const btnBiometricUnlock = document.getElementById('btnBiometricUnlock');
   
   const currentTabBox = document.getElementById('currentTabBox');
   const currentDomainLabel = document.getElementById('currentDomainLabel');
@@ -39,6 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const addUsername = document.getElementById('addUsername');
   const addPassword = document.getElementById('addPassword');
   const addUrl = document.getElementById('addUrl');
+  const addTotp = document.getElementById('addTotp');
   const addNotes = document.getElementById('addNotes');
   const btnBackFromAdd = document.getElementById('btnBackFromAdd');
   const btnQuickGenInAdd = document.getElementById('btnQuickGenInAdd');
@@ -56,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   const toastMessage = document.getElementById('toastMessage');
 
-  // In-Memory Active Session
+  // Active Session in memory
   let activeSession = {
     isUnlocked: false,
     isDemo: false,
@@ -71,6 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let currentTabUrl = '';
   let currentTabDomain = '';
+  let totpIntervalId = null;
 
   // 1. Check Active Browser Tab Domain
   try {
@@ -94,8 +104,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     'gitpass_repo',
     'gitpass_token',
     'gitpass_filename',
-    'gitpass_cached_master'
+    'gitpass_cached_master',
+    'gitpass_biometric_enabled',
+    'gitpass_biometric_id',
+    'gitpass_biometric_payload'
   ]);
+
+  // Check Biometrics Availability
+  if (stored.gitpass_biometric_enabled && stored.gitpass_biometric_id && btnBiometricUnlock) {
+    btnBiometricUnlock.classList.remove('hidden');
+  }
 
   if (stored.gitpass_user && stored.gitpass_repo && stored.gitpass_token) {
     setupUsername.value = stored.gitpass_user;
@@ -106,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     unlockSubtitle.textContent = `Connected to github.com/${stored.gitpass_user}/${stored.gitpass_repo}`;
     btnToggleSettings.textContent = 'Edit GitHub Settings';
 
-    // Auto-unlock if session password cached
+    // Auto-unlock if cached in session
     if (stored.gitpass_cached_master) {
       unlockMasterPassword.value = stored.gitpass_cached_master;
       performUnlock();
@@ -167,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 3. Unlock Logic
+  // 3. Unlock Form Submission
   formUnlock.addEventListener('submit', async (e) => {
     e.preventDefault();
     await performUnlock();
@@ -205,7 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         items = await window.GitPassCrypto.decryptVault(fileData.content, masterPass);
       }
 
-      // 4. Save credentials to storage (PAT & user, but NOT master password)
+      // 4. Save session config
       await setLocalStorage({
         gitpass_user: username,
         gitpass_repo: repo,
@@ -224,79 +242,218 @@ document.addEventListener('DOMContentLoaded', async () => {
         filename,
         masterPassword: masterPass,
         fileSha: fileData.sha,
-        items: items || []
+        items
       };
 
+      // 6. Transition to Vault View
       headerRepoTag.textContent = `${username}/${repo}`;
       headerActions.style.display = 'flex';
       renderVaultItems();
       showView(viewVault);
-      showToast(`Unlocked ${activeSession.items.length} passwords!`);
+      showToast(`Decrypted ${items.length} passwords from GitHub!`);
+      
+      // Start live TOTP generator loop
+      startTotpLoop();
+
+      // Check pending auto-captures
+      checkPendingCaptures();
+
     } catch (err) {
-      showToast(err.message, true);
+      showToast(`Unlock failed: ${err.message}`, true);
     }
   }
 
-  // Quick Demo Mode
+  // =========================================================================
+  // WebAuthn Biometric Unlock (Touch ID, Windows Hello, Fingerprint)
+  // =========================================================================
+  if (btnBiometricUnlock) {
+    btnBiometricUnlock.addEventListener('click', async () => {
+      if (!window.PublicKeyCredential) {
+        showToast('WebAuthn is not supported in this browser.', true);
+        return;
+      }
+
+      const credConfig = await getLocalStorage(['gitpass_biometric_id', 'gitpass_biometric_payload']);
+      if (!credConfig.gitpass_biometric_id || !credConfig.gitpass_biometric_payload) {
+        showToast('No biometric credential registered.', true);
+        return;
+      }
+
+      showToast('Scan fingerprint or Face ID...', false);
+
+      try {
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+
+        const assertion = await navigator.credentials.get({
+          publicKey: {
+            challenge: challenge,
+            allowCredentials: [{
+              id: base64ToArrayBuffer(credConfig.gitpass_biometric_id),
+              type: 'public-key'
+            }],
+            userVerification: 'required',
+            timeout: 60000
+          }
+        });
+
+        if (assertion) {
+          // Decrypt master password using stored biometric key
+          const rawItems = await window.GitPassCrypto.decryptVault(
+            credConfig.gitpass_biometric_payload,
+            credConfig.gitpass_biometric_id
+          );
+          if (rawItems && rawItems[0]) {
+            unlockMasterPassword.value = rawItems[0];
+            await performUnlock();
+            showToast('Biometric unlock verified!');
+          }
+        }
+      } catch (err) {
+        showToast(`Biometric verification cancelled: ${err.message}`, true);
+      }
+    });
+  }
+
+  // Toggle/Register Biometrics from Header
+  if (btnToggleBiometrics) {
+    btnToggleBiometrics.addEventListener('click', async () => {
+      if (!activeSession.isUnlocked) return;
+      if (!window.PublicKeyCredential) {
+        showToast('WebAuthn biometrics not supported on this device.', true);
+        return;
+      }
+
+      const conf = await getLocalStorage(['gitpass_biometric_enabled']);
+      if (conf.gitpass_biometric_enabled) {
+        if (confirm('Disable Biometric Unlock for this browser?')) {
+          await setLocalStorage({
+            gitpass_biometric_enabled: false,
+            gitpass_biometric_id: '',
+            gitpass_biometric_payload: ''
+          });
+          btnBiometricUnlock?.classList.add('hidden');
+          showToast('Biometric unlock disabled.');
+        }
+        return;
+      }
+
+      showToast('Touch sensor / Windows Hello to enroll...', false);
+
+      try {
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        const userId = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
+
+        const cred = await navigator.credentials.create({
+          publicKey: {
+            challenge: challenge,
+            rp: { name: 'Git-Pass Vault' },
+            user: {
+              id: userId,
+              name: activeSession.username || 'vault-user',
+              displayName: activeSession.username || 'Git-Pass User'
+            },
+            pubKeyCredParams: [
+              { alg: -7, type: 'public-key' },  // ES256
+              { alg: -257, type: 'public-key' } // RS256
+            ],
+            authenticatorSelection: {
+              authenticatorAttachment: 'platform',
+              userVerification: 'required'
+            },
+            timeout: 60000
+          }
+        });
+
+        if (cred) {
+          const credIdB64 = arrayBufferToBase64(cred.rawId);
+          // Protect master password with credential ID key
+          const encryptedMaster = await window.GitPassCrypto.encryptVault(
+            [activeSession.masterPassword],
+            credIdB64
+          );
+
+          await setLocalStorage({
+            gitpass_biometric_enabled: true,
+            gitpass_biometric_id: credIdB64,
+            gitpass_biometric_payload: encryptedMaster
+          });
+
+          btnBiometricUnlock?.classList.remove('hidden');
+          showToast('Biometric unlock enabled! Use fingerprint / Windows Hello.');
+        }
+      } catch (err) {
+        showToast(`Enrollment failed: ${err.message}`, true);
+      }
+    });
+  }
+
+  // Instant Demo Mode
   btnQuickDemo.addEventListener('click', () => {
     activeSession = {
       isUnlocked: true,
       isDemo: true,
       username: 'demo-user',
-      repo: 'git-vault-demo',
-      token: 'mock-token',
+      repo: 'git-pass-demo-vault',
+      token: 'demo_token',
       filename: 'passwords.txt',
       masterPassword: 'DemoMasterPass123!',
       fileSha: 'demo-sha',
       items: [
         {
-          id: '1',
+          id: crypto.randomUUID(),
           title: 'GitHub',
-          username: 'octocat@github.com',
-          password: 'ghp_mock_demo_token_12345',
+          username: 'developer@github.com',
+          password: 'ghp_mock_token_demo_123',
+          totp_secret: 'JBSWY3DPEHPK3PXP',
           url: 'https://github.com',
           category: 'Work',
-          notes: 'Developer account'
+          notes: 'Primary developer account'
         },
         {
-          id: '2',
-          title: 'Google Workspace',
-          username: 'admin@workspace.com',
+          id: crypto.randomUUID(),
+          title: 'Google',
+          username: 'admin@google.com',
           password: 'xK9!mQ7#vL2$pZ8*',
+          totp_secret: '',
           url: 'https://accounts.google.com',
           category: 'Work',
-          notes: 'Corporate admin'
+          notes: 'Company workspace'
         },
         {
-          id: '3',
+          id: crypto.randomUUID(),
           title: 'ProtonMail',
           username: 'privacy_user@proton.me',
           password: 'T7@wP9$qR3!zY6#m',
+          totp_secret: 'HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ',
           url: 'https://mail.proton.me',
           category: 'Personal',
-          notes: 'Encrypted email'
+          notes: 'Encrypted private mail'
         }
       ]
     };
 
-    headerRepoTag.textContent = 'Demo Mode';
+    headerRepoTag.textContent = 'demo-user/demo-vault';
     headerActions.style.display = 'flex';
     renderVaultItems();
     showView(viewVault);
-    showToast('Loaded demo vault session!');
+    showToast('Demo vault active in memory!');
+    startTotpLoop();
   });
 
   // Lock Vault
   btnLockVault.addEventListener('click', async () => {
     activeSession = { isUnlocked: false, items: [] };
-    await setLocalStorage({ gitpass_cached_master: '' });
     unlockMasterPassword.value = '';
     headerActions.style.display = 'none';
+    if (totpIntervalId) clearInterval(totpIntervalId);
+    await setLocalStorage({ gitpass_cached_master: '' });
     showView(viewUnlock);
     showToast('Vault locked.');
   });
 
-  // Open Full Web Dashboard
+  // Open Full Web App
   btnOpenWeb.addEventListener('click', () => {
     if (chrome && chrome.tabs) {
       chrome.tabs.create({ url: 'http://localhost:8000/' });
@@ -305,12 +462,64 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 4. Render Vault Items & Filter
-  function renderVaultItems(filterQuery = '') {
+  // =========================================================================
+  // Check Pending Auto-Captures
+  // =========================================================================
+  async function checkPendingCaptures() {
+    const data = await getLocalStorage(['gitpass_pending_captures']);
+    const captures = data.gitpass_pending_captures || [];
+    if (captures.length === 0) return;
+
+    const first = captures[0];
+    const confirmSave = confirm(`Auto-Captured Login Detected:\n\nSite: ${first.title}\nUser: ${first.username}\n\nAdd and encrypt this credential to your GitHub repository now?`);
+    if (confirmSave) {
+      const newItem = {
+        id: crypto.randomUUID(),
+        title: first.title,
+        username: first.username,
+        password: first.password,
+        url: first.url,
+        totp_secret: '',
+        category: 'Logins',
+        notes: 'Auto-captured by Git-Pass extension',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      activeSession.items.unshift(newItem);
+      renderVaultItems();
+      
+      if (!activeSession.isDemo) {
+        try {
+          const encrypted = await window.GitPassCrypto.encryptVault(activeSession.items, activeSession.masterPassword);
+          await window.GitPassGitHub.commitRepoFile(
+            activeSession.token,
+            activeSession.username,
+            activeSession.repo,
+            activeSession.filename,
+            encrypted,
+            `Auto-capture credential for ${newItem.title}`,
+            activeSession.fileSha
+          );
+          showToast(`Saved & committed ${newItem.title} to GitHub!`);
+        } catch (e) {
+          showToast(`Commit failed: ${e.message}`, true);
+        }
+      } else {
+        showToast(`Saved ${newItem.title} in demo session!`);
+      }
+    }
+
+    // Clear queue
+    await setLocalStorage({ gitpass_pending_captures: [] });
+  }
+
+  // =========================================================================
+  // 4. Render Vault Items & Built-in 2FA Live Authenticator
+  // =========================================================================
+  async function renderVaultItems(filterQuery = '') {
     vaultList.innerHTML = '';
     const q = filterQuery.toLowerCase().trim();
-
-    // Check if items match current domain first
     const items = activeSession.items || [];
     let sortedItems = [...items];
 
@@ -341,7 +550,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    filtered.forEach(item => {
+    for (const item of filtered) {
       const card = document.createElement('div');
       card.className = 'vault-item-card';
 
@@ -351,6 +560,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       );
 
       const avatarInitials = (item.title || 'VA').slice(0, 2).toUpperCase();
+
+      let totpHtml = '';
+      if (item.totp_secret) {
+        const totpData = await computeTotpCode(item.totp_secret);
+        const codeDisplay = totpData ? `${totpData.code.slice(0, 3)} ${totpData.code.slice(3)}` : '------';
+        const remaining = totpData ? totpData.remaining : 30;
+
+        totpHtml = `
+          <div class="totp-auth-pill mt-2 p-2 rounded-xl bg-slate-900/80 border border-emerald-500/30 flex items-center justify-between" id="ext-totp-${item.id}" data-secret="${escapeHtml(item.totp_secret)}" style="margin-top: 0.5rem; padding: 0.45rem 0.65rem; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span id="ext-sec-${item.id}" style="font-size: 10px; font-weight: 800; color: #34d399; font-family: monospace; border: 1px solid rgba(52, 211, 153, 0.4); padding: 1px 4px; border-radius: 6px;">${remaining}s</span>
+              <div>
+                <div style="font-size: 8px; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.05em;">2FA Code</div>
+                <div id="ext-code-${item.id}" style="font-size: 13px; font-family: monospace; font-weight: 800; color: #ffffff; letter-spacing: 0.12em;">${codeDisplay}</div>
+              </div>
+            </div>
+            <button type="button" class="action-chip-btn btn-copy-totp" data-item="${item.id}" style="padding: 2px 7px; font-size: 10px; color: #34d399; border-color: rgba(52, 211, 153, 0.4);">Copy 2FA</button>
+          </div>
+        `;
+      }
 
       card.innerHTML = `
         <div class="item-top-row">
@@ -376,33 +605,72 @@ document.addEventListener('DOMContentLoaded', async () => {
             <button type="button" class="action-chip-btn btn-copy-pwd" title="Copy Password">Copy</button>
           </div>
         </div>
+
+        ${totpHtml}
       `;
 
       // Copy username
-      card.querySelector('.btn-copy-user').addEventListener('click', () => {
+      card.querySelector('.btn-copy-user')?.addEventListener('click', () => {
         copyText(item.username, 'Username copied!');
       });
 
       // Toggle password
       const pwdEl = card.querySelector(`#pwd-${item.id}`);
       let isRevealed = false;
-      card.querySelector('.btn-toggle-pwd').addEventListener('click', () => {
+      card.querySelector('.btn-toggle-pwd')?.addEventListener('click', () => {
         isRevealed = !isRevealed;
         pwdEl.textContent = isRevealed ? item.password : '••••••••••••';
       });
 
       // Copy password
-      card.querySelector('.btn-copy-pwd').addEventListener('click', () => {
+      card.querySelector('.btn-copy-pwd')?.addEventListener('click', () => {
         copyText(item.password, 'Password copied!');
       });
 
+      // Copy TOTP 2FA code
+      card.querySelector('.btn-copy-totp')?.addEventListener('click', () => {
+        const codeEl = card.querySelector(`#ext-code-${item.id}`);
+        if (codeEl) {
+          const raw = codeEl.textContent.replace(/\s+/g, '');
+          copyText(raw, '2FA Authenticator code copied!');
+        }
+      });
+
       vaultList.appendChild(card);
-    });
+    }
   }
 
   vaultSearch.addEventListener('input', (e) => {
     renderVaultItems(e.target.value);
   });
+
+  // Start live rolling TOTP loop
+  function startTotpLoop() {
+    if (totpIntervalId) clearInterval(totpIntervalId);
+    totpIntervalId = setInterval(async () => {
+      const totpCards = document.querySelectorAll('.totp-auth-pill');
+      if (totpCards.length === 0) return;
+
+      const epoch = Math.floor(Date.now() / 1000);
+      const remaining = 30 - (epoch % 30);
+
+      for (const el of totpCards) {
+        const itemId = el.id.replace('ext-totp-', '');
+        const secret = el.getAttribute('data-secret');
+        const secEl = document.getElementById(`ext-sec-${itemId}`);
+        const codeEl = document.getElementById(`ext-code-${itemId}`);
+
+        if (secEl) secEl.textContent = `${remaining}s`;
+
+        if (remaining === 30 || remaining === 1) {
+          const res = await computeTotpCode(secret);
+          if (res && codeEl) {
+            codeEl.textContent = `${res.code.slice(0, 3)} ${res.code.slice(3)}`;
+          }
+        }
+      }
+    }, 1000);
+  }
 
   // 5. Add Credential View
   btnShowAddView.addEventListener('click', () => {
@@ -441,6 +709,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       username: addUsername.value.trim(),
       password: addPassword.value,
       url: addUrl.value.trim(),
+      totp_secret: addTotp.value.trim(),
       category: 'Logins',
       notes: addNotes.value.trim(),
       created_at: new Date().toISOString(),
@@ -452,7 +721,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       if (activeSession.isDemo) {
         activeSession.items.unshift(newItem);
-        renderVaultItems();
+        await renderVaultItems();
         showView(viewVault);
         showToast('Credential saved in demo session!');
         return;
@@ -491,7 +760,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       activeSession.fileSha = newSha;
       activeSession.items = currentItems;
 
-      renderVaultItems();
+      await renderVaultItems();
       showView(viewVault);
       showToast(`Encrypted & committed ${newItem.title} to GitHub!`);
     } catch (err) {
@@ -533,7 +802,67 @@ document.addEventListener('DOMContentLoaded', async () => {
     copyText(genResultText.textContent, 'Generated password copied!');
   });
 
-  // Helpers
+  // =========================================================================
+  // Cryptographic RFC 6238 TOTP Engine
+  // =========================================================================
+  function base32Decode(str) {
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    let cleaned = str.replace(/[\s=-]/g, '').toUpperCase();
+    let bits = 0, val = 0;
+    const bytes = [];
+    for (let i = 0; i < cleaned.length; i++) {
+      const idx = alphabet.indexOf(cleaned[i]);
+      if (idx === -1) continue;
+      val = (val << 5) | idx;
+      bits += 5;
+      if (bits >= 8) {
+        bytes.push((val >>> (bits - 8)) & 255);
+        bits -= 8;
+      }
+    }
+    return new Uint8Array(bytes);
+  }
+
+  async function computeTotpCode(secretOrUri, timeStep = 30) {
+    if (!secretOrUri) return null;
+    try {
+      let secret = secretOrUri.trim();
+      if (secret.startsWith('otpauth://')) {
+        const u = new URL(secret);
+        secret = u.searchParams.get('secret') || secret;
+      }
+
+      const keyBytes = base32Decode(secret);
+      if (keyBytes.length === 0) return null;
+
+      const epoch = Math.floor(Date.now() / 1000);
+      const counter = Math.floor(epoch / timeStep);
+      const remaining = timeStep - (epoch % timeStep);
+
+      const counterBuf = new ArrayBuffer(8);
+      const view = new DataView(counterBuf);
+      view.setUint32(4, counter, false);
+
+      const cryptoKey = await window.crypto.subtle.importKey(
+        'raw', keyBytes, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']
+      );
+      const signature = await window.crypto.subtle.sign('HMAC', cryptoKey, counterBuf);
+      const sigBytes = new Uint8Array(signature);
+      const offset = sigBytes[sigBytes.length - 1] & 0x0f;
+      const code = ((sigBytes[offset] & 0x7f) << 24 |
+                    (sigBytes[offset + 1] & 0xff) << 16 |
+                    (sigBytes[offset + 2] & 0xff) << 8 |
+                    (sigBytes[offset + 3] & 0xff)) % 1000000;
+      return {
+        code: String(code).padStart(6, '0'),
+        remaining: remaining
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  // Utilities
   function capitalize(str) {
     if (!str) return '';
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -544,6 +873,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  function arrayBufferToBase64(buffer) {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+  }
+
+  function base64ToArrayBuffer(base64) {
+    const binaryString = window.atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
   }
 
   function getLocalStorage(keys) {

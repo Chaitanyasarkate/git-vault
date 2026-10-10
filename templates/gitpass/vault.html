@@ -50,6 +50,23 @@
         <span>Generator</span>
       </button>
 
+      <!-- Security Health Audit Badge -->
+      <button type="button" onclick="openSecurityAuditModal()" class="btn-vault-secondary" id="openAuditBtn" title="Breach Health Audit & Password Strength Dashboard">
+        <span class="inline-flex items-center justify-center w-2 h-2 rounded-full {% if audit_summary.health_score >= 80 %}bg-emerald-400{% elif audit_summary.health_score >= 60 %}bg-teal-400{% else %}bg-amber-400{% endif %} mr-1.5 animate-pulse"></span>
+        <svg width="15" height="15" class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+        <span>Health: <strong id="auditScorePill" class="text-white">{{ audit_summary.health_score|default:"100" }}%</strong></span>
+      </button>
+
+      <!-- Time Machine Button -->
+      <button type="button" onclick="openTimeMachineModal()" class="btn-vault-secondary" id="openTimeMachineBtn" title="Git Commit Time-Machine: Browse snapshots & restore passwords">
+        <svg width="15" height="15" class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Time Machine</span>
+      </button>
+
       <!-- Raw Ciphertext View -->
       <a href="{% url 'gitpass:raw_vault' %}" target="_blank" rel="noopener noreferrer" class="btn-vault-secondary" title="Inspect raw encrypted payload on GitHub">
         <svg width="16" height="16" class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,8 +225,35 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                     </svg>
                   </button>
-                </div>
               </div>
+
+              <!-- Built-in 2FA / TOTP Authenticator Component -->
+              {% if item.totp_secret %}
+                <div class="totp-auth-box" id="totp-box-{{ item.id }}" data-totp-secret="{{ item.totp_secret }}">
+                  <div class="flex items-center gap-2.5 overflow-hidden">
+                    <div class="totp-timer-ring">
+                      <svg class="totp-timer-svg" viewBox="0 0 36 36">
+                        <circle class="totp-timer-circle-bg" cx="18" cy="18" r="15.915" />
+                        <circle id="totp-ring-{{ item.id }}" class="totp-timer-circle-val" cx="18" cy="18" r="15.915" stroke-dasharray="100, 100" stroke-dashoffset="0" />
+                      </svg>
+                      <span id="totp-sec-{{ item.id }}" class="absolute text-[8px] font-mono font-bold text-emerald-300">{{ item.totp_remaining|default:"30" }}</span>
+                    </div>
+                    <div class="overflow-hidden">
+                      <div class="text-[9px] uppercase font-bold text-slate-400 tracking-wider">2FA Authenticator</div>
+                      <div class="totp-code-digits truncate" id="totp-code-{{ item.id }}">
+                        {% if item.totp_code %}
+                          {{ item.totp_code|slice:":3" }} {{ item.totp_code|slice:"3:" }}
+                        {% else %}
+                          ------
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <button type="button" onclick="copyTotpCode('{{ item.id }}')" class="btn-vault-secondary" style="padding: 0.25rem 0.55rem; font-size: 0.72rem; color: var(--emerald-300); border-color: rgba(16, 185, 129, 0.4);" title="Copy 2FA Code">
+                    Copy 2FA
+                  </button>
+                </div>
+              {% endif %}
 
               {% if item.notes %}
                 <p class="text-xs text-slate-400 mt-2 px-1 leading-relaxed" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
@@ -343,6 +387,15 @@
       </div>
       
       <div class="form-group-vault">
+        <div class="flex items-center justify-between mb-1">
+          <label class="form-label-vault" style="margin-bottom: 0;">2FA / TOTP Secret Key (Optional)</label>
+          <span class="text-[11px] text-slate-400">Live 6-digit rolling code</span>
+        </div>
+        {{ cred_form.totp_secret }}
+        <p class="text-[11px] text-slate-500 mt-1">Paste Base32 key (e.g. JBSWY3DPEHPK3PXP) or otpauth://totp/ URI.</p>
+      </div>
+
+      <div class="form-group-vault">
         <label class="form-label-vault">Notes</label>
         {{ cred_form.notes }}
       </div>
@@ -475,6 +528,113 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- 5. Breach Health Audit & Password Strength Modal -->
+<div id="auditModal" class="modal-backdrop hidden">
+  <div class="modal-dialog" style="max-width: 34rem;">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <svg width="20" height="20" class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+        <span>Breach Health & Security Audit</span>
+      </h3>
+      <button type="button" onclick="closeModal('auditModal')" class="modal-close-btn" title="Close">&times;</button>
+    </div>
+
+    <!-- Radial Circular Gauge -->
+    <div class="audit-gauge-wrapper">
+      <svg class="audit-gauge-svg" viewBox="0 0 140 140">
+        <circle class="audit-gauge-bg" cx="70" cy="70" r="58" />
+        <circle id="auditGaugeCircle" class="audit-gauge-progress" cx="70" cy="70" r="58" stroke-dasharray="364.4" stroke-dashoffset="36.4" />
+      </svg>
+      <div class="audit-gauge-center">
+        <span id="auditGaugeScoreVal" class="text-3xl font-extrabold text-white font-mono">{{ audit_summary.health_score|default:"100" }}%</span>
+        <span id="auditGaugeGradeVal" class="text-xs font-bold text-emerald-400 uppercase tracking-widest mt-0.5">{{ audit_summary.grade|default:"A+" }} Rating</span>
+      </div>
+    </div>
+
+    <!-- 4 Metric Stat Cards -->
+    <div class="audit-metric-grid">
+      <div class="audit-metric-card">
+        <div class="audit-metric-label">Total Accounts</div>
+        <div class="audit-metric-value text-white" id="auditTotalCount">{{ total_count }}</div>
+      </div>
+      <div class="audit-metric-card">
+        <div class="audit-metric-label">Breaches</div>
+        <div class="audit-metric-value text-red-400" id="auditBreachedCount">0</div>
+      </div>
+      <div class="audit-metric-card">
+        <div class="audit-metric-label">Weak Passwords</div>
+        <div class="audit-metric-value text-amber-400" id="auditWeakCount">{{ weak_count }}</div>
+      </div>
+      <div class="audit-metric-card">
+        <div class="audit-metric-label">Reused Passwords</div>
+        <div class="audit-metric-value text-orange-400" id="auditReusedCount">0</div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-xs font-bold text-slate-300">Vault Credentials Breakdown</span>
+      <span class="text-[11px] text-slate-400" id="auditStatusText">Local strength analysis ready.</span>
+    </div>
+
+    <!-- Items Audit List -->
+    <div id="auditItemsList" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+      <div class="text-center text-slate-400 py-4 text-xs">Click Deep Breach Audit to check against HaveIBeenPwned.</div>
+    </div>
+
+    <div class="modal-footer" style="margin-top: 1.25rem;">
+      <button type="button" onclick="closeModal('auditModal')" class="btn-vault-secondary">Close</button>
+      <button type="button" id="runDeepAuditBtn" onclick="loadSecurityAudit(true)" class="btn-vault-primary flex items-center gap-2">
+        <svg width="15" height="15" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        <span>Run Deep Breach Audit (k-Anonymity)</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 6. Commit Time-Machine & Rollback Modal -->
+<div id="timeMachineModal" class="modal-backdrop hidden">
+  <div class="modal-dialog" style="max-width: 35rem;">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <svg width="20" height="20" class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Commit Time-Machine & Rollback</span>
+      </h3>
+      <button type="button" onclick="closeModal('timeMachineModal')" class="modal-close-btn" title="Close">&times;</button>
+    </div>
+
+    <p class="text-xs text-slate-400 mb-3 leading-relaxed">
+      Browse historical Git commits modifying <code class="text-cyan-300 font-mono">{{ github_filename }}</code> in your private repository. Preview previous snapshots and restore past passwords with zero server storage.
+    </p>
+
+    <!-- Timeline of Commits -->
+    <div class="time-machine-timeline" id="timeMachineList">
+      <div class="text-center text-slate-400 py-6 text-xs">Loading commits...</div>
+    </div>
+
+    <!-- Commit Snapshot Preview Box -->
+    <div id="commitPreviewContainer" class="commit-preview-box hidden">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+        <span class="text-xs font-bold text-cyan-300" id="commitPreviewMeta">Snapshot Preview</span>
+        <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Encrypted on GitHub</span>
+      </div>
+      <div id="commitPreviewItems" class="mt-2 text-xs"></div>
+    </div>
+
+    <div class="modal-footer" style="margin-top: 1.25rem;">
+      <button type="button" onclick="closeModal('timeMachineModal')" class="btn-vault-secondary">Cancel</button>
+      <button type="button" id="restoreCommitBtn" onclick="rollbackToCommit()" disabled class="btn-primary" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; padding: 0.6rem 1.15rem; border-radius: 0.75rem; font-weight: 600; font-size: 0.8125rem;">
+        Restore this Version
+      </button>
+    </div>
   </div>
 </div>
 

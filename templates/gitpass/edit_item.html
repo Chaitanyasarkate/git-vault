@@ -52,6 +52,15 @@
       </div>
       
       <div class="form-group-vault">
+        <div class="flex items-center justify-between mb-1">
+          <label class="form-label-vault" style="margin-bottom: 0;">2FA / TOTP Secret Key (Optional)</label>
+          <span class="text-[11px] text-slate-400">Live 6-digit rolling code</span>
+        </div>
+        {{ form.totp_secret }}
+        <p class="text-[11px] text-slate-500 mt-1">Paste Base32 key (e.g. JBSWY3DPEHPK3PXP) or otpauth://totp/ URI.</p>
+      </div>
+
+      <div class="form-group-vault">
         <label class="form-label-vault">Notes</label>
         {{ form.notes }}
       </div>

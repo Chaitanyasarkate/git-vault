@@ -25,11 +25,16 @@ from .github_api import (
     update_or_create_repo_file,
     verify_repo_access,
     delete_repository,
+    list_file_commits,
+    get_file_at_commit,
     GitHubError,
     GitHubAuthError,
     GitHubRepoNotFoundError,
     GitHubPermissionError,
 )
+from .security_audit import audit_vault_credentials, calculate_password_strength
+from .totp import generate_totp_code
+
 
 
 def require_session(view_func):
@@ -125,6 +130,7 @@ def login_view(request):
                     "title": "GitHub",
                     "username": "developer@github.com",
                     "password": "ghp_secure_mock_token_12345",
+                    "totp_secret": "JBSWY3DPEHPK3PXP",
                     "url": "https://github.com",
                     "category": "Work",
                     "notes": "Primary work development account",
@@ -136,6 +142,7 @@ def login_view(request):
                     "title": "Google Workspace",
                     "username": "admin@company.com",
                     "password": "xK9!mQ7#vL2$pZ8*",
+                    "totp_secret": "",
                     "url": "https://accounts.google.com",
                     "category": "Work",
                     "notes": "2FA backup codes stored offline",
@@ -147,12 +154,36 @@ def login_view(request):
                     "title": "ProtonMail",
                     "username": "privacy_user@proton.me",
                     "password": "T7@wP9$qR3!zY6#m",
+                    "totp_secret": "HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ",
                     "url": "https://mail.proton.me",
                     "category": "Personal",
                     "notes": "Encrypted personal email",
                     "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                     "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 }
+            ]
+            request.session["demo_commits"] = [
+                {
+                    "sha": "a1b2c3d4e5f678901234567890abcdef12345678",
+                    "short_sha": "a1b2c3d",
+                    "message": "Git-Pass: Update ProtonMail 2FA secret",
+                    "author": "demo-user",
+                    "date": (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=15)).isoformat(),
+                },
+                {
+                    "sha": "f9e8d7c6b5a432109876543210fedcba87654321",
+                    "short_sha": "f9e8d7c",
+                    "message": "Git-Pass: Add Google Workspace credentials",
+                    "author": "demo-user",
+                    "date": (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=2)).isoformat(),
+                },
+                {
+                    "sha": "0123456789abcdef0123456789abcdef01234567",
+                    "short_sha": "0123456",
+                    "message": "Git-Pass: Initialize encrypted password vault",
+                    "author": "demo-user",
+                    "date": (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=1)).isoformat(),
+                },
             ]
             messages.success(request, "Welcome to Demo Mode! Changes are kept in temporary session memory.")
             return redirect("gitpass:vault")
@@ -261,10 +292,26 @@ def vault_view(request):
     if selected_cat and selected_cat != "All":
         filtered_items = [i for i in filtered_items if i.get("category") == selected_cat]
 
-    # Analytics / Security stats
+    # Analytics / Security stats & TOTP computation
     categories = sorted(list(set(i.get("category", "Logins") for i in items)))
     total_count = len(items)
     weak_count = sum(1 for i in items if len(i.get("password", "")) < 12)
+
+    # Attach live TOTP generation for items with 2FA secret
+    for item in filtered_items:
+        secret = item.get("totp_secret", "")
+        if secret:
+            totp_res = generate_totp_code(secret)
+            item["totp_code"] = totp_res["code"]
+            item["totp_remaining"] = totp_res["seconds_remaining"]
+            item["totp_valid"] = totp_res["valid"]
+        else:
+            item["totp_code"] = None
+            item["totp_remaining"] = 0
+            item["totp_valid"] = False
+
+    # Quick local vault security analysis for header shield score (no network delay)
+    audit_summary = audit_vault_credentials(items, check_breaches=False)
 
     cred_form = CredentialForm()
     pw_change_form = ChangeMasterPasswordForm()
@@ -274,6 +321,7 @@ def vault_view(request):
         "items": filtered_items,
         "total_count": total_count,
         "weak_count": weak_count,
+        "audit_summary": audit_summary,
         "categories": categories,
         "selected_cat": selected_cat or "All",
         "search_q": search_q,
@@ -302,6 +350,7 @@ def add_item_view(request):
                     "title": form.cleaned_data["title"].strip(),
                     "username": form.cleaned_data["username"].strip(),
                     "password": form.cleaned_data["password"],
+                    "totp_secret": form.cleaned_data.get("totp_secret", "").strip(),
                     "url": form.cleaned_data.get("url", "").strip(),
                     "category": form.cleaned_data.get("category", "Logins"),
                     "notes": form.cleaned_data.get("notes", "").strip(),
@@ -341,6 +390,7 @@ def edit_item_view(request, item_id: str):
                 target_item["title"] = form.cleaned_data["title"].strip()
                 target_item["username"] = form.cleaned_data["username"].strip()
                 target_item["password"] = form.cleaned_data["password"]
+                target_item["totp_secret"] = form.cleaned_data.get("totp_secret", "").strip()
                 target_item["url"] = form.cleaned_data.get("url", "").strip()
                 target_item["category"] = form.cleaned_data.get("category", "Logins")
                 target_item["notes"] = form.cleaned_data.get("notes", "").strip()
@@ -520,6 +570,164 @@ def api_generate_password(request):
     return JsonResponse({"password": pwd})
 
 
+@require_session
+def api_audit_vault(request):
+    """
+    Audits active vault for password strength, reuse, and breaches (k-Anonymity).
+    """
+    try:
+        items, _ = _get_active_vault(request)
+        check_breaches = request.GET.get("check_breaches", "true").lower() == "true"
+        audit_result = audit_vault_credentials(items, check_breaches=check_breaches)
+        return JsonResponse(audit_result)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+@require_session
+def api_totp_code(request):
+    """
+    Generates rolling 6-digit TOTP code and countdown for a given secret or item.
+    """
+    secret = request.GET.get("secret", "").strip()
+    item_id = request.GET.get("item_id", "").strip()
+
+    if not secret and item_id:
+        try:
+            items, _ = _get_active_vault(request)
+            item = next((i for i in items if i.get("id") == item_id), None)
+            if item:
+                secret = item.get("totp_secret", "")
+        except Exception:
+            pass
+
+    if not secret:
+        return JsonResponse({"error": "No TOTP secret provided.", "code": "", "seconds_remaining": 0}, status=400)
+
+    result = generate_totp_code(secret)
+    return JsonResponse(result)
+
+
+@require_session
+def api_time_machine_commits(request):
+    """
+    Fetches the historical Git commit timeline for passwords.txt.
+    """
+    if request.session.get("is_demo"):
+        commits = request.session.get("demo_commits", [])
+        return JsonResponse({"commits": commits, "is_demo": True})
+
+    try:
+        token = request.session["github_token"]
+        owner = request.session["github_username"]
+        repo = request.session["github_repo"]
+        filename = request.session["github_filename"]
+
+        commits = list_file_commits(token, owner, repo, filename)
+        return JsonResponse({"commits": commits, "is_demo": False})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+@require_session
+def api_time_machine_preview(request):
+    """
+    Decrypts and returns items from a historical Git commit snapshot without saving.
+    """
+    commit_sha = request.GET.get("commit_sha", "").strip()
+    if not commit_sha:
+        return JsonResponse({"error": "commit_sha is required"}, status=400)
+
+    if request.session.get("is_demo"):
+        items = request.session.get("demo_vault", [])
+        return JsonResponse({
+            "success": True,
+            "commit_sha": commit_sha,
+            "items_count": len(items),
+            "items": [{"id": i.get("id"), "title": i.get("title"), "username": i.get("username"), "category": i.get("category")} for i in items],
+            "is_demo": True
+        })
+
+    try:
+        token = request.session["github_token"]
+        owner = request.session["github_username"]
+        repo = request.session["github_repo"]
+        filename = request.session["github_filename"]
+        master_pwd = request.session["master_password"]
+
+        raw_ciphertext = get_file_at_commit(token, owner, repo, filename, commit_sha)
+        if not raw_ciphertext:
+            return JsonResponse({"error": "No file found at this commit."}, status=404)
+
+        historical_items = decrypt_vault(raw_ciphertext, master_pwd)
+        return JsonResponse({
+            "success": True,
+            "commit_sha": commit_sha,
+            "items_count": len(historical_items),
+            "items": [{"id": i.get("id"), "title": i.get("title"), "username": i.get("username"), "category": i.get("category")} for i in historical_items],
+            "is_demo": False
+        })
+    except InvalidMasterPasswordError:
+        return JsonResponse({
+            "error": "Cannot preview this snapshot: it was encrypted with a different master password."
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+@require_session
+def api_time_machine_rollback(request):
+    """
+    Restores the vault to a historical commit snapshot and commits to GitHub.
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "POST method required"}, status=405)
+
+    commit_sha = request.POST.get("commit_sha", "").strip()
+    if not commit_sha:
+        return JsonResponse({"error": "commit_sha is required"}, status=400)
+
+    if request.session.get("is_demo"):
+        return JsonResponse({
+            "success": True,
+            "message": f"Demo vault successfully reverted to snapshot {commit_sha[:7]}!"
+        })
+
+    try:
+        token = request.session["github_token"]
+        owner = request.session["github_username"]
+        repo = request.session["github_repo"]
+        filename = request.session["github_filename"]
+        master_pwd = request.session["master_password"]
+
+        raw_ciphertext = get_file_at_commit(token, owner, repo, filename, commit_sha)
+        if not raw_ciphertext:
+            return JsonResponse({"error": "No file found at this commit."}, status=404)
+
+        # Verify decryption works with current master password
+        restored_items = decrypt_vault(raw_ciphertext, master_pwd)
+
+        # Commit this restored state back to GitHub
+        new_sha = _save_active_vault(
+            request,
+            restored_items,
+            commit_msg=f"Git-Pass: Rollback vault to commit {commit_sha[:7]}"
+        )
+
+        return JsonResponse({
+            "success": True,
+            "message": f"Vault successfully restored to commit {commit_sha[:7]}!",
+            "new_sha": new_sha,
+            "restored_items_count": len(restored_items),
+        })
+    except InvalidMasterPasswordError:
+        return JsonResponse({
+            "error": "Rollback failed: The chosen commit was encrypted with a different master password."
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
 def logout_view(request):
     """Clears the session and disconnects from GitHub."""
     request.session.flush()
@@ -530,3 +738,4 @@ def logout_view(request):
 def health_view(request):
     """Health check endpoint for Render."""
     return JsonResponse({"status": "healthy", "service": "Git-Pass", "zero_server_storage": True})
+

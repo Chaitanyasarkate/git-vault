@@ -15,6 +15,12 @@ urlpatterns = [
     path("vault/export/", views.export_vault_view, name="export_vault"),
     path("vault/raw/", views.raw_vault_view, name="raw_vault"),
     path("api/generate-password/", views.api_generate_password, name="api_generate_password"),
+    path("api/audit-vault/", views.api_audit_vault, name="api_audit_vault"),
+    path("api/totp-code/", views.api_totp_code, name="api_totp_code"),
+    path("api/time-machine/commits/", views.api_time_machine_commits, name="api_time_machine_commits"),
+    path("api/time-machine/preview/", views.api_time_machine_preview, name="api_time_machine_preview"),
+    path("api/time-machine/rollback/", views.api_time_machine_rollback, name="api_time_machine_rollback"),
     path("logout/", views.logout_view, name="logout"),
     path("health/", views.health_view, name="health"),
 ]
+

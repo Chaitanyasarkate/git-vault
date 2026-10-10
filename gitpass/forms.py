@@ -99,6 +99,15 @@ class CredentialForm(forms.Form):
             "class": "form-control",
         })
     )
+    totp_secret = forms.CharField(
+        required=False,
+        label="2FA / TOTP Secret Key (Optional)",
+        widget=forms.TextInput(attrs={
+            "placeholder": "e.g. JBSWY3DPEHPK3PXP or otpauth://totp/...",
+            "class": "form-control font-mono",
+        }),
+        help_text="Paste Base32 secret or otpauth:// URI to generate live 6-digit rolling 2FA codes."
+    )
     category = forms.ChoiceField(
         choices=CATEGORY_CHOICES,
         initial="Logins",

@@ -178,3 +178,64 @@ def delete_repository(token: str, owner: str, repo: str) -> bool:
         raise GitHubRepoNotFoundError("Repository not found or already deleted.")
     else:
         raise GitHubError(f"Failed to delete repository ({resp.status_code}): {resp.text}")
+
+
+def list_file_commits(token: str, owner: str, repo: str, file_path: str = "passwords.txt", limit: int = 15) -> list:
+    """
+    Fetches historical commits for the vault file from the user's GitHub repository.
+    Enables the Time Machine rollback feature.
+    """
+    clean_path = file_path.strip().lstrip("/")
+    url = f"{GITHUB_API_BASE}/repos/{owner.strip()}/{repo.strip()}/commits"
+    params = {"path": clean_path, "per_page": limit}
+
+    try:
+        resp = requests.get(url, params=params, headers=_headers(token), timeout=12)
+    except requests.RequestException as e:
+        raise GitHubError(f"Network error listing commits: {e}")
+
+    if resp.status_code == 404:
+        return []
+    if not resp.ok:
+        raise GitHubError(f"Failed to fetch commit history ({resp.status_code}): {resp.text}")
+
+    commits = []
+    for item in resp.json():
+        sha = item.get("sha", "")
+        commit_info = item.get("commit", {})
+        author_info = commit_info.get("author", {}) or {}
+        commits.append({
+            "sha": sha,
+            "short_sha": sha[:7],
+            "message": commit_info.get("message", "Update vault"),
+            "author": author_info.get("name", "You"),
+            "date": author_info.get("date", ""),
+        })
+    return commits
+
+
+def get_file_at_commit(token: str, owner: str, repo: str, file_path: str, commit_sha: str) -> str:
+    """
+    Retrieves the vault file ciphertext at a specific commit snapshot.
+    """
+    clean_path = file_path.strip().lstrip("/")
+    url = f"{GITHUB_API_BASE}/repos/{owner.strip()}/{repo.strip()}/contents/{clean_path}"
+    params = {"ref": commit_sha.strip()}
+
+    try:
+        resp = requests.get(url, params=params, headers=_headers(token), timeout=12)
+    except requests.RequestException as e:
+        raise GitHubError(f"Network error fetching historical commit: {e}")
+
+    if resp.status_code == 404:
+        return ""
+    if not resp.ok:
+        raise GitHubError(f"Failed to fetch historical commit ({resp.status_code}): {resp.text}")
+
+    data = resp.json()
+    raw_b64 = data.get("content", "")
+    try:
+        return base64.b64decode(raw_b64).decode("utf-8")
+    except Exception as e:
+        raise GitHubError(f"Failed to decode historical commit file content: {e}")
+

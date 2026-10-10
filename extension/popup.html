@@ -30,6 +30,9 @@
 
       <div class="popup-header-actions" id="headerActions" style="display: none;">
         <span class="popup-repo-tag" id="headerRepoTag" title="Connected Repository">repo</span>
+        <button type="button" id="btnToggleBiometrics" class="popup-icon-btn" title="Toggle Biometric Unlock">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004 11m0 0a8 8 0 00.126 1.411m2.775 5.568A9.972 9.972 0 0012 21c2.14 0 4.135-.672 5.776-1.816"/></svg>
+        </button>
         <button type="button" id="btnOpenWeb" class="popup-icon-btn" title="Open Full Web Dashboard">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
         </button>
@@ -76,6 +79,12 @@
 
         <button type="submit" id="btnSubmitUnlock" class="btn-stark-white mt-3">
           <span>Unlock & Load Vault</span>
+        </button>
+
+        <!-- Biometric Unlock Button (WebAuthn Touch ID / Windows Hello) -->
+        <button type="button" id="btnBiometricUnlock" class="btn-dark-pill mt-2 hidden" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004 11m0 0a8 8 0 00.126 1.411m2.775 5.568A9.972 9.972 0 0012 21c2.14 0 4.135-.672 5.776-1.816"/></svg>
+          <span>Unlock with Biometrics</span>
         </button>
 
         <button type="button" id="btnQuickDemo" class="btn-dark-pill mt-2">
@@ -151,6 +160,9 @@
         </div>
         <div class="form-group mt-2">
           <input type="text" id="addUrl" placeholder="Website URL (e.g. https://...)" class="popup-pill-input">
+        </div>
+        <div class="form-group mt-2">
+          <input type="text" id="addTotp" placeholder="2FA / TOTP Secret (Base32 or otpauth://)" class="popup-pill-input">
         </div>
         <div class="form-group mt-2">
           <input type="text" id="addNotes" placeholder="Notes (optional)" class="popup-pill-input">

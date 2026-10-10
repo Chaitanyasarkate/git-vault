@@ -2117,3 +2117,182 @@ button, a, input, select, textarea, .btn-vault-icon, .auth-eye-btn {
   }
 }
 
+/* =========================================================================
+   Feature 1: Security Audit & Health Score Dashboard
+   ========================================================================= */
+.audit-gauge-wrapper {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 1.25rem;
+}
+
+.audit-gauge-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.audit-gauge-bg {
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 8;
+  fill: none;
+}
+
+.audit-gauge-progress {
+  stroke: #10b981;
+  stroke-width: 8;
+  stroke-linecap: round;
+  fill: none;
+  transition: stroke-dashoffset 1s ease-out, stroke 0.4s ease;
+}
+
+.audit-gauge-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.audit-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .audit-metric-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.audit-metric-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 0.85rem 0.75rem;
+  text-align: center;
+}
+
+.audit-metric-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  margin-top: 0.25rem;
+}
+
+.audit-metric-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* =========================================================================
+   Feature 2: Built-in 2FA / TOTP Authenticator
+   ========================================================================= */
+.totp-auth-box {
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(6, 78, 59, 0.12) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.totp-auth-box:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.totp-timer-ring {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.totp-timer-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.totp-timer-circle-bg {
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 3.5;
+  fill: none;
+}
+
+.totp-timer-circle-val {
+  stroke: #10b981;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  fill: none;
+  transition: stroke-dashoffset 1s linear, stroke 0.3s ease;
+}
+
+.totp-code-digits {
+  font-family: var(--font-mono, monospace);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: #ffffff;
+  font-size: 1.05rem;
+  user-select: all;
+}
+
+/* =========================================================================
+   Feature 3: Commit Time-Machine & Rollback
+   ========================================================================= */
+.time-machine-timeline {
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.timeline-commit-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 0.75rem 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timeline-commit-card:hover, .timeline-commit-card.active {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(56, 189, 248, 0.4);
+  transform: translateX(2px);
+}
+
+.timeline-commit-card.active {
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+}
+
+.commit-preview-box {
+  background: rgba(10, 10, 15, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 1rem;
+}
+
+

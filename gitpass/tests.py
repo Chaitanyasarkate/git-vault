@@ -164,3 +164,90 @@ class ViewsTests(TestCase):
         logout_resp = self.client.get(reverse("gitpass:logout"), follow=True)
         self.assertEqual(logout_resp.status_code, 200)
         self.assertContains(logout_resp, "Connect to Your Repository")
+
+
+class AdvancedFeatureTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        # Log into demo mode
+        self.client.post(reverse("gitpass:login"), {"action": "demo"}, follow=True)
+
+    def test_totp_generation(self):
+        from gitpass.totp import generate_totp_code, clean_base32_secret
+        secret = "JBSWY3DPEHPK3PXP"
+        cleaned = clean_base32_secret(secret)
+        self.assertEqual(cleaned, "JBSWY3DPEHPK3PXP")
+
+        totp = generate_totp_code(secret)
+        self.assertTrue(totp["valid"])
+        self.assertEqual(len(totp["code"]), 6)
+        self.assertTrue(totp["code"].isdigit())
+        self.assertGreaterEqual(totp["seconds_remaining"], 1)
+        self.assertLessEqual(totp["seconds_remaining"], 30)
+
+        # Test otpauth:// URI parsing
+        uri = "otpauth://totp/GitHub:developer?secret=JBSWY3DPEHPK3PXP&issuer=GitHub"
+        totp_uri = generate_totp_code(uri)
+        self.assertTrue(totp_uri["valid"])
+        self.assertEqual(totp_uri["code"], totp["code"])
+
+    def test_security_audit_strength(self):
+        from gitpass.security_audit import calculate_password_strength, audit_vault_credentials
+        weak = calculate_password_strength("12345")
+        self.assertEqual(weak["label"], "Weak")
+        self.assertLess(weak["score"], 50)
+
+        strong = calculate_password_strength("xK9!mQ7#vL2$pZ8*kP9@")
+        self.assertIn(strong["label"], ["Strong", "Very Strong"])
+        self.assertGreaterEqual(strong["score"], 70)
+
+        # Test vault audit
+        items = [
+            {"id": "1", "title": "A", "username": "u1", "password": "weak"},
+            {"id": "2", "title": "B", "username": "u2", "password": "weak"},
+            {"id": "3", "title": "C", "username": "u3", "password": "superSecureLongPassword#123!"},
+        ]
+        audit = audit_vault_credentials(items, check_breaches=False)
+        self.assertEqual(audit["total_count"], 3)
+        self.assertEqual(audit["weak_count"], 2)
+        self.assertEqual(audit["reused_count"], 2)
+
+    def test_api_audit_vault_endpoint(self):
+        resp = self.client.get(reverse("gitpass:api_audit_vault") + "?check_breaches=false")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertIn("health_score", data)
+        self.assertIn("grade", data)
+        self.assertIn("items_audit", data)
+
+    def test_api_totp_code_endpoint(self):
+        resp = self.client.get(reverse("gitpass:api_totp_code") + "?secret=JBSWY3DPEHPK3PXP")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data["valid"])
+        self.assertEqual(len(data["code"]), 6)
+
+    def test_api_time_machine_endpoints(self):
+        # 1. Commits list
+        commits_resp = self.client.get(reverse("gitpass:api_time_machine_commits"))
+        self.assertEqual(commits_resp.status_code, 200)
+        commits_data = commits_resp.json()
+        self.assertIn("commits", commits_data)
+        self.assertTrue(commits_data["is_demo"])
+
+        # 2. Snapshot preview
+        preview_resp = self.client.get(reverse("gitpass:api_time_machine_preview") + "?commit_sha=a1b2c3d4e5f6")
+        self.assertEqual(preview_resp.status_code, 200)
+        preview_data = preview_resp.json()
+        self.assertTrue(preview_data["success"])
+        self.assertIn("items", preview_data)
+
+        # 3. Rollback
+        rollback_resp = self.client.post(
+            reverse("gitpass:api_time_machine_rollback"),
+            {"commit_sha": "a1b2c3d4e5f6"}
+        )
+        self.assertEqual(rollback_resp.status_code, 200)
+        rollback_data = rollback_resp.json()
+        self.assertTrue(rollback_data["success"])
+

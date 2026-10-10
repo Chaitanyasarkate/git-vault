@@ -220,4 +220,387 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Initialize live TOTP rolling timers
+  initTotpLiveTimers();
 });
+
+// =========================================================================
+// 7. Built-in 2FA / TOTP Live Countdown & Refresh Engine
+// =========================================================================
+function copyTotpCode(itemId) {
+  const codeEl = document.getElementById(`totp-code-${itemId}`);
+  if (codeEl) {
+    const raw = codeEl.innerText.replace(/\s+/g, '');
+    if (raw && raw !== '------') {
+      copyToClipboard(raw, '2FA Authenticator code copied!');
+    }
+  }
+}
+
+function initTotpLiveTimers() {
+  const totpBoxes = document.querySelectorAll('.totp-auth-box');
+  if (totpBoxes.length === 0) return;
+
+  function updateTimers() {
+    const now = Math.floor(Date.now() / 1000);
+    const timeStep = 30;
+    const remaining = timeStep - (now % timeStep);
+    const strokeDash = ((30 - remaining) / 30) * 100;
+
+    totpBoxes.forEach(box => {
+      const itemId = box.id.replace('totp-box-', '');
+      const secEl = document.getElementById(`totp-sec-${itemId}`);
+      const ringEl = document.getElementById(`totp-ring-${itemId}`);
+
+      if (secEl) secEl.innerText = remaining;
+      if (ringEl) {
+        ringEl.setAttribute('stroke-dasharray', `${100 - strokeDash}, 100`);
+        // Color transition when running low
+        if (remaining <= 5) {
+          ringEl.style.stroke = '#ef4444';
+        } else if (remaining <= 10) {
+          ringEl.style.stroke = '#f59e0b';
+        } else {
+          ringEl.style.stroke = '#10b981';
+        }
+      }
+    });
+
+    // When the 30-second window resets, fetch the fresh codes
+    if (remaining === 30) {
+      refreshAllTotpCodes();
+    }
+  }
+
+  setInterval(updateTimers, 1000);
+  updateTimers();
+}
+
+function refreshAllTotpCodes() {
+  const totpBoxes = document.querySelectorAll('.totp-auth-box');
+  totpBoxes.forEach(box => {
+    const itemId = box.id.replace('totp-box-', '');
+    const secret = box.getAttribute('data-totp-secret');
+    if (!secret) return;
+
+    fetch(`/api/totp-code/?secret=${encodeURIComponent(secret)}&item_id=${encodeURIComponent(itemId)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.code) {
+          const codeEl = document.getElementById(`totp-code-${itemId}`);
+          if (codeEl) {
+            codeEl.innerText = `${data.code.slice(0, 3)} ${data.code.slice(3)}`;
+          }
+        }
+      })
+      .catch(() => {});
+  });
+}
+
+// =========================================================================
+// 8. Breach Health Audit & Password Strength Dashboard
+// =========================================================================
+function openSecurityAuditModal() {
+  openModal('auditModal');
+  loadSecurityAudit(false); // First quick load, then user can click deep check
+}
+
+function loadSecurityAudit(deepCheck = false) {
+  const statusEl = document.getElementById('auditStatusText');
+  const deepBtn = document.getElementById('runDeepAuditBtn');
+  if (statusEl) statusEl.innerText = deepCheck ? 'Running k-Anonymity breach audit against HaveIBeenPwned...' : 'Evaluating password strength and reuse...';
+  if (deepBtn && deepCheck) {
+    deepBtn.disabled = true;
+    deepBtn.classList.add('opacity-50');
+  }
+
+  fetch(`/api/audit-vault/?check_breaches=${deepCheck ? 'true' : 'false'}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        showToast(data.error, 'error');
+        return;
+      }
+      renderAuditResults(data);
+      if (statusEl) {
+        statusEl.innerText = deepCheck ? 'Deep breach audit completed!' : 'Local strength analysis ready. Click below for deep breach verification.';
+      }
+    })
+    .catch(err => {
+      if (statusEl) statusEl.innerText = 'Audit check failed.';
+      showToast('Error checking vault security', 'error');
+    })
+    .finally(() => {
+      if (deepBtn) {
+        deepBtn.disabled = false;
+        deepBtn.classList.remove('opacity-50');
+      }
+    });
+}
+
+function renderAuditResults(data) {
+  // Update Gauge & Grade
+  const score = data.health_score ?? 100;
+  const grade = data.grade ?? 'A+';
+  const scoreValEl = document.getElementById('auditGaugeScoreVal');
+  const gradeEl = document.getElementById('auditGaugeGradeVal');
+  const circleEl = document.getElementById('auditGaugeCircle');
+  const pillScoreEl = document.getElementById('auditScorePill');
+
+  if (scoreValEl) scoreValEl.innerText = `${score}%`;
+  if (gradeEl) gradeEl.innerText = grade;
+  if (pillScoreEl) pillScoreEl.innerText = `${score}%`;
+
+  if (circleEl) {
+    // 2 * PI * r = 2 * 3.14159 * 58 ≈ 364.4
+    const circumference = 364.4;
+    const offset = circumference - (score / 100) * circumference;
+    circleEl.style.strokeDasharray = `${circumference}`;
+    circleEl.style.strokeDashoffset = `${offset}`;
+    if (score >= 80) circleEl.style.stroke = '#10b981';
+    else if (score >= 60) circleEl.style.stroke = '#14b8a6';
+    else if (score >= 40) circleEl.style.stroke = '#f59e0b';
+    else circleEl.style.stroke = '#ef4444';
+  }
+
+  // Update Metric Cards
+  const totalEl = document.getElementById('auditTotalCount');
+  const breachedEl = document.getElementById('auditBreachedCount');
+  const weakEl = document.getElementById('auditWeakCount');
+  const reusedEl = document.getElementById('auditReusedCount');
+
+  if (totalEl) totalEl.innerText = data.total_count ?? 0;
+  if (breachedEl) breachedEl.innerText = data.breached_count ?? 0;
+  if (weakEl) weakEl.innerText = data.weak_count ?? 0;
+  if (reusedEl) reusedEl.innerText = data.reused_count ?? 0;
+
+  // Render Items Breakdown
+  const listEl = document.getElementById('auditItemsList');
+  if (listEl && Array.isArray(data.items_audit)) {
+    if (data.items_audit.length === 0) {
+      listEl.innerHTML = '<div class="text-center text-slate-400 py-4 text-xs">No credentials in vault.</div>';
+      return;
+    }
+
+    listEl.innerHTML = data.items_audit.map(item => {
+      const isBreached = item.breach_count > 0;
+      const isWeak = item.strength?.score < 60;
+      const isReused = item.is_reused;
+
+      let badgeHtml = '';
+      if (isBreached) {
+        badgeHtml += `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-900/60 text-red-300 border border-red-500/40">⚠️ Breached (${item.breach_count.toLocaleString()}x)</span> `;
+      }
+      if (isReused) {
+        badgeHtml += `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-900/60 text-amber-300 border border-amber-500/40">Reused</span> `;
+      }
+      if (isWeak) {
+        badgeHtml += `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-900/60 text-orange-300 border border-orange-500/40">${item.strength?.label || 'Weak'}</span> `;
+      }
+      if (!isBreached && !isReused && !isWeak) {
+        badgeHtml += `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-900/60 text-emerald-300 border border-emerald-500/40">Secure</span>`;
+      }
+
+      return `
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs gap-3">
+          <div class="overflow-hidden">
+            <div class="font-bold text-white truncate">${item.title} <span class="text-slate-400 font-normal">(${item.username})</span></div>
+            <div class="mt-1 flex flex-wrap gap-1">${badgeHtml}</div>
+          </div>
+          <a href="/vault/edit/${item.id}/" class="btn-vault-secondary shrink-0 px-2.5 py-1 text-[11px] font-semibold text-emerald-400">
+            Fix / Edit
+          </a>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+// =========================================================================
+// 9. Commit Time-Machine & Rollback Engine
+// =========================================================================
+let activeTimeMachineCommit = null;
+
+function openTimeMachineModal() {
+  openModal('timeMachineModal');
+  loadTimeMachineCommits();
+}
+
+function loadTimeMachineCommits() {
+  const container = document.getElementById('timeMachineList');
+  const previewBox = document.getElementById('commitPreviewContainer');
+  const restoreBtn = document.getElementById('restoreCommitBtn');
+
+  if (container) container.innerHTML = '<div class="text-center text-slate-400 py-6 text-xs animate-pulse">Loading historical Git commits from repository...</div>';
+  if (previewBox) previewBox.classList.add('hidden');
+  if (restoreBtn) restoreBtn.disabled = true;
+
+  fetch('/api/time-machine/commits/')
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        container.innerHTML = `<div class="text-center text-red-400 py-4 text-xs">${data.error}</div>`;
+        return;
+      }
+      const commits = data.commits || [];
+      if (commits.length === 0) {
+        container.innerHTML = '<div class="text-center text-slate-400 py-4 text-xs">No previous commits found for passwords file.</div>';
+        return;
+      }
+
+      container.innerHTML = commits.map((c, idx) => `
+        <div class="timeline-commit-card ${idx === 0 ? 'active' : ''}" id="commit-card-${c.short_sha}" onclick="selectCommitSnapshot('${c.sha}', '${c.short_sha}', '${escapeHtml(c.message)}')">
+          <div class="overflow-hidden">
+            <div class="text-xs font-bold text-white truncate flex items-center gap-1.5">
+              <span class="font-mono text-cyan-400 text-[11px] px-1.5 py-0.5 rounded bg-cyan-950/70 border border-cyan-800/50">${c.short_sha}</span>
+              <span class="truncate">${c.message}</span>
+            </div>
+            <div class="text-[10px] text-slate-400 mt-1">
+              By ${c.author} • ${formatCommitDate(c.date)}
+            </div>
+          </div>
+          <button type="button" class="btn-vault-secondary px-2 py-1 text-[11px] text-cyan-300">
+            Inspect
+          </button>
+        </div>
+      `).join('');
+
+      // Auto-select the first commit
+      if (commits.length > 0) {
+        selectCommitSnapshot(commits[0].sha, commits[0].short_sha, commits[0].message);
+      }
+    })
+    .catch(() => {
+      if (container) container.innerHTML = '<div class="text-center text-red-400 py-4 text-xs">Failed to load Git history.</div>';
+    });
+}
+
+function selectCommitSnapshot(sha, shortSha, message) {
+  activeTimeMachineCommit = sha;
+  document.querySelectorAll('.timeline-commit-card').forEach(el => el.classList.remove('active'));
+  const activeEl = document.getElementById(`commit-card-${shortSha}`);
+  if (activeEl) activeEl.classList.add('active');
+
+  const previewBox = document.getElementById('commitPreviewContainer');
+  const previewItemsList = document.getElementById('commitPreviewItems');
+  const previewMeta = document.getElementById('commitPreviewMeta');
+  const restoreBtn = document.getElementById('restoreCommitBtn');
+
+  if (previewBox) previewBox.classList.remove('hidden');
+  if (previewMeta) previewMeta.innerText = `Commit ${shortSha}: "${message}"`;
+  if (previewItemsList) previewItemsList.innerHTML = '<div class="text-slate-400 text-xs py-2">Decrypting snapshot ciphertext...</div>';
+  if (restoreBtn) {
+    restoreBtn.disabled = false;
+    restoreBtn.innerText = `Restore Version ${shortSha}`;
+  }
+
+  fetch(`/api/time-machine/preview/?commit_sha=${encodeURIComponent(sha)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        if (previewItemsList) previewItemsList.innerHTML = `<div class="text-red-400 text-xs py-2">${data.error || 'Failed to decrypt.'}</div>`;
+        return;
+      }
+      const items = data.items || [];
+      if (items.length === 0) {
+        if (previewItemsList) previewItemsList.innerHTML = '<div class="text-slate-400 text-xs py-2">Vault was empty at this commit.</div>';
+        return;
+      }
+      if (previewItemsList) {
+        previewItemsList.innerHTML = `
+          <div class="text-[11px] font-bold text-slate-300 mb-1.5">${items.length} credentials in this snapshot:</div>
+          <div class="space-y-1">
+            ${items.map(it => `
+              <div class="flex items-center justify-between text-xs py-1 border-b border-slate-800/80">
+                <span class="font-semibold text-white">${it.title}</span>
+                <span class="text-slate-400 font-mono text-[11px]">${it.username || '-'}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+    })
+    .catch(() => {
+      if (previewItemsList) previewItemsList.innerHTML = '<div class="text-red-400 text-xs py-2">Preview error.</div>';
+    });
+}
+
+function rollbackToCommit() {
+  if (!activeTimeMachineCommit) return;
+  const shortSha = activeTimeMachineCommit.slice(0, 7);
+  if (!confirm(`Are you sure you want to ROLLBACK your vault to commit ${shortSha}?\n\nThis will restore all passwords from that historical snapshot and push a new Git commit to your repository.`)) {
+    return;
+  }
+
+  const restoreBtn = document.getElementById('restoreCommitBtn');
+  if (restoreBtn) {
+    restoreBtn.disabled = true;
+    restoreBtn.innerText = 'Restoring snapshot...';
+  }
+
+  const csrfToken = getCookie('csrftoken');
+  const formData = new FormData();
+  formData.append('commit_sha', activeTimeMachineCommit);
+
+  fetch('/api/time-machine/rollback/', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': csrfToken,
+    },
+    body: formData,
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showToast(data.message || 'Vault restored successfully!');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1200);
+      } else {
+        showToast(data.error || 'Rollback failed', 'error');
+        if (restoreBtn) {
+          restoreBtn.disabled = false;
+          restoreBtn.innerText = `Restore Version ${shortSha}`;
+        }
+      }
+    })
+    .catch(() => {
+      showToast('Network error during rollback', 'error');
+      if (restoreBtn) {
+        restoreBtn.disabled = false;
+        restoreBtn.innerText = `Restore Version ${shortSha}`;
+      }
+    });
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+}
+
+function formatCommitDate(dateStr) {
+  if (!dateStr) return 'Recently';
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return dateStr.slice(0, 10);
+  }
+}
+
