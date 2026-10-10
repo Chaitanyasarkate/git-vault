@@ -132,10 +132,10 @@ code {
 
 /* 2. Top Navigation Bar */
 .navbar-wrapper {
-  border-bottom: 1px solid var(--border-subtle);
-  background: rgba(11, 19, 41, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -163,22 +163,20 @@ code {
 }
 
 .brand-logo-frame {
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 0.75rem;
-  background: linear-gradient(135deg, #10b981, #06b6d4);
-  padding: 2px;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px var(--emerald-glow);
 }
 
 .brand-logo-inner {
   width: 100%;
   height: 100%;
-  background-color: var(--bg-deep);
-  border-radius: 0.65rem;
+  background-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,7 +188,7 @@ code {
 }
 
 .brand-title {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: -0.025em;
   color: #ffffff;
@@ -206,50 +204,50 @@ code {
   letter-spacing: 0.05em;
   padding: 0.15rem 0.5rem;
   border-radius: 9999px;
-  background-color: rgba(16, 185, 129, 0.12);
-  color: var(--emerald-400);
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .brand-tagline {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
 }
 
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
+  gap: 0.75rem;
 }
 
 .nav-btn-secondary {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.5rem 0.875rem;
-  border-radius: 0.65rem;
-  border: 1px solid var(--border-subtle);
-  background-color: rgba(30, 41, 59, 0.5);
+  padding: 0.45rem 0.95rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background-color: rgba(255, 255, 255, 0.04);
   transition: all 0.2s ease;
 }
 
 .nav-btn-secondary:hover {
   color: #ffffff;
-  border-color: rgba(71, 85, 105, 0.8);
-  background-color: rgba(30, 41, 59, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .nav-btn-danger {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.8125rem;
+  font-weight: 600;
   color: #fca5a5;
-  padding: 0.5rem 0.875rem;
-  border-radius: 0.65rem;
-  border: 1px solid rgba(153, 27, 27, 0.5);
-  background-color: rgba(69, 10, 10, 0.3);
+  padding: 0.45rem 0.95rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  background-color: rgba(239, 68, 68, 0.08);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -257,17 +255,37 @@ code {
 }
 
 .nav-btn-danger:hover {
-  background-color: rgba(153, 27, 27, 0.6);
+  background-color: rgba(239, 68, 68, 0.16);
+  border-color: rgba(239, 68, 68, 0.4);
   color: #ffffff;
 }
 
-.card-glass {
-  background-color: rgba(18, 18, 24, 0.7);
+.user-repo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.045);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 1.25rem;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  font-size: 0.8rem;
+}
+
+.repo-pulse-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 9999px;
+  background-color: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+}
+
+.card-glass {
+  background-color: rgba(20, 20, 26, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 24px;
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(40px) saturate(190%);
+  -webkit-backdrop-filter: blur(40px) saturate(190%);
   position: relative;
   overflow: hidden;
 }
@@ -276,49 +294,48 @@ code {
    3. Frosted Glass Authentication UI (Reference Design)
    ========================================================================== */
 
-/* Atmospheric Lighting & Diagonal Spotlight */
+/* Atmospheric Volumetric Spotlight Beam & Soft Radial Glow */
 .auth-page-wrapper {
-  min-height: calc(100vh - 140px);
+  min-height: calc(100vh - 120px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3rem 1.25rem 4.5rem;
+  padding: 2.5rem 1.25rem 4rem;
   position: relative;
   overflow: hidden;
 }
 
 .atmospheric-beam {
   position: fixed;
-  top: -35%;
-  right: -15%;
-  width: 95vw;
-  height: 120vh;
-  background: conic-gradient(
-    from 210deg at 78% 12%,
-    rgba(255, 255, 255, 0) 0deg,
-    rgba(255, 255, 255, 0.05) 20deg,
-    rgba(255, 255, 255, 0.18) 42deg,
-    rgba(255, 255, 255, 0.08) 64deg,
-    rgba(255, 255, 255, 0) 90deg
+  top: -22vh;
+  right: -8vw;
+  width: 72vw;
+  height: 145vh;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(255, 255, 255, 0.04) 45%,
+    rgba(255, 255, 255, 0) 70%
   );
-  filter: blur(55px);
-  transform: rotate(-12deg);
+  clip-path: polygon(55% 0%, 100% 0%, 45% 100%, 0% 100%);
+  filter: blur(46px);
   pointer-events: none;
-  z-index: 1;
-  opacity: 0.95;
+  z-index: 0;
+  opacity: 0.92;
 }
 
 .atmospheric-glow {
   position: fixed;
-  top: 2%;
-  right: 12%;
-  width: 36rem;
-  height: 36rem;
+  top: -12vh;
+  right: 12vw;
+  width: 48vw;
+  height: 48vw;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 40%, transparent 70%);
-  filter: blur(65px);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.035) 45%, transparent 70%);
+  filter: blur(62px);
   pointer-events: none;
-  z-index: 1;
+  z-index: 0;
 }
 
 /* Centered Frosted Glass Card */
@@ -326,23 +343,37 @@ code {
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 26.5rem;
+  max-width: 27rem;
   margin: 0 auto;
 }
 
 .frosted-glass-card {
-  background: rgba(18, 18, 24, 0.68);
+  position: relative;
+  background: rgba(22, 22, 28, 0.72);
   backdrop-filter: blur(40px) saturate(190%);
   -webkit-backdrop-filter: blur(40px) saturate(190%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 28px;
-  padding: 2.75rem 2.25rem 2.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 36px;
+  padding: 3rem 2.25rem 2.5rem;
   box-shadow: 
-    0 40px 80px -15px rgba(0, 0, 0, 0.95),
-    0 0 1px 1px rgba(255, 255, 255, 0.06),
-    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.6);
+    0 40px 90px -15px rgba(0, 0, 0, 0.98),
+    0 0 1px 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.8);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.frosted-glass-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 65%;
+  height: 45%;
+  background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+  border-radius: 36px 36px 0 0;
+  pointer-events: none;
 }
 
 .auth-emblem-wrap {
@@ -378,7 +409,7 @@ code {
 
 /* Fields & Minimalist Inputs */
 .auth-field-group {
-  margin-bottom: 1.15rem;
+  margin-bottom: 0.95rem;
 }
 
 .auth-field-label {
@@ -397,9 +428,16 @@ code {
   margin-bottom: 0.4rem;
 }
 
+.auth-meta-link-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.35rem;
+  padding-right: 0.75rem;
+}
+
 .auth-sub-link {
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(255, 255, 255, 0.42);
   transition: color 0.15s ease;
   text-decoration: none;
 }
@@ -408,28 +446,31 @@ code {
   text-decoration: underline;
 }
 
-.auth-form .form-control {
+.auth-form .form-control,
+.auth-pill-input {
   width: 100%;
-  padding: 0.85rem 1.15rem;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 0.88rem 1.25rem;
+  background: rgba(255, 255, 255, 0.055);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  border-radius: 9999px;
   font-size: 0.86rem;
   color: #ffffff;
   outline: none;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
-.auth-form .form-control:focus {
-  background: rgba(255, 255, 255, 0.085);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+.auth-form .form-control:focus,
+.auth-pill-input:focus {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
 }
 
-.auth-form .form-control::placeholder {
+.auth-form .form-control::placeholder,
+.auth-pill-input::placeholder {
   color: rgba(255, 255, 255, 0.28);
+  font-size: 0.84rem;
 }
 
 .auth-input-action-wrapper {
@@ -951,12 +992,18 @@ code {
   display: flex;
   align-items: flex-start;
   gap: 1.25rem;
-  padding: 1.75rem;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  padding: 2rem;
+  background: rgba(20, 20, 26, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  backdrop-filter: blur(40px) saturate(190%);
+  -webkit-backdrop-filter: blur(40px) saturate(190%);
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.95), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
 }
 
 .step-card:hover {
-  border-color: rgba(16, 185, 129, 0.4);
+  border-color: rgba(255, 255, 255, 0.22);
   transform: translateY(-2px);
 }
 
@@ -965,18 +1012,17 @@ code {
 }
 
 .step-number-badge {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2));
-  border: 1px solid rgba(16, 185, 129, 0.4);
-  color: var(--emerald-400);
-  font-size: 1rem;
-  font-weight: 800;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px var(--emerald-glow);
 }
 
 .step-body {
@@ -1004,35 +1050,35 @@ code {
 }
 
 .token-btn-row {
-  margin: 0.875rem 0;
+  margin: 1rem 0;
 }
 
 .btn-token-link {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1.15rem;
-  border-radius: 0.65rem;
-  background-color: rgba(30, 41, 59, 0.8);
-  border: 1px solid var(--border-subtle);
-  color: var(--emerald-300);
-  font-size: 0.8125rem;
-  font-weight: 600;
+  gap: 0.6rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: 9999px;
+  background-color: #ffffff;
+  border: none;
+  color: #000000;
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.2);
   transition: all 0.2s ease;
 }
 
 .btn-token-link:hover {
-  background-color: rgba(51, 65, 85, 0.9);
-  color: #ffffff;
-  border-color: var(--emerald-500);
+  background-color: #f1f5f9;
   transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.3);
 }
 
 .callout-box-amber {
-  background-color: rgba(69, 26, 3, 0.35);
-  border: 1px solid rgba(217, 119, 6, 0.4);
-  border-radius: 0.75rem;
-  padding: 1rem 1.25rem;
+  background-color: rgba(245, 158, 11, 0.07);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+  border-radius: 18px;
+  padding: 1.1rem 1.35rem;
   margin-top: 0.85rem;
 }
 
@@ -1152,8 +1198,8 @@ code {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 @media (min-width: 1024px) {
@@ -1170,44 +1216,44 @@ code {
   align-items: center;
   gap: 0.625rem;
   font-size: 0.75rem;
-  color: var(--text-muted);
-  margin-bottom: 0.4rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.5rem;
 }
 
 .status-synced-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.2rem 0.65rem;
+  gap: 0.45rem;
+  padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  background-color: rgba(16, 185, 129, 0.12);
-  color: var(--emerald-400);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
   font-weight: 600;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  font-size: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.72rem;
 }
 
 .status-dot-pulse {
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 0.45rem;
+  height: 0.45rem;
   border-radius: 9999px;
-  background-color: var(--emerald-400);
-  box-shadow: 0 0 8px var(--emerald-400);
+  background-color: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.85);
 }
 
 .status-demo-pill {
-  padding: 0.2rem 0.65rem;
+  padding: 0.25rem 0.75rem;
   border-radius: 9999px;
-  background-color: rgba(245, 158, 11, 0.12);
-  color: var(--amber-400);
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 600;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  font-size: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 0.72rem;
 }
 
 .vault-repo-label {
   font-family: var(--font-mono);
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.65);
 }
 
 .vault-main-title {
@@ -1221,13 +1267,13 @@ code {
 }
 
 .vault-count-badge {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  color: var(--text-muted);
-  padding: 0.25rem 0.65rem;
-  border-radius: 0.5rem;
-  background-color: rgba(30, 41, 59, 0.7);
-  border: 1px solid var(--border-subtle);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
 }
 
 /* 3. Vault Toolbar Actions */
@@ -1242,43 +1288,43 @@ code {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1.15rem;
-  border-radius: 0.75rem;
-  font-size: 0.84rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
   font-weight: 700;
-  color: #030712;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #000000;
+  background: #ffffff;
+  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.2);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   border: none;
   cursor: pointer;
 }
 
 .btn-vault-primary:hover {
-  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+  background: #f1f5f9;
   transform: translateY(-1px);
+  box-shadow: 0 6px 26px rgba(255, 255, 255, 0.32);
 }
 
 .btn-vault-secondary {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 0.95rem;
-  border-radius: 0.75rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  background-color: rgba(15, 23, 42, 0.8);
-  border: 1px solid var(--border-subtle);
+  padding: 0.65rem 1.15rem;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .btn-vault-secondary:hover {
   color: #ffffff;
-  border-color: rgba(71, 85, 105, 0.8);
-  background-color: rgba(30, 41, 59, 0.9);
+  background-color: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.18);
   transform: translateY(-1px);
 }
 
@@ -1286,20 +1332,20 @@ code {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.45rem;
-  height: 2.45rem;
-  border-radius: 0.75rem;
-  color: var(--text-muted);
-  background-color: rgba(15, 23, 42, 0.8);
-  border: 1px solid var(--border-subtle);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  color: rgba(255, 255, 255, 0.65);
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .btn-vault-icon:hover {
   color: #ffffff;
-  border-color: rgba(71, 85, 105, 0.8);
-  background-color: rgba(30, 41, 59, 0.9);
+  background-color: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.18);
   transform: translateY(-1px);
 }
 
@@ -1311,16 +1357,17 @@ code {
 
 .dropdown-menu {
   position: absolute;
-  top: calc(100% + 0.35rem);
+  top: calc(100% + 0.4rem);
   right: 0;
-  background-color: #0b1329;
-  border: 1px solid rgba(51, 65, 85, 0.8);
-  border-radius: 0.875rem;
-  box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.5);
-  padding: 0.4rem;
+  background-color: rgba(18, 18, 24, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.9), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+  padding: 0.5rem;
   z-index: 50;
   display: none;
   min-width: 13rem;
+  backdrop-filter: blur(30px);
   animation: dropdownFade 0.15s ease-out;
 }
 
@@ -1340,11 +1387,11 @@ code {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0.55rem 0.85rem;
-  border-radius: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 12px;
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.75);
   transition: all 0.15s ease;
   width: 100%;
   text-align: left;
@@ -1354,7 +1401,7 @@ code {
 }
 
 .dropdown-item:hover {
-  background-color: rgba(30, 41, 59, 0.8);
+  background-color: rgba(255, 255, 255, 0.08);
   color: #ffffff;
 }
 
@@ -1369,7 +1416,7 @@ code {
 
 .dropdown-divider {
   height: 1px;
-  background-color: rgba(51, 65, 85, 0.5);
+  background-color: rgba(255, 255, 255, 0.08);
   margin: 0.35rem 0;
 }
 
@@ -1378,7 +1425,7 @@ code {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 1.5rem;
+  margin-top: 1.75rem;
 }
 
 @media (min-width: 640px) {
@@ -1398,9 +1445,9 @@ code {
 .vault-search-icon {
   position: absolute;
   top: 50%;
-  left: 0.875rem;
+  left: 1rem;
   transform: translateY(-50%);
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.4);
   pointer-events: none;
   display: flex;
   align-items: center;
@@ -1408,27 +1455,28 @@ code {
 
 .vault-search-input {
   width: 100%;
-  padding: 0.625rem 2.25rem 0.625rem 2.5rem;
-  background-color: #0b1329;
-  border: 1px solid var(--border-subtle);
-  border-radius: 0.75rem;
-  font-size: 0.84rem;
+  padding: 0.72rem 2.25rem 0.72rem 2.6rem;
+  background-color: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9999px;
+  font-size: 0.85rem;
   color: #ffffff;
   outline: none;
   transition: all 0.2s ease;
 }
 
 .vault-search-input:focus {
-  border-color: var(--emerald-500);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
 }
 
 .vault-search-clear {
   position: absolute;
   top: 50%;
-  right: 0.75rem;
+  right: 0.85rem;
   transform: translateY(-50%);
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.4);
   font-size: 1.25rem;
   line-height: 1;
   background: none;
@@ -1443,109 +1491,64 @@ code {
 .category-tabs {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
   overflow-x: auto;
   padding-bottom: 0.25rem;
 }
 
 .category-tab {
-  padding: 0.4rem 0.85rem;
-  border-radius: 0.625rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  padding: 0.45rem 1.05rem;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 500;
   white-space: nowrap;
-  border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
-  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.035);
   transition: all 0.15s ease;
 }
 
 .category-tab:hover {
   color: #ffffff;
-  border-color: rgba(71, 85, 105, 0.8);
-  background: rgba(30, 41, 59, 0.8);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .category-tab.active {
-  background: rgba(16, 185, 129, 0.15);
-  color: var(--emerald-300);
-  border-color: rgba(16, 185, 129, 0.4);
-}
-
-/* 6. Empty Vault State */
-.empty-vault-card {
-  text-align: center;
-  padding: 4.5rem 1.5rem;
-  background: radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.06), transparent 70%), rgba(11, 19, 41, 0.6);
-  border: 1px solid var(--border-subtle);
-  border-radius: 1.25rem;
-  backdrop-filter: blur(12px);
-  margin-top: 2rem;
-}
-
-.empty-vault-icon-frame {
-  width: 4.5rem;
-  height: 4.5rem;
-  border-radius: 1.25rem;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  color: var(--emerald-400);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.5rem;
-  box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.2);
-}
-
-.empty-vault-title {
-  font-size: 1.25rem;
+  background: #ffffff;
+  color: #000000;
   font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 0.5rem;
+  border-color: #ffffff;
+  box-shadow: 0 2px 12px rgba(255, 255, 255, 0.2);
 }
 
-.empty-vault-text {
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  max-width: 28rem;
-  margin: 0 auto 1.75rem;
-  line-height: 1.6;
-}
-
-.empty-actions-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-/* 7. Vault Credential Cards Grid */
+/* 6. Empty Vault State & Cards Grid */
 .vault-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.25rem;
-  margin-top: 1.5rem;
+  margin-top: 1.75rem;
 }
 
 .vault-card {
-  background-color: rgba(11, 19, 41, 0.75);
-  border: 1px solid var(--border-subtle);
-  border-radius: 1rem;
-  padding: 1.25rem;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  background: rgba(18, 18, 24, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 1.5rem;
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.95), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
-              border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
-              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(12px);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.2s ease, 
+              box-shadow 0.2s ease;
+  backdrop-filter: blur(40px) saturate(190%);
+  -webkit-backdrop-filter: blur(40px) saturate(190%);
 }
 
 .vault-card:hover {
-  border-color: rgba(16, 185, 129, 0.4);
-  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.6), 0 0 16px -2px var(--emerald-glow);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 35px 70px -12px rgba(0, 0, 0, 0.98), 0 0 25px rgba(255, 255, 255, 0.04);
   transform: translateY(-2px);
 }
 
@@ -1558,26 +1561,26 @@ code {
 }
 
 .vault-card-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
-  border: 1px solid rgba(51, 65, 85, 0.6);
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 0.85rem;
-  color: var(--emerald-400);
+  color: #ffffff;
   flex-shrink: 0;
 }
 
 .vault-card-pill-row {
   margin: 0.65rem 0;
-  padding: 0.6rem 0.75rem;
-  border-radius: 0.75rem;
-  background-color: rgba(3, 7, 18, 0.7);
-  border: 1px solid rgba(51, 65, 85, 0.4);
+  padding: 0.65rem 0.85rem;
+  border-radius: 14px;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1590,14 +1593,14 @@ code {
 .vault-card-bottom {
   padding-top: 0.875rem;
   margin-top: 0.75rem;
-  border-top: 1px solid rgba(51, 65, 85, 0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 0.75rem;
 }
 
-/* 8. Modal Backdrop & Dialog System (STRICT POSITIONING) */
+/* 7. Modal System */
 .modal-backdrop {
   position: fixed !important;
   inset: 0 !important;
@@ -1607,9 +1610,9 @@ code {
   bottom: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
-  background-color: rgba(3, 7, 18, 0.85) !important;
-  backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
+  background-color: rgba(0, 0, 0, 0.82) !important;
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -1623,22 +1626,23 @@ code {
 }
 
 .modal-dialog {
-  background-color: #0c1427 !important;
-  border: 1px solid rgba(51, 65, 85, 0.8) !important;
-  border-radius: 1.25rem !important;
+  background: rgba(18, 18, 24, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 28px !important;
   max-width: 32rem !important;
   width: 100% !important;
-  padding: 1.75rem !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 40px rgba(16, 185, 129, 0.08) !important;
+  padding: 2.25rem 2rem !important;
+  box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.95), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.2) !important;
   position: relative !important;
   animation: modalPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
   max-height: 90vh !important;
   overflow-y: auto !important;
+  backdrop-filter: blur(40px) saturate(190%) !important;
 }
 
 .modal-dialog-danger {
-  border-color: rgba(185, 28, 28, 0.6) !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 40px rgba(239, 68, 68, 0.1) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.95), 0 0 35px rgba(239, 68, 68, 0.12) !important;
 }
 
 @keyframes modalPopIn {

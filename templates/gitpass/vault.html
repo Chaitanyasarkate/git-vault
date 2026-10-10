@@ -249,30 +249,43 @@
       </div>
 
     {% else %}
-      <!-- Empty Vault State -->
-      <div class="empty-vault-card">
-        <div class="empty-vault-icon-frame">
-          <svg width="32" height="32" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-          </svg>
-        </div>
-        <h3 class="empty-vault-title">Your GitHub Vault is Empty</h3>
-        <p class="empty-vault-text">
-          Add your first credential. Every item is encrypted with AES-256-GCM using your master password and committed directly to your private GitHub repository.
-        </p>
-        <div class="empty-actions-row">
-          <button type="button" onclick="openModal('addModal')" class="btn-vault-primary">
-            <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+      <!-- Empty Vault State (Frosted Glass Card matching Reference) -->
+      <div class="auth-card-container" style="max-width: 28rem; margin: 3.5rem auto;">
+        <div class="frosted-glass-card" style="text-align: center;">
+          
+          <!-- Geometric Segmented Cipher Emblem -->
+          <div class="auth-emblem-wrap">
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" class="auth-emblem-svg">
+              <circle cx="12" cy="12" r="9" stroke="rgba(255, 255, 255, 0.85)" stroke-width="1.8" stroke-dasharray="3.2 3.2" stroke-linecap="round"/>
+              <circle cx="12" cy="12" r="3.5" fill="#ffffff"/>
+              <circle cx="12" cy="5" r="1.2" fill="#ffffff"/>
+              <circle cx="12" cy="19" r="1.2" fill="#ffffff"/>
+              <circle cx="5" cy="12" r="1.2" fill="#ffffff"/>
+              <circle cx="19" cy="12" r="1.2" fill="#ffffff"/>
             </svg>
-            <span>Add First Password</span>
-          </button>
-          <button type="button" onclick="openModal('generatorModal')" class="btn-vault-secondary">
-            <svg width="16" height="16" class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-            </svg>
-            <span>Generate Secure Password</span>
-          </button>
+          </div>
+
+          <h3 class="auth-title" style="font-size: 1.45rem; margin-bottom: 0.5rem;">Your GitHub Vault is Empty</h3>
+          <p class="auth-subtitle" style="margin-bottom: 2rem;">
+            Add your first credential. Every item is encrypted with AES-256-GCM using your master password and committed directly to your private GitHub repository.
+          </p>
+
+          <div class="auth-action-block" style="margin-top: 0;">
+            <button type="button" onclick="openModal('addModal')" class="btn-stark-white" style="margin-bottom: 0.85rem;">
+              <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+              </svg>
+              <span>Add First Password</span>
+            </button>
+
+            <button type="button" onclick="openModal('generatorModal')" class="btn-dark-pill">
+              <svg width="16" height="16" class="w-4 h-4 text-white shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+              </svg>
+              <span>Generate Secure Password</span>
+            </button>
+          </div>
+
         </div>
       </div>
     {% endif %}
