@@ -1829,3 +1829,291 @@ textarea.form-control {
 ::-webkit-scrollbar-track { background: var(--bg-deep); }
 ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.6); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(71, 85, 105, 0.9); }
+
+/* ==========================================================================
+   13. Responsive & Multi-Device Comfort Overhauls (Mobile, Tablet, Desktop)
+   ========================================================================== */
+
+/* Universal Viewport, Touch & Overflow Constraints */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+}
+
+button, a, input, select, textarea, .btn-vault-icon, .auth-eye-btn {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Two Column Form Grid with Clean Stacking */
+.form-row-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 540px) {
+  .form-row-2col {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
+
+/* iOS Safari Auto-Zoom Prevention */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="search"],
+  select,
+  textarea,
+  .form-control,
+  .vault-search-input,
+  .auth-pill-input {
+    font-size: 16px !important;
+  }
+}
+
+/* Responsive Header & Navigation */
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 0 1rem;
+    height: 3.85rem;
+  }
+  .brand-tagline {
+    display: none !important;
+  }
+  .brand-title {
+    font-size: 1.05rem;
+  }
+  .brand-badge {
+    display: none !important;
+  }
+  .user-repo-badge {
+    max-width: 140px;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.75rem;
+  }
+  .user-repo-badge span.font-mono {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 85px;
+    display: inline-block;
+  }
+  .nav-btn-secondary,
+  .nav-btn-danger {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-container {
+    padding: 0 0.75rem;
+    height: 3.5rem;
+  }
+  .brand-link {
+    gap: 0.5rem;
+  }
+  .brand-emblem-wrap svg {
+    width: 22px;
+    height: 22px;
+  }
+  .brand-title {
+    font-size: 0.95rem;
+  }
+  .nav-actions {
+    gap: 0.35rem;
+  }
+  .nav-btn-secondary span,
+  .nav-btn-danger span {
+    display: none;
+  }
+  .nav-btn-secondary,
+  .nav-btn-danger {
+    padding: 0.45rem;
+    border-radius: 9999px;
+    min-width: 2.25rem;
+    min-height: 2.25rem;
+    justify-content: center;
+  }
+}
+
+/* Atmospheric Beam Device Adaptations */
+@media (max-width: 768px) {
+  .atmospheric-beam {
+    top: -15vh;
+    right: -25vw;
+    width: 95vw;
+    height: 120vh;
+    filter: blur(36px);
+    opacity: 0.8;
+  }
+  .atmospheric-glow {
+    top: -8vh;
+    right: -5vw;
+    width: 65vw;
+    height: 65vw;
+    filter: blur(42px);
+    opacity: 0.8;
+  }
+}
+
+/* Authentication Screen Mobile Comfort */
+@media (max-width: 639px) {
+  .auth-page-wrapper {
+    padding: 1.5rem 1rem 3rem;
+    min-height: calc(100vh - 80px);
+  }
+  .auth-card-container {
+    max-width: 100%;
+  }
+  .frosted-glass-card {
+    padding: 2.25rem 1.35rem 2rem;
+    border-radius: 28px;
+  }
+  .auth-title {
+    font-size: 1.45rem;
+  }
+  .auth-subtitle {
+    font-size: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+  .auth-form .form-control,
+  .auth-pill-input {
+    padding: 0.85rem 1.15rem;
+    min-height: 48px;
+  }
+  .btn-stark-white,
+  .btn-dark-pill {
+    min-height: 48px;
+    font-size: 0.88rem;
+  }
+}
+
+/* Vault Dashboard Multi-Device Comfort */
+@media (max-width: 768px) {
+  .vault-header-row {
+    padding-bottom: 1.25rem;
+    gap: 1rem;
+  }
+  .vault-main-title {
+    font-size: 1.45rem;
+  }
+  .vault-actions-bar {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .vault-actions-bar .btn-vault-primary {
+    width: 100%;
+    justify-content: center;
+    padding: 0.8rem 1.25rem;
+    font-size: 0.9rem;
+    order: -1;
+  }
+  .vault-actions-bar .btn-vault-secondary,
+  .vault-actions-bar .dropdown button {
+    flex: 1 1 auto;
+    justify-content: center;
+    padding: 0.6rem 0.85rem;
+    font-size: 0.78rem;
+    min-height: 42px;
+  }
+  .vault-filter-row {
+    margin-top: 1.25rem;
+    gap: 0.85rem;
+  }
+  .vault-search-wrapper {
+    max-width: 100%;
+  }
+  .category-tabs {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.4rem;
+  }
+  .category-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .vault-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1024px) {
+  .vault-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .vault-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.35rem;
+  }
+}
+
+/* Modal Dialogs Mobile Responsiveness */
+@media (max-width: 639px) {
+  .modal-backdrop {
+    padding: 0.75rem !important;
+    align-items: flex-end !important;
+  }
+  .modal-dialog {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 1.75rem 1.25rem 1.5rem !important;
+    border-radius: 26px 26px 18px 18px !important;
+    max-height: 88vh !important;
+  }
+  .modal-footer {
+    flex-direction: column-reverse;
+    gap: 0.6rem;
+  }
+  .modal-footer button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* Setup Instructions Mobile Responsiveness */
+@media (max-width: 639px) {
+  .instructions-wrapper {
+    padding: 1.5rem 1rem 3rem;
+  }
+  .instructions-title {
+    font-size: 1.85rem;
+  }
+  .instructions-subtitle {
+    font-size: 0.85rem;
+  }
+  .step-card {
+    padding: 1.35rem 1.15rem;
+    gap: 0.85rem;
+    border-radius: 22px;
+  }
+  .step-number-badge {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.95rem;
+  }
+  .step-title {
+    font-size: 1.05rem;
+  }
+  .btn-token-link {
+    width: 100%;
+    justify-content: center;
+    padding: 0.8rem 1rem;
+  }
+}
+
