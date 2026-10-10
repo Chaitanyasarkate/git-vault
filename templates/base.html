@@ -12,11 +12,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Custom Self-Contained CSS (Zero CDN Dependencies) -->
-  <link rel="stylesheet" href="{% static 'css/gitpass.css' %}?v=5.0">
+  <link rel="stylesheet" href="{% static 'css/gitpass.css' %}?v=6.0">
   
   {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-[#030712] text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+<body class="bg-black text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-white selection:text-black">
 
   <!-- Top Navigation Header -->
   <header class="navbar-wrapper">
@@ -111,7 +111,7 @@
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 pointer-events-none"></div>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-900 bg-[#02050e] py-8 mt-16 text-center text-xs text-slate-500">
+  <footer class="border-t border-white/5 bg-black py-8 mt-16 text-center text-xs text-slate-500">
     <div class="max-w-7xl mx-auto px-4 space-y-3">
       <div class="flex flex-wrap items-center justify-center gap-4 text-slate-400 text-xs">
         <span class="inline-flex items-center gap-1.5">
