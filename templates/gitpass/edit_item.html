@@ -3,43 +3,91 @@
 {% block title %}Edit {{ item.title }} — Git-Pass{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto px-4 py-6 sm:py-10 w-full">
-  
-  <!-- Back Link & Header -->
-  <div class="mb-6">
-    <a href="{% url 'gitpass:vault' %}" class="btn-vault-secondary" style="margin-bottom: 0.85rem; font-size: 0.78rem;">
-      <svg width="15" height="15" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+<div class="edit-page-container">
+
+  <!-- Top Navigation & Vault Context -->
+  <div class="edit-top-nav">
+    <a href="{% url 'gitpass:vault' %}" class="btn-vault-secondary" style="font-size: 0.78rem; padding: 0.45rem 0.9rem;">
+      <svg width="15" height="15" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
       <span>Back to Vault</span>
     </a>
-    <h1 class="text-2xl font-extrabold text-white tracking-tight">Edit Credential</h1>
-    <p class="text-xs text-slate-400 mt-1">Modifying this credential will re-encrypt your vault with AES-256-GCM and commit to GitHub.</p>
+
+    <div class="status-synced-pill" style="font-size: 0.7rem; padding: 0.25rem 0.65rem;">
+      <span class="status-dot-pulse"></span>
+      <span class="font-mono text-slate-300">{{ request.session.github_repo|default:"git-vault" }}</span>
+    </div>
   </div>
 
-  <!-- Frosted Glass Card -->
-  <div class="frosted-glass-card" style="padding: 2rem 1.5rem;">
-    <form method="post">
+  <!-- Frosted Glass Edit Card -->
+  <div class="edit-credential-card">
+    
+    <!-- Card Header -->
+    <div class="edit-card-header">
+      <div class="edit-title-group">
+        <div class="edit-avatar">
+          {{ item.title|slice:":2"|upper }}
+        </div>
+        <div>
+          <h1 class="edit-heading">Edit Credential</h1>
+          <p class="edit-subheading">
+            Updating <span class="text-white font-semibold">{{ item.title }}</span> • AES-256-GCM Zero-Knowledge
+          </p>
+        </div>
+      </div>
+
+      <span class="vault-card-badge">
+        {{ item.category|default:"Logins" }}
+      </span>
+    </div>
+
+    <!-- Edit Form -->
+    <form method="post" id="editForm">
       {% csrf_token %}
-      
+
+      <!-- Service Title -->
       <div class="form-group-vault">
         <label class="form-label-vault">Service / Title <span class="text-red-400">*</span></label>
         {{ form.title }}
+        {% if form.title.errors %}
+          <p class="auth-field-error">{{ form.title.errors.0 }}</p>
+        {% endif %}
       </div>
-      
+
+      <!-- Username / Email -->
       <div class="form-group-vault">
         <label class="form-label-vault">Username / Email <span class="text-red-400">*</span></label>
         {{ form.username }}
+        {% if form.username.errors %}
+          <p class="auth-field-error">{{ form.username.errors.0 }}</p>
+        {% endif %}
       </div>
-      
+
+      <!-- Password Field with Quick Generate & Visibility Toggle -->
       <div class="form-group-vault">
         <div class="flex items-center justify-between mb-1">
           <label class="form-label-vault" style="margin-bottom: 0;">Password <span class="text-red-400">*</span></label>
-          <button type="button" onclick="generateAndFillPassword('id_password')" class="link-emerald-sm" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
-            <span>⚡ Generate New</span>
+          <button type="button" onclick="generateAndFillPassword('item-password-field')" class="link-emerald-sm" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem;">
+            <span>⚡ Generate Strong</span>
           </button>
         </div>
-        {{ form.password }}
+        
+        <div class="edit-password-input-wrap">
+          {{ form.password }}
+          <button type="button" onclick="togglePasswordVisibility('item-password-field')" class="edit-password-toggle-btn" title="Toggle visibility" tabindex="-1">
+            <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </button>
+        </div>
+        {% if form.password.errors %}
+          <p class="auth-field-error">{{ form.password.errors.0 }}</p>
+        {% endif %}
       </div>
-      
+
+      <!-- Category & Website URL Row -->
       <div class="form-row-2col">
         <div class="form-group-vault">
           <label class="form-label-vault">Category</label>
@@ -50,7 +98,8 @@
           {{ form.url }}
         </div>
       </div>
-      
+
+      <!-- 2FA / TOTP Secret Key -->
       <div class="form-group-vault">
         <div class="flex items-center justify-between mb-1">
           <label class="form-label-vault" style="margin-bottom: 0;">2FA / TOTP Secret Key (Optional)</label>
@@ -60,18 +109,28 @@
         <p class="text-[11px] text-slate-500 mt-1">Paste Base32 key (e.g. JBSWY3DPEHPK3PXP) or otpauth://totp/ URI.</p>
       </div>
 
+      <!-- Notes -->
       <div class="form-group-vault">
-        <label class="form-label-vault">Notes</label>
+        <label class="form-label-vault">Notes & Recovery Keys</label>
         {{ form.notes }}
       </div>
-      
-      <div class="modal-footer" style="padding-top: 1.25rem; margin-top: 1.25rem;">
-        <a href="{% url 'gitpass:vault' %}" class="btn-vault-secondary">Cancel</a>
-        <button type="submit" class="btn-vault-primary">
-          Save & Commit to GitHub
+
+      <!-- Footer Action Buttons -->
+      <div class="edit-footer-bar">
+        <a href="{% url 'gitpass:vault' %}" class="btn-vault-secondary">
+          Cancel
+        </a>
+        <button type="submit" class="btn-vault-primary flex items-center gap-2">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          <span>Save & Commit to GitHub</span>
         </button>
       </div>
+
     </form>
+
   </div>
+
 </div>
 {% endblock %}

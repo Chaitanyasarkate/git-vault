@@ -2154,6 +2154,126 @@ button, a, input, select, textarea, .btn-vault-icon, .auth-eye-btn {
   }
 }
 
+/* ==========================================================================
+   11. Standalone Edit Credential Page Styling (Proportional & Centered)
+   ========================================================================== */
+
+.edit-page-container {
+  width: 100%;
+  max-width: 640px;
+  margin: clamp(1.5rem, 3.5vh, 2.75rem) auto 4rem;
+  padding: 0 clamp(1rem, 2.5vw, 1.5rem);
+  box-sizing: border-box;
+}
+
+.edit-top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.edit-credential-card {
+  position: relative;
+  background: rgba(18, 18, 24, 0.75);
+  backdrop-filter: blur(40px) saturate(190%);
+  -webkit-backdrop-filter: blur(40px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  box-shadow: 
+    0 40px 90px -20px rgba(0, 0, 0, 0.95),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.edit-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.edit-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.edit-avatar {
+  width: 2.85rem;
+  height: 2.85rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.edit-heading {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.edit-subheading {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.2rem;
+}
+
+.edit-password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.edit-password-input-wrap .form-control {
+  padding-right: 2.5rem;
+}
+
+.edit-password-toggle-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.45);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.edit-password-toggle-btn:hover {
+  color: #ffffff;
+}
+
+.edit-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 /* iOS Safari Auto-Zoom Prevention */
 @media (max-width: 768px) {
   input[type="text"],
