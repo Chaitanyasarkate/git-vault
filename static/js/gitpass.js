@@ -29,19 +29,32 @@ function showToast(message, type = 'success') {
   }, 2200);
 }
 
-// 2. Clipboard helper
+// 2. Secure Clipboard Handling with 30s Auto-Clear
+let _clipboardClearTimer = null;
+
 function copyToClipboard(text, successMsg = 'Copied to clipboard!') {
   if (!text) return;
+  const onCopied = () => {
+    showToast(`${successMsg} (Auto-clears in 30s)`);
+    if (_clipboardClearTimer) clearTimeout(_clipboardClearTimer);
+    _clipboardClearTimer = setTimeout(() => {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText('').catch(() => {});
+      }
+      showToast('Clipboard cleared for security.');
+    }, 30000);
+  };
+
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(text)
-      .then(() => showToast(successMsg))
-      .catch(() => fallbackCopy(text, successMsg));
+      .then(onCopied)
+      .catch(() => fallbackCopy(text, onCopied));
   } else {
-    fallbackCopy(text, successMsg);
+    fallbackCopy(text, onCopied);
   }
 }
 
-function fallbackCopy(text, successMsg) {
+function fallbackCopy(text, onCopied) {
   const textArea = document.createElement('textarea');
   textArea.value = text;
   textArea.style.position = 'fixed';
@@ -51,7 +64,8 @@ function fallbackCopy(text, successMsg) {
   textArea.select();
   try {
     document.execCommand('copy');
-    showToast(successMsg);
+    if (typeof onCopied === 'function') onCopied();
+    else showToast('Copied to clipboard');
   } catch (err) {
     showToast('Failed to copy', 'error');
   }
@@ -679,6 +693,85 @@ document.addEventListener('DOMContentLoaded', () => {
       openModal('addModal');
     }
   });
+
+  // ==========================================
+  // Automatic Lock & Inactivity Timeout (15 min)
+  // ==========================================
+  (function initInactivityLock() {
+    const isAuth = !!document.querySelector('.user-repo-badge');
+    if (!isAuth) return;
+
+    let idleSeconds = 0;
+    const maxIdle = 15 * 60; // 15 minutes
+    const warnAt = 14 * 60;  // 14 minutes
+
+    function resetIdle() {
+      idleSeconds = 0;
+    }
+
+    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach((ev) => {
+      window.addEventListener(ev, resetIdle, { passive: true });
+    });
+
+    setInterval(() => {
+      idleSeconds += 1;
+      if (idleSeconds === warnAt) {
+        showToast('⚠️ Inactivity detected. Locking vault in 60 seconds.', 'error');
+      } else if (idleSeconds >= maxIdle) {
+        window.location.href = '/logout/';
+      }
+    }, 1000);
+  })();
 });
+
+// ==========================================
+// Sorting, Cloud Sync & Wi-Fi QR Helpers
+// ==========================================
+function updateSortFilter(sortVal) {
+  const url = new URL(window.location.href);
+  url.searchParams.set('sort', sortVal);
+  window.location.href = url.toString();
+}
+
+async function triggerCloudSync() {
+  const btn = document.getElementById('btnCloudSync');
+  const icon = document.getElementById('cloudSyncIcon');
+  if (icon) icon.classList.add('animate-spin');
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/cloud-sync/');
+    const data = await res.json();
+    if (data.synced) {
+      showToast(data.message || 'Synced with GitHub cloud!');
+      if (data.updated) {
+        setTimeout(() => window.location.reload(), 700);
+      }
+    } else {
+      showToast(data.error || 'Cloud sync failed', 'error');
+    }
+  } catch (err) {
+    showToast('Sync network error: ' + err.message, 'error');
+  } finally {
+    if (icon) icon.classList.remove('animate-spin');
+    if (btn) btn.disabled = false;
+  }
+}
+
+function showWifiQrModal(ssid, password) {
+  const title = document.getElementById('wifiModalTitle');
+  const ssidEl = document.getElementById('wifiModalSsid');
+  const img = document.getElementById('wifiQrImage');
+
+  if (title) title.textContent = `Wi-Fi: ${ssid}`;
+  if (ssidEl) ssidEl.textContent = `SSID: ${ssid} | Key: ${password}`;
+
+  // Standard Wi-Fi URI format for QR codes: WIFI:S:<SSID>;T:WPA;P:<password>;;
+  const wifiPayload = `WIFI:S:${ssid};T:WPA;P:${password};;`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=4&data=${encodeURIComponent(wifiPayload)}`;
+  if (img) img.src = qrUrl;
+
+  openModal('wifiModal');
+}
 
 

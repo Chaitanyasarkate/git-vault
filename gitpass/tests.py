@@ -326,4 +326,67 @@ class AdvancedFeatureTests(TestCase):
         self.assertEqual(manifest_resp.status_code, 200)
         self.assertIn("application/manifest+json", manifest_resp["Content-Type"])
 
+    def test_trash_recovery_and_permanent_delete(self):
+        items = self.client.session["demo_vault"]
+        target_id = items[0]["id"]
+        target_title = items[0]["title"]
+
+        # In demo mode, delete item
+        del_resp = self.client.post(reverse("gitpass:delete_item", args=[target_id]), follow=True)
+        self.assertEqual(del_resp.status_code, 200)
+
+        # Check that it appears in Trash tab
+        trash_resp = self.client.get(reverse("gitpass:vault") + "?tab=trash")
+        self.assertEqual(trash_resp.status_code, 200)
+        self.assertContains(trash_resp, target_title)
+        self.assertContains(trash_resp, "Restore")
+        self.assertContains(trash_resp, "Purge")
+
+        # Restore item
+        restore_resp = self.client.post(reverse("gitpass:restore_item", args=[target_id]), follow=True)
+        self.assertEqual(restore_resp.status_code, 200)
+        vault_resp = self.client.get(reverse("gitpass:vault"))
+        self.assertContains(vault_resp, target_title)
+
+        # Now delete again and permanently purge
+        self.client.post(reverse("gitpass:delete_item", args=[target_id]), follow=True)
+        purge_resp = self.client.post(reverse("gitpass:permanent_delete_item", args=[target_id]), follow=True)
+        self.assertEqual(purge_resp.status_code, 200)
+
+        # Confirm it's gone completely from trash
+        trash_resp2 = self.client.get(reverse("gitpass:vault") + "?tab=trash")
+        self.assertNotContains(trash_resp2, target_id)
+
+    def test_password_history_on_edit(self):
+        items = self.client.session["demo_vault"]
+        target = items[1]
+        target_id = target["id"]
+
+        # Edit password
+        edit_resp = self.client.post(
+            reverse("gitpass:edit_item", args=[target_id]),
+            {
+                "title": target["title"],
+                "username": target.get("username", "user"),
+                "password": "BrandNewSecretPassword999!",
+                "category": target.get("category", "Personal"),
+                "url": target.get("url", ""),
+                "notes": target.get("notes", ""),
+            },
+            follow=True
+        )
+        self.assertEqual(edit_resp.status_code, 200)
+        # Verify old password was retained in password history
+        vault_resp = self.client.get(reverse("gitpass:vault"))
+        self.assertContains(vault_resp, "Previous Passwords")
+
+
+    def test_cloud_sync_api(self):
+        sync_resp = self.client.get(reverse("gitpass:api_cloud_sync"))
+        self.assertEqual(sync_resp.status_code, 200)
+        sync_data = sync_resp.json()
+        self.assertTrue(sync_data["synced"])
+        self.assertIn("message", sync_data)
+
+
 

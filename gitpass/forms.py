@@ -57,6 +57,9 @@ class ConnectForm(forms.Form):
 class CredentialForm(forms.Form):
     CATEGORY_CHOICES = [
         ("Logins", "Logins & Web"),
+        ("Passkeys", "🔑 Passkeys & FIDO2"),
+        ("WiFi", "📶 Wi-Fi Networks"),
+        ("Notes", "📝 Secure Notes"),
         ("Apps", "Desktop & Mobile Apps"),
         ("Social", "Social Media"),
         ("Work", "Work & Dev"),
@@ -67,29 +70,29 @@ class CredentialForm(forms.Form):
 
     title = forms.CharField(
         max_length=120,
-        label="Title / Service Name",
+        label="Title / Service / Network Name",
         widget=forms.TextInput(attrs={
-            "placeholder": "e.g. Google, GitHub, Netflix",
+            "placeholder": "e.g. Google, GitHub, Home-WiFi, Server-Key",
             "class": "form-control",
             "required": True,
         })
     )
     username = forms.CharField(
         max_length=150,
-        label="Username / Email",
+        required=False,
+        label="Username / Email / SSID",
         widget=forms.TextInput(attrs={
-            "placeholder": "user@example.com or username",
+            "placeholder": "user@example.com or SSID (for Wi-Fi)",
             "class": "form-control",
-            "required": True,
         })
     )
     password = forms.CharField(
-        label="Password",
+        required=False,
+        label="Password / Wi-Fi Key",
         widget=forms.TextInput(attrs={
-            "placeholder": "Password",
+            "placeholder": "Password or WPA2/WPA3 key",
             "class": "form-control font-mono",
             "id": "item-password-field",
-            "required": True,
         })
     )
     url = forms.URLField(
@@ -115,14 +118,33 @@ class CredentialForm(forms.Form):
         label="Category",
         widget=forms.Select(attrs={"class": "form-control"})
     )
+    group = forms.CharField(
+        max_length=60,
+        required=False,
+        label="Group / Folder (Shared)",
+        widget=forms.TextInput(attrs={
+            "placeholder": "e.g. Family, DevOps, Work, Personal",
+            "class": "form-control",
+        }),
+        help_text="Organize credentials into shared team, family, or project groups."
+    )
     notes = forms.CharField(
         required=False,
-        label="Notes",
+        label="Notes / Security Details",
         widget=forms.Textarea(attrs={
-            "placeholder": "Recovery codes, security answers, or extra notes...",
+            "placeholder": "Recovery codes, security answers, or encrypted notes...",
             "class": "form-control",
             "rows": 3,
         })
+    )
+    attachment = forms.FileField(
+        required=False,
+        label="Encrypted File Attachment (Optional, max 500KB)",
+        widget=forms.FileInput(attrs={
+            "class": "form-control file-input-vault",
+            "accept": ".txt,.pdf,.png,.jpg,.jpeg,.json,.key,.pem,.csv",
+        }),
+        help_text="File will be encrypted with AES-256-GCM and stored securely inside your vault."
     )
 
 

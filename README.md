@@ -7,7 +7,7 @@
 [![Framework](https://img.shields.io/badge/Framework-Django%205-092e20?style=for-the-badge&logo=django)](https://www.djangoproject.com/)
 [![Encryption](https://img.shields.io/badge/Security-AES--256--GCM%20%7C%20PBKDF2-blue?style=for-the-badge)](https://git-vault.onrender.com)
 [![Storage](https://img.shields.io/badge/Storage-GitHub%20Repository-black?style=for-the-badge&logo=github)](https://github.com)
-[![CI Tests](https://img.shields.io/badge/Tests-23%20Passing-success?style=for-the-badge)](https://github.com)
+[![CI Tests](https://img.shields.io/badge/Tests-26%20Passing-success?style=for-the-badge)](https://github.com)
 [![PWA Ready](https://img.shields.io/badge/PWA-Installable%20App-00bcd4?style=for-the-badge)](https://git-vault.onrender.com)
 [![Extension](https://img.shields.io/badge/Browser%20Extension-Manifest%20V3-orange?style=for-the-badge)](https://github.com/Chaitanyasarkate/git-vault/tree/main/extension)
 [![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)

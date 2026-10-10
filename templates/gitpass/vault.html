@@ -173,7 +173,7 @@
         <div>
           <div class="pro-sidebar-section-title">Categories</div>
           <nav class="pro-sidebar-list">
-            <a href="?category=All" class="pro-sidebar-link {% if selected_cat == 'All' %}active{% endif %}">
+            <a href="?category=All" class="pro-sidebar-link {% if selected_cat == 'All' and active_tab != 'trash' %}active{% endif %}">
               <span class="flex items-center gap-2">
                 <svg width="14" height="14" class="text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
                 <span>All Passwords</span>
@@ -181,7 +181,7 @@
               <span class="pro-sidebar-badge">{{ total_count }}</span>
             </a>
             {% for cat in categories %}
-              <a href="?category={{ cat }}" class="pro-sidebar-link {% if selected_cat == cat %}active{% endif %}">
+              <a href="?category={{ cat }}" class="pro-sidebar-link {% if selected_cat == cat and active_tab != 'trash' %}active{% endif %}">
                 <span class="flex items-center gap-2 truncate">
                   <svg width="14" height="14" class="text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
                   <span class="truncate">{{ cat }}</span>
@@ -190,6 +190,29 @@
             {% endfor %}
           </nav>
         </div>
+
+        {% if groups %}
+        <!-- Shared Groups / Folders -->
+        <div>
+          <div class="pro-sidebar-section-title">Shared Groups</div>
+          <nav class="pro-sidebar-list">
+            <a href="?group=All" class="pro-sidebar-link {% if selected_group == 'All' and active_tab != 'trash' %}active{% endif %}">
+              <span class="flex items-center gap-2">
+                <span>📁</span>
+                <span>All Groups</span>
+              </span>
+            </a>
+            {% for grp in groups %}
+              <a href="?group={{ grp }}" class="pro-sidebar-link {% if selected_group == grp and active_tab != 'trash' %}active{% endif %}">
+                <span class="flex items-center gap-2 truncate">
+                  <span>📂</span>
+                  <span class="truncate">{{ grp }}</span>
+                </span>
+              </a>
+            {% endfor %}
+          </nav>
+        </div>
+        {% endif %}
 
         <!-- Vault Tools Hub -->
         <div>
@@ -213,6 +236,15 @@
                 <span>Import Passwords</span>
               </span>
             </button>
+            <a href="?tab=trash" class="pro-sidebar-link {% if active_tab == 'trash' %}active text-red-400{% endif %}">
+              <span class="flex items-center gap-2">
+                <span>🗑️</span>
+                <span>Trash Recovery</span>
+              </span>
+              {% if trash_count %}
+                <span class="pro-sidebar-badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">{{ trash_count }}</span>
+              {% endif %}
+            </a>
           </nav>
         </div>
 
@@ -240,9 +272,9 @@
       <!-- Right Main Content: Command Bar & Cards Grid -->
       <main class="pro-vault-main">
         
-        <!-- Command Bar with Search -->
-        <div class="pro-command-bar">
-          <div class="pro-search-box">
+        <!-- Command Bar with Search, Sort, and Cloud Sync -->
+        <div class="pro-command-bar flex items-center justify-between gap-3 flex-wrap">
+          <div class="pro-search-box flex-1 min-w-[240px]">
             <div class="vault-search-icon">
               <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -253,6 +285,34 @@
             <button type="button" id="clearSearchBtn" onclick="clearSearchFilter()" class="vault-search-clear hidden" title="Clear Search">
               &times;
             </button>
+          </div>
+
+          <div class="flex items-center gap-2 shrink-0">
+            <!-- Sort Dropdown -->
+            <select id="vaultSortSelect" class="form-control" style="padding: 0.5rem 0.85rem; font-size: 0.75rem; border-radius: 9999px; background: rgba(255,255,255,0.04); color: #cbd5e1; border-color: rgba(255,255,255,0.12);" onchange="updateSortFilter(this.value)">
+              <option value="title_asc" {% if sort_by == 'title_asc' %}selected{% endif %}>Sort: A → Z</option>
+              <option value="title_desc" {% if sort_by == 'title_desc' %}selected{% endif %}>Sort: Z → A</option>
+              <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Sort: Recently Updated</option>
+              <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Sort: Oldest First</option>
+              <option value="category" {% if sort_by == 'category' %}selected{% endif %}>Sort: Category</option>
+              <option value="group" {% if sort_by == 'group' %}selected{% endif %}>Sort: Group</option>
+              <option value="weakest" {% if sort_by == 'weakest' %}selected{% endif %}>Sort: Weakest Passwords</option>
+            </select>
+
+            <!-- 1-Click Cloud Sync Button -->
+            <button type="button" onclick="triggerCloudSync()" id="btnCloudSync" class="btn-dark-pill" style="padding: 0.5rem 0.95rem; font-size: 0.75rem; display: flex; align-items: center; gap: 0.35rem;" title="1-Click Secure Cloud Sync with GitHub">
+              <svg id="cloudSyncIcon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>Cloud Sync</span>
+            </button>
+
+            {% if active_tab == 'trash' and trash_count > 0 %}
+              <form method="post" action="{% url 'gitpass:empty_trash' %}" onsubmit="return confirm('Empty Trash and permanently destroy all deleted items?');" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="btn-danger-sm" style="padding: 0.5rem 0.85rem; font-size: 0.75rem; border-radius: 9999px;">
+                  Empty Trash ({{ trash_count }})
+                </button>
+              </form>
+            {% endif %}
           </div>
         </div>
 
@@ -283,10 +343,27 @@
                         </div>
                       </div>
 
-                      <!-- Category Pill (Safe inside boundaries) -->
-                      <span class="vault-card-badge">
-                        {{ item.category|default:"Logins" }}
-                      </span>
+                      <!-- Category & Group Pills -->
+                      <div class="flex items-center gap-1.5 flex-wrap justify-end">
+                        {% if item.group %}
+                          <span class="vault-card-badge" style="background: rgba(56, 189, 248, 0.12); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">
+                            📁 {{ item.group }}
+                          </span>
+                        {% endif %}
+                        {% if item.category == 'Passkeys' %}
+                          <span class="vault-card-badge" style="background: rgba(245, 158, 11, 0.12); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);">
+                            🔑 Passkey
+                          </span>
+                        {% elif item.category == 'WiFi' %}
+                          <span class="vault-card-badge" style="background: rgba(16, 185, 129, 0.12); color: #34d399; border-color: rgba(16, 185, 129, 0.3);">
+                            📶 Wi-Fi
+                          </span>
+                        {% else %}
+                          <span class="vault-card-badge">
+                            {{ item.category|default:"Logins" }}
+                          </span>
+                        {% endif %}
+                      </div>
                     </div>
 
                     <!-- Username Pill -->
@@ -295,13 +372,15 @@
                         <svg width="16" height="16" class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
-                        <span class="text-xs font-mono text-slate-200 truncate select-all">{{ item.username }}</span>
+                        <span class="text-xs font-mono text-slate-200 truncate select-all">{{ item.username|default:"(None)" }}</span>
                       </div>
-                      <button type="button" onclick="copyToClipboard('{{ item.username }}', 'Username copied!')" class="text-slate-400 hover:text-white transition p-1" title="Copy Username">
+                      {% if item.username %}
+                      <button type="button" onclick="copyToClipboard('{{ item.username|escapejs }}', 'Username copied!')" class="text-slate-400 hover:text-white transition p-1" title="Copy Username">
                         <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                         </svg>
                       </button>
+                      {% endif %}
                     </div>
 
                     <!-- Password Pill -->
@@ -319,11 +398,13 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                           </svg>
                         </button>
-                        <button type="button" onclick="copyToClipboard('{{ item.password }}', 'Password copied!')" class="text-slate-400 hover:text-white transition p-1" title="Copy Password">
+                        {% if item.password %}
+                        <button type="button" onclick="copyToClipboard('{{ item.password|escapejs }}', 'Password copied!')" class="text-slate-400 hover:text-white transition p-1" title="Copy Password">
                           <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                           </svg>
                         </button>
+                        {% endif %}
                       </div>
                     </div>
 
@@ -355,6 +436,47 @@
                       </div>
                     {% endif %}
 
+                    <!-- Wi-Fi QR Code Quick Connect Button -->
+                    {% if item.category == 'WiFi' %}
+                      <div class="mt-2.5">
+                        <button type="button" onclick="showWifiQrModal('{{ item.title|escapejs }}', '{{ item.password|escapejs }}')" class="btn-dark-pill text-xs w-full py-1.5 flex items-center justify-center gap-1.5" style="border-color: rgba(52, 211, 153, 0.4); color: #34d399;">
+                          <span>📶</span>
+                          <span>Show Wi-Fi QR Code (Scan to Join)</span>
+                        </button>
+                      </div>
+                    {% endif %}
+
+                    <!-- Encrypted Attachments Badges -->
+                    {% if item.attachments %}
+                      <div class="mt-2 flex flex-wrap gap-1">
+                        {% for att in item.attachments %}
+                          <a href="{% url 'gitpass:download_attachment' item.id forloop.counter0 %}" class="inline-flex items-center gap-1 text-[11px] text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 hover:bg-emerald-500/20" title="Download encrypted attachment {{ att.name }}">
+                            📎 {{ att.name }} ({{ att.size|filesizeformat }})
+                          </a>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+
+                    <!-- Password History Preview Drawer -->
+                    {% if item.password_history %}
+                      <details class="mt-2 text-xs" style="border-top: 1px dashed rgba(255, 255, 255, 0.08); padding-top: 6px;">
+                        <summary class="cursor-pointer text-slate-400 hover:text-slate-300 text-[11px] select-none flex items-center justify-between">
+                          <span>🕒 Previous Passwords ({{ item.password_history|length }})</span>
+                          <span>▾</span>
+                        </summary>
+                        <div class="mt-1.5 space-y-1">
+                          {% for h in item.password_history|slice:":3" %}
+                            <div class="flex items-center justify-between text-[11px] font-mono text-slate-300 bg-black/40 px-2 py-1 rounded border border-white/5">
+                              <span class="truncate">{{ h.password }}</span>
+                              <button type="button" onclick="copyToClipboard('{{ h.password|escapejs }}', 'Past password copied!')" class="text-emerald-400 hover:underline text-[10px] ml-2 shrink-0">
+                                Copy
+                              </button>
+                            </div>
+                          {% endfor %}
+                        </div>
+                      </details>
+                    {% endif %}
+
                     {% if item.notes %}
                       <p class="text-xs text-slate-400 mt-2 px-1 leading-relaxed" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                         {{ item.notes }}
@@ -362,22 +484,43 @@
                     {% endif %}
                   </div>
 
-                  <!-- Card Bottom Bar: Edit & Delete -->
+                  <!-- Card Bottom Bar: Edit & Delete / Restore Actions -->
                   <div class="vault-card-bottom">
-                    <span class="text-slate-500">
-                      Updated {{ item.updated_at|slice:":10" }}
-                    </span>
-                    <div class="flex items-center gap-2">
-                      <a href="{% url 'gitpass:edit_item' item.id %}" class="btn-vault-secondary" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
-                        Edit
-                      </a>
-                      <form method="post" action="{% url 'gitpass:delete_item' item.id %}" onsubmit="return confirm('Delete credential for {{ item.title }} from your GitHub repository?');" style="margin: 0;">
-                        {% csrf_token %}
-                        <button type="submit" class="dropdown-item-danger" style="padding: 0.25rem 0.65rem; border-radius: 0.5rem; font-size: 0.75rem; border: 1px solid rgba(153, 27, 27, 0.4); background: rgba(69, 10, 10, 0.2); cursor: pointer;">
-                          Delete
-                        </button>
-                      </form>
-                    </div>
+                    {% if active_tab == 'trash' %}
+                      <span class="text-red-400 text-xs flex items-center gap-1">
+                        <span>🗑️ Deleted:</span>
+                        <span>{{ item.deleted_at|slice:":10" }}</span>
+                      </span>
+                      <div class="flex items-center gap-2">
+                        <form method="post" action="{% url 'gitpass:restore_item' item.id %}" style="margin: 0;">
+                          {% csrf_token %}
+                          <button type="submit" class="btn-sm-white" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
+                            Restore
+                          </button>
+                        </form>
+                        <form method="post" action="{% url 'gitpass:permanent_delete_item' item.id %}" onsubmit="return confirm('Permanently destroy {{ item.title }}? This cannot be recovered.');" style="margin: 0;">
+                          {% csrf_token %}
+                          <button type="submit" class="dropdown-item-danger" style="padding: 0.25rem 0.65rem; border-radius: 0.5rem; font-size: 0.75rem; border: 1px solid rgba(153, 27, 27, 0.4); background: rgba(69, 10, 10, 0.2); cursor: pointer;">
+                            Purge
+                          </button>
+                        </form>
+                      </div>
+                    {% else %}
+                      <span class="text-slate-500 text-xs">
+                        Updated {{ item.updated_at|slice:":10" }}
+                      </span>
+                      <div class="flex items-center gap-2">
+                        <a href="{% url 'gitpass:edit_item' item.id %}" class="btn-vault-secondary" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
+                          Edit
+                        </a>
+                        <form method="post" action="{% url 'gitpass:delete_item' item.id %}" onsubmit="return confirm('Move credential for {{ item.title }} to Trash?');" style="margin: 0;">
+                          {% csrf_token %}
+                          <button type="submit" class="dropdown-item-danger" style="padding: 0.25rem 0.65rem; border-radius: 0.5rem; font-size: 0.75rem; border: 1px solid rgba(153, 27, 27, 0.4); background: rgba(69, 10, 10, 0.2); cursor: pointer;">
+                            Delete
+                          </button>
+                        </form>
+                      </div>
+                    {% endif %}
                   </div>
 
                 </div>
@@ -459,7 +602,7 @@
       <button type="button" onclick="closeModal('addModal')" class="modal-close-btn" title="Close">&times;</button>
     </div>
 
-    <form method="post" action="{% url 'gitpass:add_item' %}">
+    <form method="post" action="{% url 'gitpass:add_item' %}" enctype="multipart/form-data">
       {% csrf_token %}
       
       <div class="form-group-vault">
@@ -468,13 +611,13 @@
       </div>
       
       <div class="form-group-vault">
-        <label class="form-label-vault">Username / Email <span class="text-red-400">*</span></label>
+        <label class="form-label-vault">Username / Email / SSID</label>
         {{ cred_form.username }}
       </div>
       
       <div class="form-group-vault">
         <div class="flex items-center justify-between mb-1">
-          <label class="form-label-vault" style="margin-bottom: 0;">Password <span class="text-red-400">*</span></label>
+          <label class="form-label-vault" style="margin-bottom: 0;">Password / Key</label>
           <button type="button" onclick="generateAndFillPassword('id_password')" class="link-emerald-sm" style="background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
             <span>⚡ Quick Generate</span>
           </button>
@@ -488,9 +631,14 @@
           {{ cred_form.category }}
         </div>
         <div class="form-group-vault">
-          <label class="form-label-vault">Website URL</label>
-          {{ cred_form.url }}
+          <label class="form-label-vault">Shared Group / Folder</label>
+          {{ cred_form.group }}
         </div>
+      </div>
+
+      <div class="form-group-vault">
+        <label class="form-label-vault">Website URL</label>
+        {{ cred_form.url }}
       </div>
       
       <div class="form-group-vault">
@@ -503,8 +651,14 @@
       </div>
 
       <div class="form-group-vault">
-        <label class="form-label-vault">Notes</label>
+        <label class="form-label-vault">Notes & Recovery Keys</label>
         {{ cred_form.notes }}
+      </div>
+
+      <div class="form-group-vault">
+        <label class="form-label-vault">Encrypted Attachment (Optional, max 500KB)</label>
+        {{ cred_form.attachment }}
+        <p class="text-[11px] text-slate-500 mt-1">Encrypted with AES-256-GCM before pushing to GitHub repository.</p>
       </div>
 
       <div class="modal-footer">
@@ -798,6 +952,25 @@
         </button>
       </div>
     </form>
+  </div>
+<!-- 8. Wi-Fi QR Code Instant Connect Modal -->
+<div id="wifiModal" class="modal-backdrop hidden">
+  <div class="modal-dialog" style="max-width: 22rem; text-align: center;">
+    <div class="modal-header">
+      <h3 class="modal-title flex items-center justify-center gap-2">
+        <span>📶</span>
+        <span id="wifiModalTitle">Wi-Fi Connect</span>
+      </h3>
+      <button type="button" onclick="closeModal('wifiModal')" class="modal-close-btn" title="Close">&times;</button>
+    </div>
+    <p class="text-xs text-slate-300 mb-3">Scan this code with your smartphone camera to connect to the Wi-Fi network instantly.</p>
+    <div class="p-3 bg-white rounded-2xl inline-block mx-auto shadow-2xl border-4 border-emerald-400">
+      <img id="wifiQrImage" src="" alt="Wi-Fi QR Code" width="200" height="200" class="block mx-auto">
+    </div>
+    <div class="mt-3 text-xs font-mono text-emerald-400 font-bold select-all" id="wifiModalSsid"></div>
+    <div class="modal-footer" style="margin-top: 1rem; justify-content: center;">
+      <button type="button" onclick="closeModal('wifiModal')" class="btn-stark-white text-xs">Done</button>
+    </div>
   </div>
 </div>
 
