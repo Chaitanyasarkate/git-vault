@@ -1,22 +1,17 @@
-name: panda.vault 24/7 Keep-Alive Heartbeat
+name: Git-Pass Keep-Alive Heartbeat
 
 on:
   schedule:
-    # Run every 10 minutes to prevent Render free-tier 15-minute inactivity spin-down
+    # Run every 10 minutes to prevent Render free-tier inactivity spin-down
     - cron: '*/10 * * * *'
   workflow_dispatch:
 
 jobs:
   keep-alive:
-    name: Ping Services
+    name: Ping Git-Pass Service
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Backend Health Endpoint
+      - name: Ping Git-Pass Health Endpoint
         run: |
-          echo "Sending keep-alive ping to Backend..."
-          curl -s -f -m 30 https://panda-vault-backend.onrender.com/health || echo "Backend ping returned status code $?"
-
-      - name: Ping Frontend Health Endpoint
-        run: |
-          echo "Sending keep-alive ping to Frontend..."
-          curl -s -f -m 30 https://panda-vault.onrender.com/health || echo "Frontend ping returned status code $?"
+          echo "Sending keep-alive ping to Git-Pass..."
+          curl -s -f -m 30 https://git-pass.onrender.com/health/ || echo "Git-Pass ping returned status code $?"

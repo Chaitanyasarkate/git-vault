@@ -6,11 +6,12 @@ venv/
 .venv/
 .pytest_cache/
 
-# Next.js & Vite Builds
+# Next.js & Vite Builds & Django Static
 .next/
 dist/
 build/
 out/
+staticfiles/
 
 # Environment & Secrets
 .env

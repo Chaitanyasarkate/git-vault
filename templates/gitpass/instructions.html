@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Git-Pass — Setup Instructions{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+  
+  <!-- Back Link & Title -->
+  <div class="mb-8">
+    <a href="{% url 'gitpass:login' %}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 mb-3 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      Back to Login & Connect
+    </a>
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+      Git-Pass Setup Instructions
+    </h1>
+    <p class="text-slate-400 text-sm mt-1">
+      Follow these straightforward steps to set up your private GitHub repository for password storage.
+    </p>
+  </div>
+
+  <div class="space-y-6">
+
+    <!-- Step 1 -->
+    <div class="instruction-card bg-slate-900/80 border border-slate-800 rounded-2xl p-6 relative">
+      <div class="flex items-start gap-4">
+        <div class="step-badge w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-sm shrink-0">
+          1
+        </div>
+        <div class="space-y-2 flex-1">
+          <h2 class="text-base font-bold text-white">Create a GitHub Account</h2>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            If you don't already have one, create a free GitHub account at 
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="text-emerald-400 underline font-medium">github.com</a>. 
+            You will need this account to store your encrypted password data securely in your own repository.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="instruction-card bg-slate-900/80 border border-slate-800 rounded-2xl p-6 relative">
+      <div class="flex items-start gap-4">
+        <div class="step-badge w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-sm shrink-0">
+          2
+        </div>
+        <div class="space-y-3 flex-1">
+          <h2 class="text-base font-bold text-white">Generate a Personal Access Token (PAT)</h2>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Generate a Personal Access Token to allow Git-Pass to access and update your encrypted file in your repository:
+          </p>
+          <a href="https://github.com/settings/tokens/new?scopes=repo,delete_repo" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-emerald-300 hover:text-white hover:bg-slate-700/80 text-xs font-semibold transition">
+            <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+            GitHub Personal Access Token Generator &nearr;
+          </a>
+          <div class="bg-amber-950/40 border border-amber-800/40 rounded-xl p-3 text-xs text-amber-200/90 space-y-1">
+            <p class="font-semibold">Important scopes to select:</p>
+            <ul class="list-disc list-inside space-y-0.5 text-amber-300/80">
+              <li><strong>repo</strong>: Gives full control of private repositories to read & write the encrypted file.</li>
+              <li><strong>delete_repo</strong> (optional): Only needed if you want the ability to delete the entire repo from Git-Pass settings.</li>
+            </ul>
+            <p class="text-[11px] text-amber-400/70 pt-1">Copy and save your token securely immediately — GitHub will never show it to you again!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="instruction-card bg-slate-900/80 border border-slate-800 rounded-2xl p-6 relative">
+      <div class="flex items-start gap-4">
+        <div class="step-badge w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-sm shrink-0">
+          3
+        </div>
+        <div class="space-y-2 flex-1">
+          <h2 class="text-base font-bold text-white">Create a Dedicated GitHub Repository</h2>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Create a new repository on GitHub (e.g., <code>gitpass-vault</code> or <code>my-passwords</code>).
+          </p>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            We recommend setting the repository to <strong>Private</strong> for maximum confidentiality, though your password data will be strongly encrypted with AES-256-GCM either way.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="instruction-card bg-slate-900/80 border border-slate-800 rounded-2xl p-6 relative">
+      <div class="flex items-start gap-4">
+        <div class="step-badge w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-sm shrink-0">
+          4
+        </div>
+        <div class="space-y-3 flex-1">
+          <h2 class="text-base font-bold text-white">Add a File to Initialize the Repository</h2>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Add any file to your repository to initialize it. For example:
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono">
+            <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-emerald-400 flex items-center gap-1.5">
+              <span>📄</span> passwords.txt
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-emerald-400 flex items-center gap-1.5">
+              <span>📄</span> data.json
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-950 border border-slate-800 text-emerald-400 flex items-center gap-1.5">
+              <span>📄</span> vault.dat
+            </div>
+          </div>
+          <p class="text-xs text-slate-400">
+            The file can be completely empty initially. Git-Pass will automatically format and store your encrypted ciphertext in this file.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="instruction-card bg-slate-900/80 border border-slate-800 rounded-2xl p-6 relative">
+      <div class="flex items-start gap-4">
+        <div class="step-badge w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-sm shrink-0">
+          5
+        </div>
+        <div class="space-y-2 flex-1">
+          <h2 class="text-base font-bold text-white">Connect and Unlock Your Vault</h2>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Return to the login screen and enter your:
+          </p>
+          <ul class="text-xs text-slate-300 space-y-1 list-disc list-inside">
+            <li><strong>GitHub Username:</strong> Your GitHub account handle</li>
+            <li><strong>Personal Access Token:</strong> The token created in step 2</li>
+            <li><strong>Repository Name:</strong> The repository created in step 3</li>
+            <li><strong>Filename:</strong> The filename selected in step 4 (e.g. <code>passwords.txt</code>)</li>
+            <li><strong>Master Password:</strong> Your chosen strong master passphrase</li>
+          </ul>
+          <div class="mt-4 p-3.5 bg-red-950/30 border border-red-900/40 rounded-xl text-xs text-red-300/90">
+            <strong>CRITICAL:</strong> Your master password is <em>never stored anywhere</em> on our backend servers. If you forget your master password, your encrypted data cannot be decrypted or recovered!
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom CTA -->
+  <div class="mt-10 text-center">
+    <a href="{% url 'gitpass:login' %}" class="inline-flex items-center gap-2 btn-primary py-3 px-6 rounded-xl font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 hover:scale-[1.01] transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+      Ready? Go to Login & Connect
+    </a>
+  </div>
+
+</div>
+{% endblock %}

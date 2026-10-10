@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit {{ item.title }} — Git-Pass{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-8 sm:py-12">
+  <div class="mb-6">
+    <a href="{% url 'gitpass:vault' %}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 mb-2 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      Back to Vault
+    </a>
+    <h1 class="text-2xl font-extrabold text-white tracking-tight">Edit Credential</h1>
+    <p class="text-xs text-slate-400">Modifying this credential will re-encrypt your vault and create a new commit on GitHub.</p>
+  </div>
+
+  <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-2xl backdrop-blur-md">
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Service / Title *</label>
+        {{ form.title }}
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Username / Email *</label>
+        {{ form.username }}
+      </div>
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <label class="block text-xs font-semibold text-slate-300">Password *</label>
+          <button type="button" onclick="generateAndFillPassword('item-password-field')" class="text-[11px] text-emerald-400 hover:underline">
+            ⚡ Generate New
+          </button>
+        </div>
+        {{ form.password }}
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Category</label>
+          {{ form.category }}
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Website URL</label>
+          {{ form.url }}
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Notes</label>
+        {{ form.notes }}
+      </div>
+      <div class="pt-4 flex items-center justify-between border-t border-slate-800">
+        <a href="{% url 'gitpass:vault' %}" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white border border-slate-700 text-xs font-medium">Cancel</a>
+        <button type="submit" class="btn-primary px-5 py-2.5 rounded-xl text-slate-950 font-semibold text-xs shadow-md">
+          Save & Commit to GitHub
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

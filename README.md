@@ -1,161 +1,142 @@
-# 🐼 panda.vault
+# 🔐 Git-Pass
 
-> **Client-Side Encrypted Zero-Knowledge Password Manager & Digital Vault with Manifest V3 Chrome Extension**
+> **A privacy-focused password manager**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-panda--vault.onrender.com-brightgreen?style=for-the-badge&logo=render)](https://panda-vault.onrender.com)
-[![Backend API](https://img.shields.io/badge/API%20Docs-panda--vault--backend.onrender.com-blue?style=for-the-badge&logo=fastapi)](https://panda-vault-backend.onrender.com/docs)
-[![CI Security & Tests](https://img.shields.io/badge/CI%20Suite-68%20Passing-brightgreen?style=for-the-badge&logo=githubactions)](https://github.com/Chaitanyasarkate/-panda.vault/actions)
-[![Security Architecture](https://img.shields.io/badge/Encryption-AES--256--GCM%20%7C%20Argon2id-gold?style=for-the-badge)](https://panda-vault.onrender.com)
-
----
-
-
-## 🌐 Live Deployment & Links
-
-
-| Service | Live URL | Description |
-| :--- | :--- | :--- |
-| 🚀 **Web Application** | [**https://panda-vault.onrender.com**](https://panda-vault.onrender.com) | Next.js 16 Client-Side Encrypted Web Dashboard |
-| ⚡ **Backend API** | [**https://panda-vault-backend.onrender.com**](https://panda-vault-backend.onrender.com) | FastAPI REST API & Async PostgreSQL Engine |
-| 📚 **Interactive Swagger Docs** | [**https://panda-vault-backend.onrender.com/docs**](https://panda-vault-backend.onrender.com/docs) | OpenAPI Interactive Endpoint Documentation |
-| 🩺 **Health Check** | [**https://panda-vault-backend.onrender.com/health**](https://panda-vault-backend.onrender.com/health) | Uptime & Database Connectivity Probe |
+[![Live Deployment](https://img.shields.io/badge/Live%20Website-git--pass.onrender.com-brightgreen?style=for-the-badge&logo=render)](https://git-pass.onrender.com)
+[![Framework](https://img.shields.io/badge/Framework-Django%205-092e20?style=for-the-badge&logo=django)](https://www.djangoproject.com/)
+[![Encryption](https://img.shields.io/badge/Security-AES--256--GCM%20%7C%20PBKDF2-blue?style=for-the-badge)](https://git-pass.onrender.com)
+[![Storage](https://img.shields.io/badge/Storage-GitHub%20Repository-black?style=for-the-badge&logo=github)](https://github.com)
+[![CI Tests](https://img.shields.io/badge/Tests-13%20Passing-success?style=for-the-badge)](https://github.com)
 
 ---
 
 ## 🌟 Overview
 
-**panda.vault** is an open-source, client-side encrypted password manager built on strict zero-knowledge principles. Your master password and plaintext vault items **never leave your device or touch the server unencrypted**.
+**Git-pass** uses the master password obtained from the user to encrypt user's passwords.
+
+These encrypted passwords are stored in a **GitHub repository provided by the user**, giving complete access of user's data to only themselves.
+
+- 🔒 **Zero Server Storage**: Git-pass does not store any passwords on its backend server.
+- 🗑️ **User Sovereignty**: User repositories can be deleted by the user at anytime directly through Git-pass or GitHub.
+- 🔑 **Master Key Derivation**: High-entropy PBKDF2HMAC (SHA-256, 120,000 iterations) with authenticated AES-256-GCM ciphertexts.
+- 🚀 **Cloud Ready**: Production-ready deployment blueprint for **Render.com**.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Backend**: Python 3.11+, Django 5, Gunicorn
+- **Static Assets**: WhiteNoise
+- **Cryptography**: `cryptography` (AES-256-GCM + PBKDF2HMAC-SHA256)
+- **External Storage**: GitHub REST API
+- **Deployment**: Render.com Web Service (`git-pass.onrender.com`)
 
 ```text
-User Master Password + Email Salt
+User Master Password
         ↓
-  Argon2id (hash-wasm WebAssembly KDF)
+  PBKDF2HMAC-SHA256 (120,000 iterations + Salt)
         ↓
-  Master Key (MK)
-   ├──► HKDF-SHA256 (Info: "auth") ──► Auth Key (AK) ──► Server Auth (TLS)
-   └──► HKDF-SHA256 (Info: "enc")  ──► Decrypts Vault Master Key (VMK)
-                                            ↓
-                                       AES-256-GCM
-                                            ↓
-                             Encrypted Vault Ciphertext (PostgreSQL)
+   Derived Key (256-bit)
+        ↓
+   AES-256-GCM Encryption (with 12-byte Nonce & Auth Tag)
+        ↓
+  Encrypted Ciphertext
+        ↓
+  Direct Commit via GitHub API (User's Private GitHub Repo)
+  [0 PASSWORDS STORED ON BACKEND SERVER]
 ```
 
 ---
 
+## ✨ Features
 
-## ✨ Key Features
-
-
-- 🔐 **Zero-Knowledge Client-Side Encryption**: Argon2id KDF + HKDF-SHA256 key splitting + AES-256-GCM authenticated ciphertext.
-- 🛡️ **Local Password Security Audit**: In-browser password health scoring, reused/weak password detection, and age analytics calculated 100% locally.
-- 🧩 **Chrome & Edge Manifest V3 Extension**:
-  - Auto-detects credential inputs on active browser tabs.
-  - Strict eTLD+1 domain origin matching for robust phishing prevention.
-  - Explicit user-controlled one-click autofill into login forms.
-  - Rejection-sampling cryptographic password generator.
-  - In-memory Master Key caching with auto-lock timers.
-- ⏱️ **RFC 6238 TOTP Authenticator**: Built-in rotating 30-second two-factor code generator.
-- 🚀 **1-Click Render Cloud Deployment**: Automated deployment blueprint (`render.yaml`) provisioning PostgreSQL, FastAPI, and Next.js.
-- 🧪 **Enterprise Test Suite**: 68 automated unit, cryptographic, and integration tests across Backend (Pytest), Frontend (Vitest), and Extension (Vitest).
+- **Personal GitHub Storage**: Store passwords in any repository file (e.g. `passwords.txt`, `data.json`, `vault.dat`).
+- **AES-256-GCM Cryptographic Security**: Authenticated encryption ensures your ciphertext cannot be tampered with.
+- **Zero Server Retention**: No database holds your master password, PAT, or password items. Signed ephemeral sessions keep your memory secure.
+- **Instant Search & Category Filtering**: Filter by category (Logins, Social, Work, Finance, Personal) and live search in real time.
+- **Cryptographic Password Generator**: Generate high-entropy secure passwords with custom lengths and symbol toggles.
+- **One-Click Clipboard Copying**: Instant copy for usernames and passwords with feedback toasts.
+- **Master Password Re-encryption**: Change your master password at any time—Git-Pass automatically re-encrypts all items and commits the new vault to GitHub.
+- **Complete Repository Deletion**: Exercise your right to erase your data—delete your repository directly via GitHub API.
+- **Encrypted Payload Transparency**: View the exact raw ciphertext currently in GitHub via `/vault/raw/`.
+- **Offline Export**: Download your decrypted vault anytime in JSON or CSV format.
+- **Interactive Demo Mode**: Test the complete vault experience instantly without entering personal credentials.
 
 ---
 
-## 📂 Project Structure
+## 📋 Setup Instructions
 
-```text
-├── backend/                  # FastAPI REST API, Argon2id auth, rate limiting, and pytest suite
-│   ├── app/                  # Application core, models, endpoints, and schemas
-│   ├── tests/                # 17 backend security & CRUD pytest test cases
-│   └── requirements.txt      # Python dependencies (FastAPI, SQLAlchemy, Argon2, Bandit)
-├── frontend/                 # Next.js 16 App Router web app, Web Crypto workers, Vitest
-│   ├── src/app/              # Next.js App Router pages and layouts
-│   ├── src/lib/crypto/       # Zero-knowledge cryptographic engine & security auditors
-│   └── src/lib/crypto/__tests__/ # 41 frontend crypto & TOTP unit tests
-├── extension/                # Chrome/Edge Manifest V3 browser extension
-│   ├── src/background/       # Background service worker with in-memory key storage
-│   ├── src/content/          # DOM input detector & secure autofill injector
-│   ├── src/popup/            # Extension UI popup built with React 19 & Tailwind CSS
-│   └── src/__tests__/        # 10 origin-matching & extension crypto tests
-├── .github/workflows/ci.yml  # Automated GitHub Actions CI test & security audit pipeline
-└── render.yaml               # 1-Click Render Blueprint for DB, backend, and frontend
-```
+### 1. Create a GitHub Account
+Create a free account at [github.com](https://github.com).
+
+### 2. Generate a Personal Access Token (PAT)
+1. Go to [GitHub Settings &gt; Developer Settings &gt; Personal Access Tokens](https://github.com/settings/tokens).
+2. Generate a token with the **`repo`** scope (to read and write your encrypted file).
+3. *(Optional)* Select **`delete_repo`** if you want the ability to delete your repository from Git-Pass settings.
+4. Copy and store your token securely.
+
+### 3. Create a Repository
+1. Create a repository on GitHub (e.g., `my-passwords-vault`). Setting it to **Private** is recommended.
+2. Initialize it by adding any file (e.g., `passwords.txt`, `data.json`, or `vault.dat`).
+
+### 4. Connect with Git-Pass
+1. Enter your GitHub Username, Repository Name, Filename, PAT, and chosen Master Password.
+2. If the file is brand new, Git-Pass will automatically format and initialize your encrypted vault!
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## 🚀 Local Development
 
-### 1. Backend Service (FastAPI)
+### 1. Clone the repository
 ```bash
-cd backend
+git clone https://github.com/Chaitanyasarkate/-panda.vault.git
+cd vaultx
+```
+
+### 2. Install dependencies
+```bash
 python -m venv venv
-.\venv\Scripts\activate      # On Linux/macOS: source venv/bin/activate
+# Windows:
+.\venv\Scripts\activate
+# Linux/macOS:
+source venv/bin/activate
+
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
 ```
 
-### 2. Frontend Web Application (Next.js)
+### 3. Run migrations and collect static files
 ```bash
-cd frontend
-npm install
-npm run dev
+python manage.py migrate
+python manage.py collectstatic --no-input
 ```
-Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
-### 3. Browser Extension (Chrome / Edge / Brave)
+### 4. Run tests
 ```bash
-cd extension
-npm install
-npm run build
+python manage.py test
 ```
-1. Open your browser and navigate to `chrome://extensions/`.
-2. Toggle on **Developer mode** (top right).
-3. Click **Load unpacked** and select the `extension/dist` folder.
-4. Pin the **panda.vault** extension to your toolbar.
 
----
-
-## 🧪 Automated Test Suite (68 Tests Passing)
-
+### 5. Start the local server
 ```bash
-# 1. Backend Pytest Suite (17 tests) + Bandit Security Scan
-cd backend
-python -m pytest -v
-
-# 2. Frontend Vitest Suite (41 tests)
-cd frontend
-npx vitest run
-
-# 3. Extension Vitest Suite (10 tests)
-cd extension
-npx vitest run
+python manage.py runserver
 ```
+Visit **[http://localhost:8000](http://localhost:8000)** in your browser.
 
 ---
 
-## ☁️ Deploying to Render
+## ☁️ Deployment on Render.com
 
-This repository includes a `render.yaml` Blueprint for automated deployment:
+This project is pre-configured for 1-click deployment on [Render.com](https://render.com) using `render.yaml`.
 
-1. Log into your [Render Dashboard](https://dashboard.render.com/).
-2. Click **New +** → **Blueprint**.
-3. Select your repository: `https://github.com/Chaitanyasarkate/-panda.vault.git`.
-4. Render will automatically provision and connect:
-   - **PostgreSQL Database** (`panda-vault-db`)
-   - **FastAPI Web Service** (`panda-vault-backend`)
-   - **Next.js Web Service** (`panda-vault`)
-5. Click **Apply**.
-
----
-
-## 🔒 Security & Threat Model
-
-- **Zero-Knowledge Guarantee**: Master passwords never touch server RAM or persistent disks.
-- **Argon2id Memory Hardening**: WebAssembly-powered key derivation resists GPU/ASIC brute-force attacks.
-- **Authenticated Encryption**: All item payloads are encrypted with unique 96-bit random IVs and AES-256-GCM authentication tags.
-- **Strict Content-Security-Policy (CSP)**: Hardened headers with `wasm-unsafe-eval` for client-side WASM crypto, blocking unauthorized scripts and cross-site exfiltration.
+1. Fork or push this repository to GitHub.
+2. In the Render Dashboard, create a **New Blueprint Instance** and select this repository.
+3. Render automatically provisions the web service using `render.yaml`:
+   - **Build Command**: `./build.sh`
+   - **Start Command**: `gunicorn gitpass_project.wsgi:application`
+   - **Health Check**: `/health/`
+4. Your application will be live at `https://<your-service-name>.onrender.com`!
 
 ---
 
-## 📄 License
+## 📜 License
 
-MIT License. Designed with privacy, zero-knowledge security, and reliability as top priorities.
+MIT License. Free and open source for personal and enterprise use.

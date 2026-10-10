@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Raw Ciphertext in GitHub — Git-Pass{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+  <div class="mb-6">
+    <a href="{% url 'gitpass:vault' %}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 mb-2 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      Back to Vault
+    </a>
+    <h1 class="text-2xl font-extrabold text-white tracking-tight flex items-center gap-3">
+      Raw Ciphertext in GitHub
+      <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-mono border border-emerald-500/20">
+        {{ repo }}:{{ filename }}
+      </span>
+    </h1>
+    <p class="text-xs text-slate-400 mt-1">
+      This is the exact, unadulterated payload stored in your GitHub repository. It demonstrates that without your master password, all data is cryptographically indistinguishable from random noise.
+    </p>
+  </div>
+
+  <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-2xl relative">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3 text-xs text-slate-400">
+      <span class="font-mono">Payload Format: AES-256-GCM + PBKDF2HMAC-SHA256</span>
+      <button onclick="copyToClipboard(document.getElementById('rawCodeBlock').innerText, 'Ciphertext copied!')" class="px-3 py-1 rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition">
+        Copy Ciphertext
+      </button>
+    </div>
+    <pre id="rawCodeBlock" class="p-4 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs text-emerald-400 overflow-x-auto max-h-[600px] leading-relaxed select-all"><code>{{ raw_text }}</code></pre>
+  </div>
+</div>
+{% endblock %}

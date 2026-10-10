@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+
+{% block title %}Password Vault — Git-Pass{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+
+  <!-- Top Controls & Status Bar -->
+  <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 pb-6 border-b border-slate-800/80">
+    
+    <!-- Left: Vault Status & Heading -->
+    <div>
+      <div class="flex flex-wrap items-center gap-2 text-xs text-slate-400 mb-1.5">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-medium border border-emerald-500/20">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          Active & Synced
+        </span>
+        {% if is_demo %}
+          <span class="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 font-semibold border border-amber-500/20">
+            Demo Mode (In-Memory)
+          </span>
+        {% endif %}
+        <span>•</span>
+        <span class="font-mono text-slate-300">{{ github_username }}/{{ github_repo }} <span class="text-slate-500">({{ github_filename }})</span></span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+        Password Vault
+        <span class="text-xs font-semibold text-slate-400 px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700/80">
+          {{ total_count }} saved
+        </span>
+      </h1>
+    </div>
+
+    <!-- Right: Actions & Tools -->
+    <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+      
+      <!-- Add Password Button -->
+      <button onclick="openModal('addModal')" class="btn-primary flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-slate-950 text-sm shadow-lg shadow-emerald-500/20 hover:scale-[1.02] transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+        <span>Add Password</span>
+      </button>
+
+      <!-- Password Generator Button -->
+      <button onclick="openModal('generatorModal')" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white border border-slate-700/80 hover:border-slate-600 bg-slate-800/80 hover:bg-slate-800 text-sm font-medium transition">
+        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        <span>Generator</span>
+      </button>
+
+      <!-- Raw Ciphertext View -->
+      <a href="{% url 'gitpass:raw_vault' %}" target="_blank" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white border border-slate-700/80 hover:border-slate-600 bg-slate-800/80 hover:bg-slate-800 text-sm font-medium transition" title="Inspect raw encrypted payload in GitHub">
+        <svg class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+        <span>Raw GitHub Data</span>
+      </a>
+
+      <!-- Export Dropdown -->
+      <div class="relative group">
+        <button class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white border border-slate-700/80 hover:border-slate-600 bg-slate-800/80 hover:bg-slate-800 text-sm font-medium transition">
+          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>Export</span>
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+        <div class="absolute right-0 mt-1 w-40 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-1.5 hidden group-hover:block z-30">
+          <a href="{% url 'gitpass:export_vault' %}?format=json" class="flex items-center gap-2 px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white">
+            <span>📄</span> JSON Backup
+          </a>
+          <a href="{% url 'gitpass:export_vault' %}?format=csv" class="flex items-center gap-2 px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white">
+            <span>📊</span> CSV Spreadsheet
+          </a>
+        </div>
+      </div>
+
+      <!-- Settings Dropdown -->
+      <div class="relative group">
+        <button class="p-2.5 rounded-xl text-slate-300 hover:text-white border border-slate-700/80 hover:border-slate-600 bg-slate-800/80 hover:bg-slate-800 text-sm transition" title="Vault Settings">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </button>
+        <div class="absolute right-0 mt-1 w-60 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-1.5 hidden group-hover:block z-30">
+          <button onclick="openModal('pwChangeModal')" class="w-full text-left px-4 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-2.5">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <span>Change Master Password</span>
+          </button>
+          <div class="border-t border-slate-800 my-1"></div>
+          <button onclick="openModal('deleteRepoModal')" class="w-full text-left px-4 py-2 text-xs text-red-400 hover:bg-red-950/50 hover:text-red-300 flex items-center gap-2.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            <span>Delete GitHub Repository</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Search & Category Filters -->
+  <div class="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+    
+    <!-- Search Bar -->
+    <div class="relative w-full sm:max-w-md">
+      <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      </div>
+      <input type="text" id="vaultSearchInput" placeholder="Filter passwords, accounts, or notes..." value="{{ search_q }}" class="w-full pl-10 pr-9 py-2.5 rounded-xl bg-slate-900/90 border border-slate-800 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition">
+      <button type="button" id="clearSearchBtn" onclick="clearSearchFilter()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300 hidden">
+        &times;
+      </button>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+      <a href="?category=All" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition {% if selected_cat == 'All' %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% else %}text-slate-400 hover:text-white hover:bg-slate-800/80 border border-slate-800/60{% endif %}">
+        All ({{ total_count }})
+      </a>
+      {% for cat in categories %}
+        <a href="?category={{ cat }}" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition {% if selected_cat == cat %}bg-emerald-500/20 text-emerald-300 border border-emerald-500/30{% else %}text-slate-400 hover:text-white hover:bg-slate-800/80 border border-slate-800/60{% endif %}">
+          {{ cat }}
+        </a>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <!-- Items List Grid -->
+  <div class="mt-8">
+    {% if items %}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="vaultCardsContainer">
+        {% for item in items %}
+          <div class="vault-card bg-slate-900/90 border border-slate-800/90 rounded-2xl p-5 shadow-xl flex flex-col justify-between" data-search="{{ item.title|lower }} {{ item.username|lower }} {{ item.url|lower }} {{ item.notes|lower }} {{ item.category|lower }}">
+            
+            <div>
+              <!-- Top Row: Avatar Badge, Title, Category Badge -->
+              <div class="flex items-start justify-between gap-3 mb-3.5">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-slate-800 to-slate-700 border border-slate-700/80 flex items-center justify-center font-bold text-sm text-emerald-400 shrink-0 shadow-inner">
+                    {{ item.title|slice:":2"|upper }}
+                  </div>
+                  <div class="overflow-hidden">
+                    <h3 class="text-base font-bold text-white leading-snug truncate">{{ item.title }}</h3>
+                    {% if item.url %}
+                      <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer" class="text-xs text-emerald-400 hover:underline flex items-center gap-1 mt-0.5 truncate max-w-[200px]" title="{{ item.url }}">
+                        {{ item.url|cut:"https://"|cut:"http://" }}
+                        <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <!-- Category Pill -->
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md border shrink-0 
+                  {% if item.category == 'Work' %}bg-blue-500/10 text-blue-400 border-blue-500/20
+                  {% elif item.category == 'Social' %}bg-purple-500/10 text-purple-400 border-purple-500/20
+                  {% elif item.category == 'Finance' %}bg-emerald-500/10 text-emerald-400 border-emerald-500/20
+                  {% elif item.category == 'Personal' %}bg-amber-500/10 text-amber-400 border-amber-500/20
+                  {% else %}bg-slate-800 text-slate-400 border-slate-700{% endif %}">
+                  {{ item.category|default:"Logins" }}
+                </span>
+              </div>
+
+              <!-- Username Pill -->
+              <div class="my-2.5 p-2.5 rounded-xl bg-[#030712]/80 border border-slate-800 flex items-center justify-between group">
+                <div class="flex items-center gap-2.5 overflow-hidden pr-2">
+                  <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                  <span class="text-xs font-mono text-slate-200 truncate select-all">{{ item.username }}</span>
+                </div>
+                <button type="button" onclick="copyToClipboard('{{ item.username }}', 'Username copied!')" class="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition" title="Copy Username">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                </button>
+              </div>
+
+              <!-- Password Pill -->
+              <div class="my-2.5 p-2.5 rounded-xl bg-[#030712]/80 border border-slate-800 flex items-center justify-between group">
+                <div class="flex items-center gap-2.5 overflow-hidden pr-2">
+                  <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                  <span id="pwd-val-{{ item.id }}" class="text-xs font-mono text-slate-200 password-masked truncate select-all" data-password="{{ item.password }}">••••••••••••</span>
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                  <button type="button" onclick="togglePasswordCard('{{ item.id }}')" class="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition" title="Reveal / Hide">
+                    <svg id="eye-icon-{{ item.id }}" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  </button>
+                  <button type="button" onclick="copyToClipboard('{{ item.password }}', 'Password copied!')" class="p-1 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition" title="Copy Password">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              {% if item.notes %}
+                <p class="text-xs text-slate-400 line-clamp-2 mt-2 px-1 leading-relaxed">
+                  {{ item.notes }}
+                </p>
+              {% endif %}
+            </div>
+
+            <!-- Card Bottom Bar: Edit & Delete -->
+            <div class="pt-3.5 mt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <span class="text-[11px] text-slate-500">
+                Updated {{ item.updated_at|slice:":10" }}
+              </span>
+              <div class="flex items-center gap-1.5">
+                <a href="{% url 'gitpass:edit_item' item.id %}" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 font-medium transition">
+                  Edit
+                </a>
+                <form method="post" action="{% url 'gitpass:delete_item' item.id %}" onsubmit="return confirm('Delete credential for {{ item.title }} from your GitHub repository?');">
+                  {% csrf_token %}
+                  <button type="submit" class="px-2.5 py-1 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-950/40 font-medium transition">
+                    Delete
+                  </button>
+                </form>
+              </div>
+            </div>
+
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- No Search Results Found placeholder -->
+      <div id="noSearchResults" class="hidden text-center py-16 bg-slate-900/40 border border-slate-800/80 rounded-2xl">
+        <p class="text-slate-400 text-sm">No passwords match your search query.</p>
+        <button onclick="clearSearchFilter()" class="mt-3 text-xs text-emerald-400 hover:underline">Clear search filter</button>
+      </div>
+
+    {% else %}
+      <!-- Empty Vault State -->
+      <div class="text-center py-16 px-4 bg-slate-900/40 border border-slate-800/80 rounded-2xl">
+        <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 mx-auto flex items-center justify-center mb-4">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <h3 class="text-lg font-bold text-white">Your GitHub Vault is Empty</h3>
+        <p class="text-slate-400 text-sm max-w-md mx-auto mt-1 mb-6">
+          Add your first credential. Every item is encrypted with your master password and committed straight to your GitHub repository.
+        </p>
+        <button onclick="openModal('addModal')" class="btn-primary py-2.5 px-5 rounded-xl font-semibold text-slate-950 text-sm inline-flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+          Add First Password
+        </button>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- 1. Add Credential Modal -->
+<div id="addModal" class="modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="modal-dialog bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+      <h3 class="text-base font-bold text-white flex items-center gap-2">
+        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Add New Password
+      </h3>
+      <button onclick="closeModal('addModal')" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
+    </div>
+
+    <form method="post" action="{% url 'gitpass:add_item' %}" class="space-y-3.5">
+      {% csrf_token %}
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Service / Title *</label>
+        {{ cred_form.title }}
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Username / Email *</label>
+        {{ cred_form.username }}
+      </div>
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <label class="block text-xs font-semibold text-slate-300">Password *</label>
+          <button type="button" onclick="generateAndFillPassword('id_password')" class="text-[11px] text-emerald-400 hover:underline flex items-center gap-1">
+            ⚡ Quick Generate
+          </button>
+        </div>
+        {{ cred_form.password }}
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Category</label>
+          {{ cred_form.category }}
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Website URL</label>
+          {{ cred_form.url }}
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Notes</label>
+        {{ cred_form.notes }}
+      </div>
+      <div class="pt-3 flex justify-end gap-2.5">
+        <button type="button" onclick="closeModal('addModal')" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white border border-slate-700 text-xs font-medium">Cancel</button>
+        <button type="submit" class="btn-primary px-5 py-2 rounded-xl text-slate-950 font-semibold text-xs shadow-md">Encrypt & Commit to GitHub</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 2. Password Generator Modal -->
+<div id="generatorModal" class="modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="modal-dialog bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+      <h3 class="text-base font-bold text-white flex items-center gap-2">
+        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        Password Generator
+      </h3>
+      <button onclick="closeModal('generatorModal')" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
+    </div>
+
+    <!-- Generated Password Display -->
+    <div class="p-3.5 rounded-xl bg-[#030712] border border-slate-800 flex items-center justify-between mb-4">
+      <span id="genDisplay" class="font-mono text-sm text-emerald-400 font-bold break-all select-all">Generating...</span>
+      <button type="button" onclick="copyGeneratedPassword()" class="ml-2 px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30 text-xs font-semibold shrink-0 transition">
+        Copy
+      </button>
+    </div>
+
+    <!-- Generator Controls -->
+    <div class="space-y-3.5 text-xs">
+      <div>
+        <div class="flex justify-between text-slate-300 mb-1.5 font-medium">
+          <span>Length:</span>
+          <span class="font-bold text-emerald-400" id="lenDisplay">18</span>
+        </div>
+        <input type="range" id="genLength" min="8" max="40" value="18" class="w-full accent-emerald-500" oninput="document.getElementById('lenDisplay').innerText = this.value; generatePasswordModal();">
+      </div>
+
+      <div class="space-y-2 pt-1">
+        <label class="flex items-center gap-2.5 text-slate-300 cursor-pointer">
+          <input type="checkbox" id="genSymbols" checked class="w-4 h-4 rounded accent-emerald-500" onchange="generatePasswordModal()">
+          <span>Include Symbols (!@#$%^&*)</span>
+        </label>
+        <label class="flex items-center gap-2.5 text-slate-300 cursor-pointer">
+          <input type="checkbox" id="genDigits" checked class="w-4 h-4 rounded accent-emerald-500" onchange="generatePasswordModal()">
+          <span>Include Numbers (0-9)</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="pt-4 mt-4 border-t border-slate-800 flex justify-end gap-2">
+      <button type="button" onclick="generatePasswordModal()" class="px-4 py-2 rounded-xl text-slate-300 hover:text-white border border-slate-700 hover:bg-slate-800 text-xs font-medium transition">Regenerate</button>
+      <button type="button" onclick="closeModal('generatorModal')" class="btn-primary px-4 py-2 rounded-xl text-slate-950 text-xs font-semibold">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Change Master Password Modal -->
+<div id="pwChangeModal" class="modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="modal-dialog bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+      <h3 class="text-base font-bold text-white flex items-center gap-2">
+        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        Change Master Password
+      </h3>
+      <button onclick="closeModal('pwChangeModal')" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
+    </div>
+
+    <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+      This will decrypt your vault with your current password, re-encrypt it with your new password using AES-256-GCM, and push a new commit to GitHub.
+    </p>
+
+    <form method="post" action="{% url 'gitpass:change_master_password' %}" class="space-y-3.5">
+      {% csrf_token %}
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Current Master Password</label>
+        {{ pw_change_form.current_password }}
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">New Master Password</label>
+        {{ pw_change_form.new_password }}
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">Confirm New Password</label>
+        {{ pw_change_form.confirm_password }}
+      </div>
+      <div class="pt-3 flex justify-end gap-2.5">
+        <button type="button" onclick="closeModal('pwChangeModal')" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white border border-slate-700 text-xs font-medium">Cancel</button>
+        <button type="submit" class="btn-primary px-5 py-2 rounded-xl text-slate-950 font-semibold text-xs shadow-md">Re-Encrypt Vault</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 4. Delete GitHub Repository Modal -->
+<div id="deleteRepoModal" class="modal-backdrop hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="modal-dialog bg-slate-900 border border-red-900/60 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+    <div class="flex items-center justify-between pb-3 border-b border-red-900/40 mb-4">
+      <h3 class="text-base font-bold text-red-400 flex items-center gap-2">
+        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        Permanently Delete Repository
+      </h3>
+      <button onclick="closeModal('deleteRepoModal')" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
+    </div>
+
+    <div class="p-3.5 bg-red-950/40 border border-red-900/50 rounded-xl text-xs text-red-200/90 mb-4 space-y-1">
+      <p class="font-semibold text-red-300">⚠️ Irreversible Action</p>
+      <p>This will permanently delete the repository <strong>{{ github_username }}/{{ github_repo }}</strong> directly on GitHub via your Personal Access Token. All stored files and git history will be destroyed immediately.</p>
+    </div>
+
+    <form method="post" action="{% url 'gitpass:delete_repo' %}" class="space-y-3.5">
+      {% csrf_token %}
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">
+          Type <span class="font-mono text-emerald-400 select-all">{{ github_repo }}</span> to confirm:
+        </label>
+        {{ delete_repo_form.confirm_repo_name }}
+      </div>
+      <div class="pt-3 flex justify-end gap-2.5">
+        <button type="button" onclick="closeModal('deleteRepoModal')" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white border border-slate-700 text-xs font-medium">Cancel</button>
+        <button type="submit" class="bg-red-600 hover:bg-red-500 text-white font-semibold text-xs px-5 py-2 rounded-xl shadow-lg shadow-red-600/30">Delete Repository Forever</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
