@@ -8,7 +8,7 @@ class ConnectForm(forms.Form):
         widget=forms.TextInput(attrs={
             "placeholder": "e.g. octocat",
             "class": "form-control",
-            "autocomplete": "username",
+            "autocomplete": "off",
             "required": True,
         })
     )
@@ -18,6 +18,7 @@ class ConnectForm(forms.Form):
         widget=forms.TextInput(attrs={
             "placeholder": "e.g. my-passwords-vault",
             "class": "form-control",
+            "autocomplete": "off",
             "required": True,
         })
     )
@@ -28,6 +29,7 @@ class ConnectForm(forms.Form):
         widget=forms.TextInput(attrs={
             "placeholder": "e.g. passwords.txt or vault.dat",
             "class": "form-control",
+            "autocomplete": "off",
             "required": True,
         }),
         help_text="File inside your GitHub repository that holds the encrypted ciphertext."
@@ -47,7 +49,7 @@ class ConnectForm(forms.Form):
         widget=forms.PasswordInput(attrs={
             "placeholder": "Your master encryption key",
             "class": "form-control",
-            "autocomplete": "current-password",
+            "autocomplete": "new-password",
             "required": True,
         }),
         help_text="Never stored on our server! Encrypts and decrypts all your vault items."
@@ -71,6 +73,7 @@ class CredentialForm(forms.Form):
         widget=forms.TextInput(attrs={
             "placeholder": "e.g. Google, GitHub, Netflix",
             "class": "form-control",
+            "autocomplete": "off",
             "required": True,
         })
     )
@@ -80,6 +83,7 @@ class CredentialForm(forms.Form):
         widget=forms.TextInput(attrs={
             "placeholder": "user@example.com or username",
             "class": "form-control",
+            "autocomplete": "off",
             "required": True,
         })
     )
@@ -89,6 +93,7 @@ class CredentialForm(forms.Form):
             "placeholder": "Password",
             "class": "form-control font-mono",
             "id": "item-password-field",
+            "autocomplete": "new-password",
             "required": True,
         })
     )
@@ -98,6 +103,7 @@ class CredentialForm(forms.Form):
         widget=forms.URLInput(attrs={
             "placeholder": "https://example.com/login",
             "class": "form-control",
+            "autocomplete": "off",
         })
     )
     totp_secret = forms.CharField(
@@ -106,6 +112,7 @@ class CredentialForm(forms.Form):
         widget=forms.TextInput(attrs={
             "placeholder": "e.g. JBSWY3DPEHPK3PXP or otpauth://totp/...",
             "class": "form-control font-mono",
+            "autocomplete": "off",
         }),
         help_text="Paste Base32 secret or otpauth:// URI to generate live 6-digit rolling 2FA codes."
     )
@@ -121,6 +128,7 @@ class CredentialForm(forms.Form):
         widget=forms.Textarea(attrs={
             "placeholder": "Recovery codes, security answers, or extra notes...",
             "class": "form-control",
+            "autocomplete": "off",
             "rows": 3,
         })
     )
@@ -132,6 +140,7 @@ class ChangeMasterPasswordForm(forms.Form):
         widget=forms.PasswordInput(attrs={
             "placeholder": "Enter your current master password",
             "class": "form-control",
+            "autocomplete": "new-password",
             "required": True,
         })
     )
@@ -141,6 +150,7 @@ class ChangeMasterPasswordForm(forms.Form):
         widget=forms.PasswordInput(attrs={
             "placeholder": "At least 8 characters",
             "class": "form-control",
+            "autocomplete": "new-password",
             "required": True,
         })
     )
@@ -150,6 +160,7 @@ class ChangeMasterPasswordForm(forms.Form):
         widget=forms.PasswordInput(attrs={
             "placeholder": "Re-enter new master password",
             "class": "form-control",
+            "autocomplete": "new-password",
             "required": True,
         })
     )
@@ -169,6 +180,7 @@ class DeleteRepoForm(forms.Form):
         widget=forms.TextInput(attrs={
             "placeholder": "Type exact repository name",
             "class": "form-control",
+            "autocomplete": "off",
             "required": True,
         })
     )

@@ -104,11 +104,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     'gitpass_repo',
     'gitpass_token',
     'gitpass_filename',
-    'gitpass_cached_master',
     'gitpass_biometric_enabled',
     'gitpass_biometric_id',
     'gitpass_biometric_payload'
   ]);
+  // Ensure any legacy cached master password is removed
+  chrome.storage?.local?.remove?.('gitpass_cached_master');
 
   // Check Biometrics Availability
   if (stored.gitpass_biometric_enabled && stored.gitpass_biometric_id && btnBiometricUnlock) {
@@ -123,12 +124,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     unlockTitle.textContent = `Unlock ${stored.gitpass_repo}`;
     unlockSubtitle.textContent = `Connected to github.com/${stored.gitpass_user}/${stored.gitpass_repo}`;
     btnToggleSettings.textContent = 'Edit GitHub Settings';
-
-    // Auto-unlock if cached in session
-    if (stored.gitpass_cached_master) {
-      unlockMasterPassword.value = stored.gitpass_cached_master;
-      performUnlock();
-    }
   } else {
     setupFields.classList.remove('hidden');
     unlockTitle.textContent = 'Connect & Unlock';
@@ -228,8 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         gitpass_user: username,
         gitpass_repo: repo,
         gitpass_token: token,
-        gitpass_filename: filename,
-        gitpass_cached_master: masterPass
+        gitpass_filename: filename
       });
 
       // 5. Populate Active Session
@@ -448,7 +442,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     unlockMasterPassword.value = '';
     headerActions.style.display = 'none';
     if (totpIntervalId) clearInterval(totpIntervalId);
-    await setLocalStorage({ gitpass_cached_master: '' });
     showView(viewUnlock);
     showToast('Vault locked.');
   });

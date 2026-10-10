@@ -60,20 +60,20 @@
         <p class="popup-view-subtitle" id="unlockSubtitle">Enter master password to decrypt repository data.</p>
       </div>
 
-      <form id="formUnlock" class="popup-form">
+      <form id="formUnlock" class="popup-form" autocomplete="off">
         <!-- Setup fields (Hidden when already configured) -->
         <div id="setupFields" class="popup-field-group">
-          <input type="text" id="setupUsername" placeholder="GitHub username (e.g. ChaitanyaSarkate)" class="popup-pill-input">
-          <input type="text" id="setupRepo" placeholder="Repository name (e.g. git-vault)" class="popup-pill-input mt-2">
+          <input type="text" id="setupUsername" placeholder="GitHub username (e.g. ChaitanyaSarkate)" autocomplete="off" class="popup-pill-input">
+          <input type="text" id="setupRepo" placeholder="Repository name (e.g. git-vault)" autocomplete="off" class="popup-pill-input mt-2">
           <div class="input-with-action mt-2">
-            <input type="password" id="setupToken" placeholder="GitHub PAT (ghp_...)" class="popup-pill-input">
+            <input type="password" id="setupToken" placeholder="GitHub PAT (ghp_...)" autocomplete="off" class="popup-pill-input">
             <button type="button" class="eye-toggle-btn" data-target="setupToken">👁</button>
           </div>
         </div>
 
         <!-- Master Password (Always Required to Decrypt) -->
         <div class="input-with-action mt-2">
-          <input type="password" id="unlockMasterPassword" placeholder="Master encryption password" required class="popup-pill-input">
+          <input type="password" id="unlockMasterPassword" placeholder="Master encryption password" required autocomplete="new-password" class="popup-pill-input">
           <button type="button" class="eye-toggle-btn" data-target="unlockMasterPassword">👁</button>
         </div>
 
@@ -144,28 +144,28 @@
         <h3 class="view-subtitle-heading">Add New Credential</h3>
       </div>
 
-      <form id="formAddCredential" class="popup-form">
+      <form id="formAddCredential" class="popup-form" autocomplete="off">
         <div class="form-group">
-          <input type="text" id="addTitle" placeholder="Service / Title (e.g. GitHub)" required class="popup-pill-input">
+          <input type="text" id="addTitle" placeholder="Service / Title (e.g. GitHub)" required autocomplete="off" class="popup-pill-input">
         </div>
         <div class="form-group mt-2">
-          <input type="text" id="addUsername" placeholder="Username / Email" required class="popup-pill-input">
+          <input type="text" id="addUsername" placeholder="Username / Email" required autocomplete="off" class="popup-pill-input">
         </div>
         <div class="form-group mt-2">
           <div class="input-with-action">
-            <input type="password" id="addPassword" placeholder="Password" required class="popup-pill-input">
+            <input type="password" id="addPassword" placeholder="Password" required autocomplete="new-password" class="popup-pill-input">
             <button type="button" class="eye-toggle-btn" data-target="addPassword">👁</button>
             <button type="button" id="btnQuickGenInAdd" class="btn-inline-gen" title="Generate Strong Password">⚡</button>
           </div>
         </div>
         <div class="form-group mt-2">
-          <input type="text" id="addUrl" placeholder="Website URL (e.g. https://...)" class="popup-pill-input">
+          <input type="text" id="addUrl" placeholder="Website URL (e.g. https://...)" autocomplete="off" class="popup-pill-input">
         </div>
         <div class="form-group mt-2">
-          <input type="text" id="addTotp" placeholder="2FA / TOTP Secret (Base32 or otpauth://)" class="popup-pill-input">
+          <input type="text" id="addTotp" placeholder="2FA / TOTP Secret (Base32 or otpauth://)" autocomplete="off" class="popup-pill-input">
         </div>
         <div class="form-group mt-2">
-          <input type="text" id="addNotes" placeholder="Notes (optional)" class="popup-pill-input">
+          <input type="text" id="addNotes" placeholder="Notes (optional)" autocomplete="off" class="popup-pill-input">
         </div>
 
         <button type="submit" id="btnSaveCredential" class="btn-stark-white mt-3">
