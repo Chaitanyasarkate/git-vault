@@ -31,10 +31,10 @@
       </h1>
     </div>
 
-    <!-- Right: Actions & Tools -->
+    <!-- Right: Single Primary Action & Options -->
     <div class="vault-actions-bar">
       
-      <!-- Add Password Button -->
+      <!-- Primary: Add Password Button -->
       <button type="button" onclick="openModal('addModal')" class="btn-vault-primary" id="addPasswordBtn">
         <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
@@ -42,46 +42,13 @@
         <span>Add Password</span>
       </button>
 
-      <!-- Password Generator Button -->
-      <button type="button" onclick="openModal('generatorModal')" class="btn-vault-secondary" id="openGeneratorBtn">
-        <svg width="16" height="16" class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
-        </svg>
-        <span>Generator</span>
-      </button>
-
-      <!-- Security Health Audit Badge -->
-      <button type="button" onclick="openSecurityAuditModal()" class="btn-vault-secondary" id="openAuditBtn" title="Breach Health Audit & Password Strength Dashboard">
-        <span class="inline-flex items-center justify-center w-2 h-2 rounded-full {% if audit_summary.health_score >= 80 %}bg-emerald-400{% elif audit_summary.health_score >= 60 %}bg-teal-400{% else %}bg-amber-400{% endif %} mr-1.5 animate-pulse"></span>
-        <svg width="15" height="15" class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-        </svg>
-        <span>Health: <strong id="auditScorePill" class="text-white">{{ audit_summary.health_score|default:"100" }}%</strong></span>
-      </button>
-
-      <!-- Time Machine Button -->
-      <button type="button" onclick="openTimeMachineModal()" class="btn-vault-secondary" id="openTimeMachineBtn" title="Git Commit Time-Machine: Browse snapshots & restore passwords">
-        <svg width="15" height="15" class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <span>Time Machine</span>
-      </button>
-
-      <!-- Raw Ciphertext View -->
-      <a href="{% url 'gitpass:raw_vault' %}" target="_blank" rel="noopener noreferrer" class="btn-vault-secondary" title="Inspect raw encrypted payload on GitHub">
-        <svg width="16" height="16" class="w-4 h-4 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-        </svg>
-        <span>Raw GitHub Data</span>
-      </a>
-
-      <!-- Export Dropdown -->
+      <!-- Vault Options Dropdown -->
       <div class="dropdown">
-        <button type="button" class="btn-vault-secondary">
+        <button type="button" class="btn-vault-secondary" title="Export & Vault Operations">
           <svg width="16" height="16" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
           </svg>
-          <span>Export</span>
+          <span>Options</span>
           <svg width="14" height="14" class="w-3.5 h-3.5 text-slate-400 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
           </svg>
@@ -89,36 +56,20 @@
         <div class="dropdown-menu">
           <a href="{% url 'gitpass:export_vault' %}?format=json" class="dropdown-item">
             <span>📄</span>
-            <span>JSON Backup</span>
+            <span>Export JSON Backup</span>
           </a>
           <a href="{% url 'gitpass:export_vault' %}?format=csv" class="dropdown-item">
             <span>📊</span>
-            <span>CSV Spreadsheet</span>
+            <span>Export CSV Spreadsheet</span>
           </a>
-        </div>
-      </div>
-
-      <!-- Settings Dropdown -->
-      <div class="dropdown">
-        <button type="button" class="btn-vault-icon" title="Vault Settings">
-          <svg width="18" height="18" class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
-        </button>
-        <div class="dropdown-menu" style="min-width: 14rem;">
-          <button type="button" onclick="openModal('pwChangeModal')" class="dropdown-item">
-            <svg width="16" height="16" class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-            </svg>
-            <span>Change Master Password</span>
-          </button>
+          <a href="{% url 'gitpass:raw_vault' %}" target="_blank" rel="noopener noreferrer" class="dropdown-item">
+            <span>🔍</span>
+            <span>Raw GitHub Payload</span>
+          </a>
           <div class="dropdown-divider"></div>
           <button type="button" onclick="openModal('deleteRepoModal')" class="dropdown-item dropdown-item-danger">
-            <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-            </svg>
-            <span>Delete GitHub Repository</span>
+            <span>🗑️</span>
+            <span>Delete GitHub Repo</span>
           </button>
         </div>
       </div>
@@ -132,20 +83,20 @@
     <!-- 1. Executive Telemetry HUD Strip -->
     <div class="pro-hud-grid">
       
-      <!-- Card 1: Vault Health -->
-      <div class="pro-hud-card cursor-pointer" onclick="openSecurityAuditModal()" title="Click to open Security Audit">
+      <!-- Card 1: Vault Health (Clickable to open Breach Audit) -->
+      <div class="pro-hud-card cursor-pointer" onclick="openSecurityAuditModal()" title="Run Breach Health Audit">
         <div class="pro-hud-icon-wrap text-emerald-400">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
         </div>
         <div>
-          <div class="pro-hud-card-label">Vault Health</div>
+          <div class="pro-hud-card-label">Security Health</div>
           <div class="pro-hud-card-val">
-            <span>{{ audit_summary.health_score|default:"100" }}%</span>
+            <span id="auditScorePill">{{ audit_summary.health_score|default:"100" }}%</span>
             <span class="text-xs font-semibold text-emerald-400 px-1.5 py-0.5 rounded-full bg-emerald-500/10">{{ audit_summary.grade|default:"A+" }}</span>
           </div>
-          <div class="pro-hud-card-sub">k-Anonymity Guard Active</div>
+          <div class="pro-hud-card-sub text-emerald-400">Click to run audit &rarr;</div>
         </div>
       </div>
 
@@ -157,7 +108,7 @@
           </svg>
         </div>
         <div>
-          <div class="pro-hud-card-label">Credentials Saved</div>
+          <div class="pro-hud-card-label">Saved Accounts</div>
           <div class="pro-hud-card-val">{{ total_count }}</div>
           <div class="pro-hud-card-sub">Zero Server Storage</div>
         </div>
@@ -173,12 +124,12 @@
         <div>
           <div class="pro-hud-card-label">Cipher Engine</div>
           <div class="pro-hud-card-val text-sm font-mono tracking-tight">AES-256-GCM</div>
-          <div class="pro-hud-card-sub">PBKDF2-HMAC-SHA256</div>
+          <div class="pro-hud-card-sub">PBKDF2 (120k rounds)</div>
         </div>
       </div>
 
-      <!-- Card 4: Version Control Engine -->
-      <div class="pro-hud-card cursor-pointer" onclick="openTimeMachineModal()" title="Click to open Git Time Machine">
+      <!-- Card 4: Version Control Engine (Clickable to open Time-Machine) -->
+      <div class="pro-hud-card cursor-pointer" onclick="openTimeMachineModal()" title="Browse Git Snapshots & Rollback">
         <div class="pro-hud-icon-wrap text-sky-400">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -187,7 +138,7 @@
         <div>
           <div class="pro-hud-card-label">Git Time-Machine</div>
           <div class="pro-hud-card-val text-sm">Commit Logs</div>
-          <div class="pro-hud-card-sub truncate max-w-[140px]">{{ github_repo }}</div>
+          <div class="pro-hud-card-sub text-cyan-400">Click to view history &rarr;</div>
         </div>
       </div>
 
@@ -238,24 +189,11 @@
 
         <!-- Vault Tools Hub -->
         <div>
-          <div class="pro-sidebar-section-title">Security & Tools</div>
+          <div class="pro-sidebar-section-title">Vault Tools</div>
           <nav class="pro-sidebar-list">
-            <button type="button" onclick="openSecurityAuditModal()" class="pro-sidebar-link text-left">
+            <button type="button" onclick="openModal('generatorModal')" class="pro-sidebar-link text-left" id="openGeneratorBtn">
               <span class="flex items-center gap-2">
-                <span class="text-emerald-400">🛡️</span>
-                <span>Breach Audit</span>
-              </span>
-              <span class="text-emerald-400 text-xs font-bold">{{ audit_summary.health_score|default:"100" }}%</span>
-            </button>
-            <button type="button" onclick="openTimeMachineModal()" class="pro-sidebar-link text-left">
-              <span class="flex items-center gap-2">
-                <span class="text-cyan-400">⏳</span>
-                <span>Time-Machine</span>
-              </span>
-            </button>
-            <button type="button" onclick="openModal('generatorModal')" class="pro-sidebar-link text-left">
-              <span class="flex items-center gap-2">
-                <span class="text-teal-400">⚡</span>
+                <span class="text-emerald-400">⚡</span>
                 <span>Password Generator</span>
               </span>
             </button>
@@ -292,7 +230,7 @@
       <!-- Right Main Content: Command Bar & Cards Grid -->
       <main class="pro-vault-main">
         
-        <!-- Command Bar with Search & Quick Add -->
+        <!-- Command Bar with Search -->
         <div class="pro-command-bar">
           <div class="pro-search-box">
             <div class="vault-search-icon">
@@ -306,13 +244,6 @@
               &times;
             </button>
           </div>
-
-          <button type="button" onclick="openModal('addModal')" class="btn-vault-primary shrink-0">
-            <svg width="15" height="15" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-            </svg>
-            <span>Add</span>
-          </button>
         </div>
 
         <!-- Items List Grid -->
@@ -481,13 +412,12 @@
                     </div>
                   </div>
 
-                  <div class="pt-3 border-t border-white/10 flex items-center justify-between">
-                    <button type="button" onclick="openSecurityAuditModal()" class="link-emerald-sm text-xs font-semibold hover:underline" style="background: none; border: none; cursor: pointer;">
-                      Run Breach Audit &rarr;
-                    </button>
-                    <button type="button" onclick="openModal('addModal')" class="btn-vault-secondary" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
-                      + Add Item
-                    </button>
+                  <div class="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
+                    <span class="inline-flex items-center gap-1.5 text-emerald-400">
+                      <span class="status-dot-pulse"></span>
+                      <span>Zero Plaintext Transmitted</span>
+                    </span>
+                    <span class="font-mono text-slate-400">PBKDF2-SHA256</span>
                   </div>
                 </div>
               {% endif %}
