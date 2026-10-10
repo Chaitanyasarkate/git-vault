@@ -142,9 +142,10 @@ code {
 }
 
 .navbar-container {
-  max-width: 80rem;
+  max-width: 1440px;
+  width: 100%;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 clamp(1rem, 3.5vw, 2.5rem);
   height: 4.25rem;
   display: flex;
   align-items: center;
@@ -296,13 +297,14 @@ code {
 
 /* Atmospheric Volumetric Spotlight Beam & Soft Radial Glow */
 .auth-page-wrapper {
-  min-height: calc(100vh - 120px);
+  min-height: calc(100vh - 4.25rem);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2.5rem 1.25rem 4rem;
+  padding: clamp(1.25rem, 3vh, 3rem) clamp(1rem, 2vw, 1.5rem);
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .atmospheric-beam {
@@ -338,13 +340,13 @@ code {
   z-index: 0;
 }
 
-/* Centered Frosted Glass Card */
+/* Centered Frosted Glass Card with Proportional Ratio */
 .auth-card-container {
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 27rem;
-  margin: 0 auto;
+  max-width: clamp(22rem, 28vw, 26.5rem);
+  margin: auto;
 }
 
 .frosted-glass-card {
@@ -353,8 +355,8 @@ code {
   backdrop-filter: blur(40px) saturate(190%);
   -webkit-backdrop-filter: blur(40px) saturate(190%);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 36px;
-  padding: 3rem 2.25rem 2.5rem;
+  border-radius: clamp(24px, 2.5vw, 34px);
+  padding: clamp(1.75rem, 3.2vh, 2.5rem) clamp(1.25rem, 2vw, 2.15rem);
   box-shadow: 
     0 40px 90px -15px rgba(0, 0, 0, 0.98),
     0 0 1px 1px rgba(255, 255, 255, 0.08),
@@ -362,6 +364,45 @@ code {
     inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.8);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
+}
+
+/* Responsive vertical scaling for laptop viewports & high DPI zoom */
+@media (max-height: 840px) {
+  .auth-emblem-wrap {
+    margin-bottom: 0.75rem !important;
+  }
+  .auth-emblem-svg {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .auth-header {
+    margin-bottom: 1.15rem !important;
+  }
+  .auth-title {
+    font-size: 1.45rem !important;
+  }
+  .auth-field-group {
+    margin-bottom: 0.65rem !important;
+  }
+  .auth-form .form-control,
+  .auth-pill-input {
+    padding: 0.7rem 1.15rem !important;
+    font-size: 0.82rem !important;
+  }
+  .auth-action-block {
+    margin-top: 1rem !important;
+  }
+  .btn-stark-white {
+    padding: 0.72rem 1.15rem !important;
+    font-size: 0.85rem !important;
+  }
+  .auth-divider {
+    margin: 0.8rem 0 !important;
+  }
+  .btn-dark-pill {
+    padding: 0.68rem 1.15rem !important;
+    font-size: 0.82rem !important;
+  }
 }
 
 .frosted-glass-card::before {
@@ -1193,7 +1234,16 @@ code {
 .z-50 { z-index: 50 !important; }
 .z-100 { z-index: 100 !important; }
 
-/* 2. Vault Header & Top Status Bar */
+/* Fluid & Proportional Application Layout Architecture */
+.vault-container-fluid {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 2.5vw, 2.25rem) clamp(1rem, 3.5vw, 2.5rem) 4rem;
+  box-sizing: border-box;
+}
+
+/* 2. Vault Header & Top Status Bar with Screen Ratio Optimization */
 .vault-header-row {
   display: flex;
   flex-direction: column;
@@ -1202,11 +1252,12 @@ code {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1100px) {
   .vault-header-row {
     flex-direction: row;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
+    gap: 1.5rem;
   }
 }
 
@@ -1257,7 +1308,7 @@ code {
 }
 
 .vault-main-title {
-  font-size: 1.75rem;
+  font-size: clamp(1.4rem, 2vw, 1.85rem);
   font-weight: 800;
   letter-spacing: -0.025em;
   color: #ffffff;
@@ -1276,21 +1327,21 @@ code {
   border: 1px solid rgba(255, 255, 255, 0.09);
 }
 
-/* 3. Vault Toolbar Actions */
+/* 3. Vault Toolbar Actions with Proportional Ratio */
 .vault-actions-bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.5rem;
 }
 
 .btn-vault-primary {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1.25rem;
+  gap: 0.45rem;
+  padding: 0.62rem 1.15rem;
   border-radius: 9999px;
-  font-size: 0.85rem;
+  font-size: clamp(0.78rem, 0.9vw, 0.85rem);
   font-weight: 700;
   color: #000000;
   background: #ffffff;
@@ -1298,6 +1349,7 @@ code {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   border: none;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .btn-vault-primary:hover {
@@ -1309,16 +1361,17 @@ code {
 .btn-vault-secondary {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1.15rem;
+  gap: 0.45rem;
+  padding: 0.62rem 1.05rem;
   border-radius: 9999px;
-  font-size: 0.82rem;
+  font-size: clamp(0.76rem, 0.85vw, 0.82rem);
   font-weight: 600;
   color: rgba(255, 255, 255, 0.88);
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.09);
   transition: all 0.2s ease;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .btn-vault-secondary:hover {
@@ -1522,19 +1575,44 @@ code {
   box-shadow: 0 2px 12px rgba(255, 255, 255, 0.2);
 }
 
-/* 6. Empty Vault State & Cards Grid */
+/* 6. Empty Vault State & Adaptive Multi-Column Cards Grid */
 .vault-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(290px, 24vw, 360px), 1fr));
+  gap: clamp(1rem, 1.4vw, 1.35rem);
   margin-top: 1.75rem;
+}
+
+@media (min-width: 1560px) {
+  .vault-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 1120px) and (max-width: 1559px) {
+  .vault-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 720px) and (max-width: 1119px) {
+  .vault-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 719px) {
+  .vault-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .vault-card {
   background: rgba(18, 18, 24, 0.68);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
-  padding: 1.5rem;
+  padding: clamp(1.2rem, 1.8vw, 1.5rem);
+  min-height: 230px;
   box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.95), inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
   display: flex;
   flex-direction: column;
@@ -1626,16 +1704,16 @@ code {
 }
 
 .modal-dialog {
-  background: rgba(18, 18, 24, 0.88) !important;
+  background: rgba(18, 18, 24, 0.92) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 28px !important;
-  max-width: 32rem !important;
-  width: 100% !important;
-  padding: 2.25rem 2rem !important;
+  border-radius: clamp(20px, 2.5vw, 28px) !important;
+  width: min(94vw, 36rem);
+  max-width: 36rem;
+  padding: clamp(1.35rem, 2.5vw, 2.25rem) clamp(1.2rem, 2vw, 1.85rem) !important;
   box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.95), inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.2) !important;
   position: relative !important;
   animation: modalPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  max-height: 90vh !important;
+  max-height: min(88vh, 760px) !important;
   overflow-y: auto !important;
   backdrop-filter: blur(40px) saturate(190%) !important;
 }
