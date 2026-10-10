@@ -459,7 +459,7 @@
       <button type="button" onclick="closeModal('addModal')" class="modal-close-btn" title="Close">&times;</button>
     </div>
 
-    <form method="post" action="{% url 'gitpass:add_item' %}" autocomplete="off">
+    <form method="post" action="{% url 'gitpass:add_item' %}">
       {% csrf_token %}
       
       <div class="form-group-vault">
@@ -580,7 +580,7 @@
       This will decrypt your vault with your current password, re-derive a new encryption key using PBKDF2 (120,000 iterations), encrypt with authenticated AES-256-GCM, and push a new commit to your GitHub repository.
     </p>
 
-    <form method="post" action="{% url 'gitpass:change_master_password' %}" autocomplete="off">
+    <form method="post" action="{% url 'gitpass:change_master_password' %}">
       {% csrf_token %}
       <div class="form-group-vault">
         <label class="form-label-vault">Current Master Password</label>
@@ -620,7 +620,7 @@
       <p>This will permanently delete the repository <strong>{{ github_username }}/{{ github_repo }}</strong> directly on GitHub via your Personal Access Token. All stored files and git history will be destroyed immediately.</p>
     </div>
 
-    <form method="post" action="{% url 'gitpass:delete_repo' %}" autocomplete="off">
+    <form method="post" action="{% url 'gitpass:delete_repo' %}">
       {% csrf_token %}
       <div class="form-group-vault">
         <label class="form-label-vault">
@@ -758,7 +758,7 @@
       <button type="button" onclick="closeModal('importModal')" class="modal-close-btn" title="Close">&times;</button>
     </div>
 
-    <form method="post" action="{% url 'gitpass:import_vault' %}" enctype="multipart/form-data" autocomplete="off">
+    <form method="post" action="{% url 'gitpass:import_vault' %}" enctype="multipart/form-data">
       {% csrf_token %}
       
       <p class="text-xs text-slate-300 mb-3 leading-relaxed">

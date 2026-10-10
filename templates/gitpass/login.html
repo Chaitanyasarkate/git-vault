@@ -28,13 +28,13 @@
       </div>
 
       <!-- Main Login & Connect Form -->
-      <form method="post" action="{% url 'gitpass:login' %}" id="loginForm" class="auth-form" autocomplete="off">
+      <form method="post" action="{% url 'gitpass:login' %}" id="loginForm" class="auth-form">
         {% csrf_token %}
 
         <!-- GitHub Username -->
         <div class="auth-field-group">
           <div class="auth-input-action-wrapper">
-            <input type="text" name="username" id="id_username" placeholder="GitHub username (e.g. ChaitanyaSarkate)" value="{{ form.username.value|default:'' }}" required autocomplete="off" class="form-control auth-pill-input">
+            <input type="text" name="username" id="id_username" placeholder="GitHub username (e.g. ChaitanyaSarkate)" value="{{ form.username.value|default:'' }}" required autocomplete="username" class="form-control auth-pill-input">
           </div>
           {% if form.username.errors %}
             <p class="auth-field-error">{{ form.username.errors.0 }}</p>
@@ -44,7 +44,7 @@
         <!-- Repository Name -->
         <div class="auth-field-group">
           <div class="auth-input-action-wrapper">
-            <input type="text" name="repo_name" id="id_repo_name" placeholder="Repository name (e.g. git-vault)" value="{{ form.repo_name.value|default:'' }}" required autocomplete="off" class="form-control auth-pill-input">
+            <input type="text" name="repo_name" id="id_repo_name" placeholder="Repository name (e.g. git-vault)" value="{{ form.repo_name.value|default:'' }}" required class="form-control auth-pill-input">
           </div>
           {% if form.repo_name.errors %}
             <p class="auth-field-error">{{ form.repo_name.errors.0 }}</p>
@@ -75,7 +75,7 @@
         <!-- Master Password -->
         <div class="auth-field-group">
           <div class="auth-input-action-wrapper">
-            <input type="password" name="master_password" id="id_master_password" placeholder="Master encryption password" required autocomplete="new-password" class="form-control auth-pill-input">
+            <input type="password" name="master_password" id="id_master_password" placeholder="Master encryption password" required autocomplete="current-password" class="form-control auth-pill-input">
             <button type="button" onclick="togglePasswordVisibility('id_master_password')" class="auth-eye-btn" title="Toggle password visibility" tabindex="-1">
               <svg width="17" height="17" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -147,13 +147,34 @@
 
 </div>
 
-<!-- Purge any previously saved auto-completion credentials -->
+<!-- Auto-Save & Remember Username / Repo in LocalStorage -->
 <script>
-  try {
-    localStorage.removeItem('gitvault_saved_user');
-    localStorage.removeItem('gitvault_saved_repo');
-    localStorage.removeItem('gitpass_saved_user');
-    localStorage.removeItem('gitpass_saved_repo');
-  } catch (e) {}
+  document.addEventListener('DOMContentLoaded', function() {
+    const userInput = document.getElementById('id_username');
+    const repoInput = document.getElementById('id_repo_name');
+    
+    // Auto-populate from previous sessions if input is empty
+    if (userInput && !userInput.value) {
+      const savedUser = localStorage.getItem('gitvault_saved_user') || localStorage.getItem('gitpass_saved_user');
+      if (savedUser) userInput.value = savedUser;
+    }
+    if (repoInput && !repoInput.value) {
+      const savedRepo = localStorage.getItem('gitvault_saved_repo') || localStorage.getItem('gitpass_saved_repo');
+      if (savedRepo) repoInput.value = savedRepo;
+    }
+
+    // Persist on submit
+    const form = document.getElementById('loginForm');
+    if (form) {
+      form.addEventListener('submit', function() {
+        if (userInput && userInput.value) {
+          localStorage.setItem('gitvault_saved_user', userInput.value.trim());
+        }
+        if (repoInput && repoInput.value) {
+          localStorage.setItem('gitvault_saved_repo', repoInput.value.trim());
+        }
+      });
+    }
+  });
 </script>
 {% endblock %}
