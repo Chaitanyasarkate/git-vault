@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Instant Demo Mode
-  btnQuickDemo.addEventListener('click', () => {
+  btnQuickDemo.addEventListener('click', async () => {
     activeSession = {
       isUnlocked: true,
       isDemo: true,
