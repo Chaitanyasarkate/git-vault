@@ -373,55 +373,6 @@
                 </div>
               {% endfor %}
 
-              <!-- Pro Companion Card (Prevents awkward empty screen when items are few) -->
-              {% if items|length < 3 %}
-                <div class="vault-pro-companion-card" id="vaultCompanionCard">
-                  <div>
-                    <div class="flex items-center justify-between mb-3">
-                      <div class="flex items-center gap-2.5">
-                        <div class="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                          </svg>
-                        </div>
-                        <div>
-                          <h4 class="text-sm font-bold text-white leading-tight">Zero-Knowledge Shield</h4>
-                          <span class="text-[10px] text-emerald-400 font-mono font-semibold">AES-256-GCM Active</span>
-                        </div>
-                      </div>
-                      <span class="text-[10px] uppercase font-bold text-slate-400 px-2 py-0.5 rounded-full bg-white/5 border border-white/10">Vault Pro</span>
-                    </div>
-
-                    <p class="text-xs text-slate-300 leading-relaxed mb-3">
-                      Your vault data is encrypted purely in your browser before committing to GitHub. No server ever sees plaintext passwords.
-                    </p>
-
-                    <div class="space-y-1.5 text-[11px] text-slate-400 mb-2">
-                      <div class="flex items-center gap-2">
-                        <span class="text-emerald-400 font-bold">✓</span>
-                        <span>Click 👁️ to unmask or 📋 to copy credentials with 1 click</span>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <span class="text-emerald-400 font-bold">✓</span>
-                        <span>Press <kbd class="px-1 py-0.5 rounded bg-white/10 font-mono text-[9px] text-white">/</kbd> to quickly search items anytime</span>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <span class="text-emerald-400 font-bold">✓</span>
-                        <span>k-Anonymity breach detection against 10+ billion records</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
-                    <span class="inline-flex items-center gap-1.5 text-emerald-400">
-                      <span class="status-dot-pulse"></span>
-                      <span>Zero Plaintext Transmitted</span>
-                    </span>
-                    <span class="font-mono text-slate-400">PBKDF2-SHA256</span>
-                  </div>
-                </div>
-              {% endif %}
-
             </div>
 
             <!-- No Search Results Found placeholder -->

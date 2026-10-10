@@ -186,7 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('vaultSearchInput');
   const clearBtn = document.getElementById('clearSearchBtn');
   const cards = document.querySelectorAll('.vault-card');
-  const companionCard = document.getElementById('vaultCompanionCard');
   const noResults = document.getElementById('noSearchResults');
 
   if (searchInput && cards.length > 0) {
@@ -211,14 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
           card.style.display = 'none';
         }
       });
-
-      if (companionCard) {
-        if (q.length > 0) {
-          companionCard.style.display = 'none';
-        } else {
-          companionCard.style.display = 'flex';
-        }
-      }
 
       if (noResults) {
         if (matchCount === 0 && q.length > 0) {
