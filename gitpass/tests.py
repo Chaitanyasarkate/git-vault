@@ -251,3 +251,79 @@ class AdvancedFeatureTests(TestCase):
         rollback_data = rollback_resp.json()
         self.assertTrue(rollback_data["success"])
 
+    def test_importer_chrome_csv(self):
+        from gitpass.importer import parse_import_file
+        chrome_csv = (
+            "name,url,username,password,note\n"
+            "Google,https://google.com,user@gmail.com,Pass123!,Recovery email set\n"
+            "GitHub,https://github.com,octocat,GhpPass456,Work PAT\n"
+        ).encode("utf-8")
+        items = parse_import_file(chrome_csv, "chrome_passwords.csv")
+        self.assertEqual(len(items), 2)
+        self.assertEqual(items[0]["title"], "Google")
+        self.assertEqual(items[0]["username"], "user@gmail.com")
+        self.assertEqual(items[0]["password"], "Pass123!")
+        self.assertEqual(items[1]["title"], "GitHub")
+
+    def test_importer_bitwarden_csv(self):
+        from gitpass.importer import parse_import_file
+        bw_csv = (
+            "folder,favorite,type,name,notes,fields,reprompt,login_uri,login_username,login_password,login_totp\n"
+            ",0,1,Discord,Gamer tag,,0,,discord_user,DiscordPass789,JBSWY3DPEHPK3PXP\n"
+        ).encode("utf-8")
+        items = parse_import_file(bw_csv, "bitwarden_export.csv")
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]["title"], "Discord")
+        self.assertEqual(items[0]["username"], "discord_user")
+        self.assertEqual(items[0]["password"], "DiscordPass789")
+        self.assertEqual(items[0]["totp_secret"], "JBSWY3DPEHPK3PXP")
+
+    def test_importer_bitwarden_json(self):
+        from gitpass.importer import parse_import_file
+        bw_json = json.dumps({
+            "encrypted": False,
+            "items": [
+                {
+                    "name": "Spotify",
+                    "notes": "Premium Plan",
+                    "login": {
+                        "uris": [{"uri": "https://spotify.com"}],
+                        "username": "music_fan",
+                        "password": "SpotifySecurePass!"
+                    }
+                }
+            ]
+        }).encode("utf-8")
+        items = parse_import_file(bw_json, "bitwarden.json")
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]["title"], "Spotify")
+        self.assertEqual(items[0]["username"], "music_fan")
+        self.assertEqual(items[0]["password"], "SpotifySecurePass!")
+
+    def test_importer_merge_deduplicate(self):
+        from gitpass.importer import merge_vault_items
+        existing = [
+            {"id": "1", "title": "GitHub", "username": "octocat", "password": "OldPassword"}
+        ]
+        imported = [
+            {"id": "2", "title": "GitHub", "username": "octocat", "password": "NewUpdatedPassword"},
+            {"id": "3", "title": "Netflix", "username": "octocat", "password": "NetflixPass"}
+        ]
+        merged, added, updated = merge_vault_items(existing, imported, deduplicate=True)
+        self.assertEqual(len(merged), 2)
+        self.assertEqual(added, 1)
+        self.assertEqual(updated, 1)
+        self.assertEqual(merged[0]["password"], "NewUpdatedPassword")
+
+    def test_pwa_service_worker_and_manifest_endpoints(self):
+        # Service worker
+        sw_resp = self.client.get(reverse("gitpass:service_worker"))
+        self.assertEqual(sw_resp.status_code, 200)
+        self.assertIn("application/javascript", sw_resp["Content-Type"])
+
+        # Web App Manifest
+        manifest_resp = self.client.get(reverse("gitpass:manifest"))
+        self.assertEqual(manifest_resp.status_code, 200)
+        self.assertIn("application/manifest+json", manifest_resp["Content-Type"])
+
+

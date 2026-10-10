@@ -62,6 +62,10 @@
             <span>📊</span>
             <span>Export CSV Spreadsheet</span>
           </a>
+          <button type="button" onclick="openModal('importModal')" class="dropdown-item">
+            <span>📥</span>
+            <span>Import Passwords (CSV / JSON)</span>
+          </button>
           <a href="{% url 'gitpass:raw_vault' %}" target="_blank" rel="noopener noreferrer" class="dropdown-item">
             <span>🔍</span>
             <span>Raw GitHub Payload</span>
@@ -203,6 +207,12 @@
                 <span>Browser Extension</span>
               </span>
             </a>
+            <button type="button" onclick="openModal('importModal')" class="pro-sidebar-link text-left">
+              <span class="flex items-center gap-2">
+                <span class="text-teal-400">📥</span>
+                <span>Import Passwords</span>
+              </span>
+            </button>
           </nav>
         </div>
 
@@ -732,6 +742,62 @@
         Restore this Version
       </button>
     </div>
+  </div>
+</div>
+
+<!-- 7. Universal 1-Click Password Import Modal -->
+<div id="importModal" class="modal-backdrop hidden">
+  <div class="modal-dialog" style="max-width: 32rem;">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <svg width="20" height="20" class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+        </svg>
+        <span>Import Passwords in Bulk</span>
+      </h3>
+      <button type="button" onclick="closeModal('importModal')" class="modal-close-btn" title="Close">&times;</button>
+    </div>
+
+    <form method="post" action="{% url 'gitpass:import_vault' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <p class="text-xs text-slate-300 mb-3 leading-relaxed">
+        Upload an export file from your browser or password manager. Credentials will be parsed, encrypted with your Master Password, and committed directly to GitHub.
+      </p>
+
+      <!-- Supported Source Badges -->
+      <div class="flex flex-wrap gap-1.5 mb-4 text-[11px]">
+        <span class="vault-card-badge">Google Chrome (.csv)</span>
+        <span class="vault-card-badge">Bitwarden (.csv / .json)</span>
+        <span class="vault-card-badge">Mozilla Firefox (.csv)</span>
+        <span class="vault-card-badge">1Password (.csv)</span>
+        <span class="vault-card-badge">LastPass (.csv)</span>
+        <span class="vault-card-badge">Git-Vault Backup</span>
+      </div>
+
+      <!-- File Input -->
+      <div class="form-group-vault">
+        <label class="form-label-vault">Select Export File (.csv or .json) <span class="text-red-400">*</span></label>
+        <input type="file" name="import_file" id="importFileInput" accept=".csv,.json" required class="form-control" style="padding: 0.6rem; cursor: pointer; background: rgba(255,255,255,0.04);">
+        <p class="text-[11px] text-slate-500 mt-1">Export file is processed in memory and encrypted directly with your master key.</p>
+      </div>
+
+      <!-- Deduplication Option -->
+      <div class="form-group-vault" style="margin-top: 0.85rem;">
+        <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+          <input type="checkbox" name="deduplicate" value="true" checked style="accent-color: #10b981; width: 16px; height: 16px;">
+          <span>Merge intelligently (update matching accounts without duplicates)</span>
+        </label>
+      </div>
+
+      <div class="modal-footer" style="margin-top: 1.5rem;">
+        <button type="button" onclick="closeModal('importModal')" class="btn-vault-secondary">Cancel</button>
+        <button type="submit" class="btn-vault-primary flex items-center gap-2">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+          <span>Encrypt & Import</span>
+        </button>
+      </div>
+    </form>
   </div>
 </div>
 

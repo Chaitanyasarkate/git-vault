@@ -14,6 +14,16 @@
   <!-- Custom Self-Contained CSS (Zero CDN Dependencies) -->
   <link rel="stylesheet" href="{% static 'css/gitpass.css' %}?v=12.0">
   
+  <!-- Progressive Web App (PWA) Manifest & Icons -->
+  <link rel="manifest" href="{% url 'gitpass:manifest' %}">
+  <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Git-Vault">
+  <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
+  <link rel="icon" type="image/png" sizes="192x192" href="{% static 'icons/icon-192.png' %}">
+  
   {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-black text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-white selection:text-black relative overflow-x-hidden">
@@ -49,6 +59,14 @@
 
       <!-- Right Navigation Links / User State -->
       <div class="nav-actions">
+        <!-- PWA Install Button (Dynamic) -->
+        <button type="button" id="pwaInstallBtn" class="nav-btn-secondary" style="display: none;" title="Install Git-Vault as Native App">
+          <svg width="15" height="15" class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          <span>Install App</span>
+        </button>
+
         <a href="{% url 'gitpass:instructions' %}" class="nav-btn-secondary">
           <svg width="15" height="15" class="w-3.5 h-3.5 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -139,6 +157,20 @@
 
   <!-- Scripts -->
   <script src="{% static 'js/gitpass.js' %}?v=12.0"></script>
+  <script>
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then((reg) => {
+            console.log('Git-Vault PWA Service Worker active:', reg.scope);
+          })
+          .catch((err) => {
+            console.warn('PWA Service Worker registration:', err);
+          });
+      });
+    }
+  </script>
   {% block extra_js %}{% endblock %}
 </body>
 </html>

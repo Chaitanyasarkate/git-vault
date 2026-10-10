@@ -613,3 +613,72 @@ function formatCommitDate(dateStr) {
   }
 }
 
+// ==========================================
+// PWA Install Prompt Handler
+// ==========================================
+let deferredPwaPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPwaPrompt = e;
+  const installBtn = document.getElementById('pwaInstallBtn');
+  if (installBtn) {
+    installBtn.style.display = 'inline-flex';
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const installBtn = document.getElementById('pwaInstallBtn');
+  if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+      if (deferredPwaPrompt) {
+        deferredPwaPrompt.prompt();
+        const { outcome } = await deferredPwaPrompt.userChoice;
+        if (outcome === 'accepted') {
+          showToast('Git-Vault installed as desktop/mobile app!');
+        }
+        deferredPwaPrompt = null;
+        installBtn.style.display = 'none';
+      } else {
+        showToast('App is already installed or install prompt not triggered yet.');
+      }
+    });
+  }
+
+  // ==========================================
+  // Power-User Daily Keyboard Shortcuts
+  // ==========================================
+  document.addEventListener('keydown', (e) => {
+    const targetTag = e.target.tagName.toLowerCase();
+    const isEditing = targetTag === 'input' || targetTag === 'textarea' || targetTag === 'select';
+
+    // Press '/' to instantly jump to search
+    if (e.key === '/' && !isEditing) {
+      e.preventDefault();
+      const searchInput = document.getElementById('vaultSearchInput');
+      if (searchInput) {
+        searchInput.focus();
+        searchInput.select();
+      }
+    }
+
+    // Press 'Esc' to close any open modal
+    if (e.key === 'Escape') {
+      const openModals = document.querySelectorAll('.modal-backdrop:not(.hidden)');
+      openModals.forEach((m) => {
+        m.classList.add('hidden');
+        document.body.style.overflow = '';
+      });
+      // Also close options dropdown if open
+      const dropdown = document.querySelector('.dropdown-container.open');
+      if (dropdown) dropdown.classList.remove('open');
+    }
+
+    // Press Alt + N or Ctrl + Shift + N to open Add Credential modal
+    if ((e.altKey && (e.key === 'n' || e.key === 'N')) || (e.ctrlKey && e.shiftKey && (e.key === 'n' || e.key === 'N'))) {
+      e.preventDefault();
+      openModal('addModal');
+    }
+  });
+});
+
+

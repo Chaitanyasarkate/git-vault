@@ -7,7 +7,8 @@
 [![Framework](https://img.shields.io/badge/Framework-Django%205-092e20?style=for-the-badge&logo=django)](https://www.djangoproject.com/)
 [![Encryption](https://img.shields.io/badge/Security-AES--256--GCM%20%7C%20PBKDF2-blue?style=for-the-badge)](https://git-vault.onrender.com)
 [![Storage](https://img.shields.io/badge/Storage-GitHub%20Repository-black?style=for-the-badge&logo=github)](https://github.com)
-[![CI Tests](https://img.shields.io/badge/Tests-18%20Passing-success?style=for-the-badge)](https://github.com)
+[![CI Tests](https://img.shields.io/badge/Tests-23%20Passing-success?style=for-the-badge)](https://github.com)
+[![PWA Ready](https://img.shields.io/badge/PWA-Installable%20App-00bcd4?style=for-the-badge)](https://git-vault.onrender.com)
 [![Extension](https://img.shields.io/badge/Browser%20Extension-Manifest%20V3-orange?style=for-the-badge)](https://github.com/Chaitanyasarkate/git-vault/tree/main/extension)
 [![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)](LICENSE)
 
@@ -91,6 +92,9 @@ Every vault update written to your GitHub repository adheres to the authenticate
 - **Full Credential Lifecycle**: Add, view, edit, and delete credentials (Title, Username/Email, Password, Category, Website URL, 2FA Secret Key, and Recovery Notes).
 - **Instant Search & Category Filtering**: Instantly search titles, usernames, and URLs; filter by `Logins`, `Social`, `Work`, `Finance`, or `Personal`.
 - **1-Click Clipboard Copying**: Instant 1-click copy buttons for usernames, passwords, and TOTP codes with visual feedback toasts.
+- **1-Click Bulk Password Importer**: Import your complete password library from **Google Chrome**, **Bitwarden**, **Mozilla Firefox**, **1Password**, or **LastPass** in under 2 seconds. Merges without duplicates and encrypts under your Master Password.
+- **Progressive Web App (PWA) Support**: Install Git-Vault directly onto your **Windows taskbar**, **macOS dock**, **Android**, or **iPhone home screen** as a standalone application with fast offline shell caching.
+- **Power-User Keyboard Shortcuts**: Press `/` to focus search instantly, `Alt + N` to create a credential, and `Esc` to close modals.
 - **Transparent Ciphertext Inspection**: Inspect the raw, unmodified base64 ciphertext stored in your GitHub repository anytime via `/vault/raw/`.
 - **Master Password Re-encryption**: Rotate your master password at any time. Git-Vault automatically re-encrypts all credentials under the new key and commits the updated file to GitHub.
 - **Offline Data Portability**: Export your decrypted vault to formatted JSON or CSV anytime for local backups.

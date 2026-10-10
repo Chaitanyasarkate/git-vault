@@ -13,6 +13,7 @@ urlpatterns = [
     path("vault/change-master-password/", views.change_master_password_view, name="change_master_password"),
     path("vault/delete-repo/", views.delete_repo_view, name="delete_repo"),
     path("vault/export/", views.export_vault_view, name="export_vault"),
+    path("vault/import/", views.import_vault_view, name="import_vault"),
     path("vault/raw/", views.raw_vault_view, name="raw_vault"),
     path("api/generate-password/", views.api_generate_password, name="api_generate_password"),
     path("api/audit-vault/", views.api_audit_vault, name="api_audit_vault"),
@@ -22,5 +23,7 @@ urlpatterns = [
     path("api/time-machine/rollback/", views.api_time_machine_rollback, name="api_time_machine_rollback"),
     path("logout/", views.logout_view, name="logout"),
     path("health/", views.health_view, name="health"),
+    path("sw.js", views.service_worker_view, name="service_worker"),
+    path("manifest.webmanifest", views.manifest_view, name="manifest"),
 ]
 

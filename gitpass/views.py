@@ -32,8 +32,11 @@ from .github_api import (
     GitHubRepoNotFoundError,
     GitHubPermissionError,
 )
+import os
+from django.conf import settings
 from .security_audit import audit_vault_credentials, calculate_password_strength
 from .totp import generate_totp_code
+from .importer import parse_import_file, merge_vault_items, ImportError as VaultImportError
 
 
 
@@ -738,4 +741,78 @@ def logout_view(request):
 def health_view(request):
     """Health check endpoint for Render."""
     return JsonResponse({"status": "healthy", "service": "Git-Vault", "zero_server_storage": True})
+
+
+@require_session
+def import_vault_view(request):
+    """Import credentials in bulk from Chrome, Bitwarden, Firefox, 1Password, or CSV/JSON."""
+    if request.method == "POST":
+        upload_file = request.FILES.get("import_file")
+        if not upload_file:
+            messages.error(request, "Please choose a CSV or JSON file to import.")
+            return redirect("gitpass:vault")
+
+        # Max file size limit: 10MB
+        if upload_file.size > 10 * 1024 * 1024:
+            messages.error(request, "File exceeds maximum size limit of 10MB.")
+            return redirect("gitpass:vault")
+
+        try:
+            raw_bytes = upload_file.read()
+            imported_items = parse_import_file(raw_bytes, upload_file.name)
+            if not imported_items:
+                messages.warning(request, "No credentials found in the uploaded file.")
+                return redirect("gitpass:vault")
+
+            dedup = request.POST.get("deduplicate", "true").lower() in ("true", "1", "yes", "on")
+            current_items, _ = _get_active_vault(request)
+
+            merged_items, added_cnt, updated_cnt = merge_vault_items(
+                current_items, imported_items, deduplicate=dedup
+            )
+
+            _save_active_vault(
+                request,
+                merged_items,
+                commit_msg=f"Git-Vault: Import {len(imported_items)} credentials from {upload_file.name}"
+            )
+
+            messages.success(
+                request,
+                f"Successfully imported {len(imported_items)} credentials! ({added_cnt} newly added, {updated_cnt} updated)"
+            )
+        except VaultImportError as e:
+            messages.error(request, f"Import error: {e}")
+        except Exception as e:
+            messages.error(request, f"Failed to import credentials: {e}")
+
+    return redirect("gitpass:vault")
+
+
+def service_worker_view(request):
+    """Serves the PWA Service Worker script from root scope /sw.js."""
+    sw_path = os.path.join(settings.BASE_DIR, "static", "js", "sw.js")
+    try:
+        with open(sw_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        response = HttpResponse(content, content_type="application/javascript")
+        response["Service-Worker-Allowed"] = "/"
+        response["Cache-Control"] = "no-cache"
+        return response
+    except Exception:
+        return HttpResponse("// SW unavailable", content_type="application/javascript")
+
+
+def manifest_view(request):
+    """Serves the PWA Web App Manifest from /manifest.webmanifest."""
+    manifest_path = os.path.join(settings.BASE_DIR, "static", "manifest.webmanifest")
+    try:
+        with open(manifest_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        response = HttpResponse(content, content_type="application/manifest+json")
+        response["Cache-Control"] = "public, max-age=3600"
+        return response
+    except Exception:
+        return HttpResponse("{}", content_type="application/manifest+json")
+
 
