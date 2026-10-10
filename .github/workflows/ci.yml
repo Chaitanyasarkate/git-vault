@@ -1,4 +1,4 @@
-name: Git-Pass CI Test Suite
+name: Git-Vault CI Test Suite
 
 on:
   push:
