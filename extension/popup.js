@@ -229,9 +229,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         gitpass_repo: repo,
         gitpass_token: token,
         gitpass_filename: filename,
-        gitpass_cached_master: masterPass,
-        gitvault_active_items: items,
-        gitvault_is_unlocked: true
+        gitpass_cached_master: masterPass
       });
 
       // 5. Populate Active Session
@@ -392,7 +390,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Instant Demo Mode
-  btnQuickDemo.addEventListener('click', async () => {
+  btnQuickDemo.addEventListener('click', () => {
     activeSession = {
       isUnlocked: true,
       isDemo: true,
@@ -442,10 +440,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     showView(viewVault);
     showToast('Demo vault active in memory!');
     startTotpLoop();
-    await setLocalStorage({
-      gitvault_active_items: activeSession.items,
-      gitvault_is_unlocked: true
-    });
   });
 
   // Lock Vault
@@ -454,11 +448,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     unlockMasterPassword.value = '';
     headerActions.style.display = 'none';
     if (totpIntervalId) clearInterval(totpIntervalId);
-    await setLocalStorage({
-      gitpass_cached_master: '',
-      gitvault_active_items: [],
-      gitvault_is_unlocked: false
-    });
+    await setLocalStorage({ gitpass_cached_master: '' });
     showView(viewUnlock);
     showToast('Vault locked.');
   });
@@ -769,7 +759,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       activeSession.fileSha = newSha;
       activeSession.items = currentItems;
-      await setLocalStorage({ gitvault_active_items: currentItems });
 
       await renderVaultItems();
       showView(viewVault);
