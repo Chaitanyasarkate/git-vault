@@ -220,14 +220,6 @@ This repository is pre-configured with [`render.yaml`](render.yaml) and [`build.
    - **Health Check Path**: `/health/`
 5. Your app will be live at `https://git-vault.onrender.com` with free automated SSL!
 
-### Option 2: Railway.app
-1. Go to [Railway.app](https://railway.app) and sign in.
-2. Click **New Project** &rarr; **Deploy from GitHub repo** &rarr; Select `git-vault`.
-3. Under **Variables**, add:
-   - `DEBUG`: `False`
-   - `ALLOWED_HOSTS`: `*`
-   - `DJANGO_SECRET_KEY`: *(random secure string)*
-4. Click **Generate Domain**.
 
 ### Environment Variables Reference
 
