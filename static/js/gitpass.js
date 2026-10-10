@@ -186,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('vaultSearchInput');
   const clearBtn = document.getElementById('clearSearchBtn');
   const cards = document.querySelectorAll('.vault-card');
+  const companionCard = document.getElementById('vaultCompanionCard');
   const noResults = document.getElementById('noSearchResults');
 
   if (searchInput && cards.length > 0) {
@@ -211,12 +212,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
+      if (companionCard) {
+        if (q.length > 0) {
+          companionCard.style.display = 'none';
+        } else {
+          companionCard.style.display = 'flex';
+        }
+      }
+
       if (noResults) {
         if (matchCount === 0 && q.length > 0) {
           noResults.classList.remove('hidden');
         } else {
           noResults.classList.add('hidden');
         }
+      }
+    });
+
+    // Keyboard shortcut to focus search bar (/ or Ctrl+K / Cmd+K)
+    document.addEventListener('keydown', (e) => {
+      if ((e.key === '/' || (e.ctrlKey && e.key.toLowerCase() === 'k') || (e.metaKey && e.key.toLowerCase() === 'k')) && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
       }
     });
   }

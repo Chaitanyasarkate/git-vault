@@ -1578,33 +1578,9 @@ code {
 /* 6. Empty Vault State & Adaptive Multi-Column Cards Grid */
 .vault-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(290px, 24vw, 360px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: clamp(1rem, 1.4vw, 1.35rem);
-  margin-top: 1.75rem;
-}
-
-@media (min-width: 1560px) {
-  .vault-grid {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (min-width: 1120px) and (max-width: 1559px) {
-  .vault-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 720px) and (max-width: 1119px) {
-  .vault-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 719px) {
-  .vault-grid {
-    grid-template-columns: 1fr;
-  }
+  width: 100%;
 }
 
 .vault-card {
@@ -1622,6 +1598,8 @@ code {
               box-shadow 0.2s ease;
   backdrop-filter: blur(40px) saturate(190%);
   -webkit-backdrop-filter: blur(40px) saturate(190%);
+  position: relative;
+  overflow: hidden;
 }
 
 .vault-card:hover {
@@ -1632,10 +1610,29 @@ code {
 
 .vault-card-top {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.6rem;
   margin-bottom: 0.875rem;
+  width: 100%;
+}
+
+.vault-card-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.22rem 0.58rem;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.1;
 }
 
 .vault-card-avatar {
@@ -1676,6 +1673,247 @@ code {
   align-items: center;
   justify-content: space-between;
   font-size: 0.75rem;
+}
+
+/* =========================================================================
+   8. Pro Command-Center Layout (Executive HUD + Sidebar + Workspace)
+   ========================================================================= */
+
+.pro-vault-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* 8.1 Executive HUD Telemetry Strip */
+.pro-hud-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .pro-hud-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .pro-hud-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pro-hud-card {
+  background: rgba(18, 18, 24, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  padding: 1rem 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.pro-hud-card:hover {
+  background: rgba(22, 22, 30, 0.75);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.pro-hud-icon-wrap {
+  width: 2.65rem;
+  height: 2.65rem;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pro-hud-card-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.pro-hud-card-val {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  line-height: 1.25;
+}
+
+.pro-hud-card-sub {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 0.1rem;
+}
+
+/* 8.2 Pro Dual-Pane Workspace */
+.pro-vault-workspace {
+  display: grid;
+  grid-template-columns: 270px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+}
+
+@media (max-width: 1023px) {
+  .pro-vault-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pro-vault-sidebar {
+  background: rgba(14, 14, 18, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  padding: 1.25rem;
+  backdrop-filter: blur(35px);
+  -webkit-backdrop-filter: blur(35px);
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  position: sticky;
+  top: 5.5rem;
+}
+
+.pro-sidebar-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.42);
+  margin-bottom: 0.45rem;
+  padding-left: 0.35rem;
+}
+
+.pro-sidebar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pro-sidebar-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.68);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  text-decoration: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pro-sidebar-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.pro-sidebar-link.active {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.16);
+  font-weight: 700;
+}
+
+.pro-sidebar-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.12rem 0.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.pro-sidebar-link.active .pro-sidebar-badge {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+.pro-vault-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+/* 8.3 Command Bar */
+.pro-command-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.pro-search-box {
+  position: relative;
+  flex: 1;
+}
+
+.pro-shortcut-badge {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 0.15rem 0.45rem;
+  pointer-events: none;
+}
+
+/* 8.4 Pro Companion Card for Low Item Counts */
+.vault-pro-companion-card {
+  background: linear-gradient(145deg, rgba(16, 26, 20, 0.75) 0%, rgba(14, 18, 24, 0.65) 100%);
+  border: 1px dashed rgba(16, 185, 129, 0.35);
+  border-radius: 24px;
+  padding: clamp(1.2rem, 1.8vw, 1.5rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 230px;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vault-pro-companion-card:hover {
+  border-color: rgba(16, 185, 129, 0.6);
+  background: linear-gradient(145deg, rgba(16, 30, 24, 0.85) 0%, rgba(14, 20, 28, 0.75) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.15);
 }
 
 /* 7. Modal System */
