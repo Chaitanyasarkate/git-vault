@@ -57,6 +57,7 @@ class ConnectForm(forms.Form):
 class CredentialForm(forms.Form):
     CATEGORY_CHOICES = [
         ("Logins", "Logins & Web"),
+        ("Apps", "Desktop & Mobile Apps"),
         ("Social", "Social Media"),
         ("Work", "Work & Dev"),
         ("Finance", "Finance & Banking"),
