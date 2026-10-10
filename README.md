@@ -89,8 +89,8 @@ Create a free account at [github.com](https://github.com).
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/Chaitanyasarkate/-panda.vault.git
-cd vaultx
+git clone https://github.com/Chaitanyasarkate/git-vault.git
+cd git-vault
 ```
 
 ### 2. Install dependencies
