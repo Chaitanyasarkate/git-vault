@@ -663,6 +663,289 @@ code {
   border-top: 1px solid rgba(51, 65, 85, 0.4);
 }
 
+/* ==========================================================================
+   Instructions Page Styling
+   ========================================================================== */
+.instructions-wrapper {
+  max-width: 54rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+  width: 100%;
+}
+
+.instructions-header {
+  margin-bottom: 2.25rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--emerald-400);
+  margin-bottom: 1rem;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.back-link:hover {
+  transform: translateX(-3px);
+  color: var(--emerald-300);
+}
+
+.instructions-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .instructions-title {
+    font-size: 2.75rem;
+  }
+}
+
+.instructions-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  margin-top: 0.4rem;
+  line-height: 1.5;
+}
+
+.steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.step-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1.75rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.step-card:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  transform: translateY(-2px);
+}
+
+.step-badge-col {
+  flex-shrink: 0;
+}
+
+.step-number-badge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2));
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: var(--emerald-400);
+  font-size: 1rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px var(--emerald-glow);
+}
+
+.step-body {
+  flex: 1;
+}
+
+.step-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.step-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.step-subtext {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+  line-height: 1.55;
+}
+
+.token-btn-row {
+  margin: 0.875rem 0;
+}
+
+.btn-token-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.15rem;
+  border-radius: 0.65rem;
+  background-color: rgba(30, 41, 59, 0.8);
+  border: 1px solid var(--border-subtle);
+  color: var(--emerald-300);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-token-link:hover {
+  background-color: rgba(51, 65, 85, 0.9);
+  color: #ffffff;
+  border-color: var(--emerald-500);
+  transform: translateY(-1px);
+}
+
+.callout-box-amber {
+  background-color: rgba(69, 26, 3, 0.35);
+  border: 1px solid rgba(217, 119, 6, 0.4);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-top: 0.85rem;
+}
+
+.callout-heading {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #fbbf24;
+  margin-bottom: 0.35rem;
+}
+
+.callout-list {
+  padding-left: 1.25rem;
+  font-size: 0.8125rem;
+  color: #fde68a;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.callout-note {
+  font-size: 0.75rem;
+  color: #fcd34d;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.file-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+}
+
+.file-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 0.625rem;
+  background-color: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--emerald-400);
+  font-weight: 500;
+}
+
+.credentials-checklist {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.credentials-checklist li {
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.credentials-checklist li::before {
+  content: "•";
+  color: var(--emerald-400);
+  position: absolute;
+  left: 0.25rem;
+  font-weight: bold;
+}
+
+.callout-box-red {
+  background-color: rgba(69, 10, 10, 0.4);
+  border: 1px solid rgba(153, 27, 27, 0.5);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  font-size: 0.8125rem;
+  color: #fca5a5;
+  margin-top: 1rem;
+  line-height: 1.5;
+}
+
+.cta-bottom-row {
+  margin-top: 2.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.cta-btn {
+  max-width: 24rem;
+  width: 100%;
+}
+
+/* ==========================================================================
+   Vault Dashboard & Modals Styling
+   ========================================================================== */
+.max-w-7xl { max-width: 80rem; }
+.mx-auto { margin-left: auto; margin-right: auto; }
+.px-4 { padding-left: 1rem; padding-right: 1rem; }
+.py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+
+.vault-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.vault-card:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.6), 0 0 16px -2px var(--emerald-glow);
+  transform: translateY(-2px);
+}
+
+.password-masked {
+  letter-spacing: 0.2em;
+}
+
+.modal-backdrop {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background-color: rgba(3, 7, 18, 0.75);
+}
+
+.modal-dialog {
+  animation: modalPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPopIn {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
 /* 8. Global Flash Alerts & Toasts */
 .flash-alert {
   display: flex;
