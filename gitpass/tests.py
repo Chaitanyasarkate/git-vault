@@ -386,7 +386,54 @@ class AdvancedFeatureTests(TestCase):
         self.assertEqual(sync_resp.status_code, 200)
         sync_data = sync_resp.json()
         self.assertTrue(sync_data["synced"])
+        self.assertTrue(sync_data["success"])
         self.assertIn("message", sync_data)
+
+    def test_generate_password_api(self):
+        resp = self.client.get(reverse("gitpass:api_generate_password") + "?length=24&symbols=true&digits=true")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(len(data["password"]), 24)
+
+    def test_totp_code_api(self):
+        resp = self.client.get(reverse("gitpass:api_totp_code") + "?secret=JBSWY3DPEHPK3PXP")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(len(data["code"]), 6)
+        self.assertIn("remaining", data)
+
+    def test_audit_vault_api(self):
+        resp = self.client.get(reverse("gitpass:api_audit_vault") + "?check_breaches=false")
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertTrue(data["success"])
+        self.assertIn("health_score", data)
+        self.assertIn("items_audit", data)
+
+    def test_export_endpoints(self):
+        # JSON export
+        resp_json = self.client.get(reverse("gitpass:export_vault") + "?format=json")
+        self.assertEqual(resp_json.status_code, 200)
+        self.assertEqual(resp_json["Content-Type"], "application/json")
+
+        # CSV export
+        resp_csv = self.client.get(reverse("gitpass:export_vault") + "?format=csv")
+        self.assertEqual(resp_csv.status_code, 200)
+        self.assertEqual(resp_csv["Content-Type"], "text/csv")
+
+    def test_pwa_and_public_routes(self):
+        resp_sw = self.client.get(reverse("gitpass:service_worker"))
+        self.assertEqual(resp_sw.status_code, 200)
+        self.assertIn("javascript", resp_sw["Content-Type"])
+
+        resp_manifest = self.client.get(reverse("gitpass:manifest"))
+        self.assertEqual(resp_manifest.status_code, 200)
+        self.assertIn("manifest+json", resp_manifest["Content-Type"])
+
+        resp_health = self.client.get(reverse("gitpass:health"))
+        self.assertEqual(resp_health.status_code, 200)
 
 
 

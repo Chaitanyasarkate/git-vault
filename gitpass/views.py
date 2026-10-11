@@ -729,6 +729,7 @@ def api_cloud_sync(request):
     """1-Click Cloud Synchronization with GitHub remote repository."""
     if request.session.get("is_demo"):
         return JsonResponse({
+            "success": True,
             "synced": True,
             "updated": False,
             "message": "Demo vault in-sync with memory.",
@@ -750,6 +751,7 @@ def api_cloud_sync(request):
             latest_items = decrypt_vault(raw_content, master_pwd)
             request.session["file_sha"] = remote_sha
             return JsonResponse({
+                "success": True,
                 "synced": True,
                 "updated": True,
                 "items_count": len([i for i in latest_items if not i.get("deleted_at")]),
@@ -759,6 +761,7 @@ def api_cloud_sync(request):
             })
         else:
             return JsonResponse({
+                "success": True,
                 "synced": True,
                 "updated": False,
                 "remote_sha": (remote_sha or local_sha or "")[:7],
@@ -766,7 +769,7 @@ def api_cloud_sync(request):
                 "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             })
     except Exception as e:
-        return JsonResponse({"synced": False, "error": str(e)}, status=500)
+        return JsonResponse({"success": False, "synced": False, "error": str(e)}, status=500)
 
 
 @require_session
@@ -903,7 +906,7 @@ def api_generate_password(request):
     use_digits = request.GET.get("digits", "true").lower() == "true"
 
     pwd = generate_secure_password(length, use_symbols, use_digits)
-    return JsonResponse({"password": pwd})
+    return JsonResponse({"password": pwd, "success": True})
 
 
 @require_session
@@ -915,9 +918,10 @@ def api_audit_vault(request):
         items, _ = _get_active_vault(request)
         check_breaches = request.GET.get("check_breaches", "true").lower() == "true"
         audit_result = audit_vault_credentials(items, check_breaches=check_breaches)
+        audit_result["success"] = True
         return JsonResponse(audit_result)
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        return JsonResponse({"error": str(e), "success": False}, status=500)
 
 
 @require_session
@@ -938,9 +942,11 @@ def api_totp_code(request):
             pass
 
     if not secret:
-        return JsonResponse({"error": "No TOTP secret provided.", "code": "", "seconds_remaining": 0}, status=400)
+        return JsonResponse({"error": "No TOTP secret provided.", "code": "", "seconds_remaining": 0, "remaining": 0, "success": False}, status=400)
 
     result = generate_totp_code(secret)
+    result["success"] = result.get("valid", False)
+    result["remaining"] = result.get("seconds_remaining", 0)
     return JsonResponse(result)
 
 
