@@ -1,6 +1,6 @@
 # Git-Vault Browser WebExtension (Manifest V3)
 
-A privacy-focused browser extension for **Git-Vault** that enables you to save, view, and generate passwords with zero server retention, directly synced with your private GitHub repository.
+A privacy-focused browser extension for **Git-Vault** that enables you to save, view, and generate passwords with zero server retention, directly synced with your private GitHub repository and hosted on [git-vault.onrender.com](https://git-vault.onrender.com/).
 
 ---
 
@@ -13,6 +13,7 @@ A privacy-focused browser extension for **Git-Vault** that enables you to save, 
 5. **Cryptographic Password Generator**: Built-in high-entropy password generator with customizable length, symbols, and character sets.
 6. **Autofill Integration**: Supports 1-click credential filling on web forms.
 7. **Instant Demo Mode**: Test the extension UI and workflow instantly without entering GitHub credentials.
+8. **Render Cloud Connectivity**: Real-time connectivity monitor and 1-click navigation to [git-vault.onrender.com](https://git-vault.onrender.com/).
 
 ---
 
@@ -50,5 +51,13 @@ This extension uses **Manifest V3** and works on all Chromium-based browsers (**
    - Browse your saved credentials with 1-click **Copy Username** and **Copy Password**.
    - Click **+ Add Password** to save a new credential (current tab URL is automatically detected).
    - Use the **⚡ Generator** tab to create strong passwords.
-   - Click the link icon in the top header to open your local web app at `http://localhost:8000/`.
+   - Click the link icon in the top header or the **Render Live** status badge to open your hosted dashboard at `https://git-vault.onrender.com/`.
 4. When finished, click the **Lock** button in the top header. Your master password is removed from memory.
+
+---
+
+## Connectivity with git-vault.onrender.com
+
+- **Shared GitHub Cloud Storage**: Both the extension and [git-vault.onrender.com](https://git-vault.onrender.com/) use identical Zero-Knowledge AES-256-GCM + PBKDF2 encryption. Any credential saved in the extension is committed to your GitHub repository and immediately accessible in the Render web app (and vice-versa via 1-Click Cloud Sync).
+- **Live Cloud Health Ping**: The extension actively checks and displays the live health status of `git-vault.onrender.com`.
+- **Intelligent Protection**: Form auto-capture automatically avoids capturing master passphrases when interacting with Git-Vault itself.

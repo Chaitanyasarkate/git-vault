@@ -20,12 +20,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnToggleBiometrics = document.getElementById('btnToggleBiometrics');
   const btnLockVault = document.getElementById('btnLockVault');
   const btnOpenWeb = document.getElementById('btnOpenWeb');
+  const renderCloudBadge = document.getElementById('renderCloudBadge');
+  const footerWebLink = document.getElementById('footerWebLink');
   
   const formUnlock = document.getElementById('formUnlock');
   const setupFields = document.getElementById('setupFields');
   const setupUsername = document.getElementById('setupUsername');
   const setupRepo = document.getElementById('setupRepo');
   const setupToken = document.getElementById('setupToken');
+  const setupWebUrl = document.getElementById('setupWebUrl');
   const unlockMasterPassword = document.getElementById('unlockMasterPassword');
   const unlockTitle = document.getElementById('unlockTitle');
   const unlockSubtitle = document.getElementById('unlockSubtitle');
@@ -74,6 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     token: '',
     filename: 'passwords.txt',
     masterPassword: '',
+    webUrl: 'https://git-vault.onrender.com',
     fileSha: null,
     items: []
   };
@@ -107,8 +111,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     'gitpass_cached_master',
     'gitpass_biometric_enabled',
     'gitpass_biometric_id',
-    'gitpass_biometric_payload'
+    'gitpass_biometric_payload',
+    'gitvault_web_url'
   ]);
+
+  if (stored.gitvault_web_url) {
+    activeSession.webUrl = stored.gitvault_web_url;
+  }
+  if (setupWebUrl) {
+    setupWebUrl.value = activeSession.webUrl;
+  }
+
+  // Asynchronously verify live connectivity with Render Cloud
+  checkCloudConnectivity();
+
+  async function checkCloudConnectivity() {
+    const webUrl = (activeSession.webUrl || 'https://git-vault.onrender.com').replace(/\/$/, '');
+    if (renderCloudBadge) renderCloudBadge.href = `${webUrl}/`;
+    if (footerWebLink) footerWebLink.href = `${webUrl}/`;
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const resp = await fetch(`${webUrl}/health/`, {
+        method: 'GET',
+        cache: 'no-store',
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        if (data.status === 'healthy') {
+          if (renderCloudBadge) {
+            renderCloudBadge.innerHTML = `<span class="cloud-dot online"></span><span class="cloud-text">Render Live</span>`;
+            renderCloudBadge.title = `Connected to ${webUrl} (Healthy). Click to open dashboard.`;
+          }
+          return;
+        }
+      }
+    } catch (err) {
+      // Offline, connecting, or network timeout
+    }
+    if (renderCloudBadge) {
+      renderCloudBadge.innerHTML = `<span class="cloud-dot checking"></span><span class="cloud-text">Render Standby</span>`;
+      renderCloudBadge.title = `Connecting to ${webUrl}... Click to open.`;
+    }
+  }
 
   // Check Biometrics Availability
   if (stored.gitpass_biometric_enabled && stored.gitpass_biometric_id && btnBiometricUnlock) {
@@ -223,13 +272,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         items = await window.GitVaultCrypto.decryptVault(fileData.content, masterPass);
       }
 
+      const webUrl = setupWebUrl ? (setupWebUrl.value.trim() || 'https://git-vault.onrender.com') : 'https://git-vault.onrender.com';
+      activeSession.webUrl = webUrl;
+
       // 4. Save session config
       await setLocalStorage({
         gitpass_user: username,
         gitpass_repo: repo,
         gitpass_token: token,
         gitpass_filename: filename,
-        gitpass_cached_master: masterPass
+        gitpass_cached_master: masterPass,
+        gitvault_web_url: webUrl
       });
 
       // 5. Populate Active Session
@@ -453,12 +506,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     showToast('Vault locked.');
   });
 
-  // Open Full Web App
+  // Open Full Web App (git-vault.onrender.com or configured dashboard)
   btnOpenWeb.addEventListener('click', () => {
+    const webUrl = (activeSession.webUrl || 'https://git-vault.onrender.com').replace(/\/$/, '') + '/';
     if (chrome && chrome.tabs) {
-      chrome.tabs.create({ url: 'http://localhost:8000/' });
+      chrome.tabs.create({ url: webUrl });
     } else {
-      window.open('http://localhost:8000/', '_blank');
+      window.open(webUrl, '_blank');
     }
   });
 

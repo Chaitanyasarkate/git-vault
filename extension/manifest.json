@@ -9,8 +9,18 @@
     "clipboardWrite"
   ],
   "host_permissions": [
-    "https://api.github.com/*"
+    "https://api.github.com/*",
+    "https://git-vault.onrender.com/*",
+    "http://127.0.0.1:8000/*",
+    "http://localhost:8000/*"
   ],
+  "externally_connectable": {
+    "matches": [
+      "https://git-vault.onrender.com/*",
+      "http://127.0.0.1:8000/*",
+      "http://localhost:8000/*"
+    ]
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

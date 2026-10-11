@@ -38,6 +38,7 @@
               <a href="{% url 'gitpass:export_vault' %}?format=csv" class="dropdown-item"><span>📊</span> <span>Export CSV</span></a>
               <button type="button" onclick="openModal('importModal')" class="dropdown-item"><span>📥</span> <span>Import (CSV / JSON)</span></button>
               <a href="{% url 'gitpass:raw_vault' %}" target="_blank" rel="noopener noreferrer" class="dropdown-item"><span>🔍</span> <span>Raw GitHub Payload</span></a>
+              <a href="{% url 'gitpass:instructions' %}" class="dropdown-item"><span>🧩</span> <span>Browser Extension</span></a>
               <div class="dropdown-divider"></div>
               <button type="button" onclick="openModal('deleteRepoModal')" class="dropdown-item dropdown-item-danger"><span>🗑️</span> <span>Delete GitHub Repo</span></button>
             </div>

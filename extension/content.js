@@ -42,10 +42,48 @@ function fillForm(username, password) {
   }
 }
 
-// 2. Intelligent Auto-Capture Engine
+// 2. Git-Vault Web App Bridge (for git-vault.onrender.com & localhost)
+const currentHost = window.location.hostname.toLowerCase();
+const isGitVaultSite = currentHost.includes('git-vault.onrender.com') ||
+  (currentHost === 'localhost' || currentHost === '127.0.0.1') && (document.title.includes('Git-Vault') || document.querySelector('meta[name="apple-mobile-web-app-title"]'));
+
+if (isGitVaultSite) {
+  document.documentElement.setAttribute('data-gitvault-extension-installed', 'true');
+  window.dispatchEvent(new CustomEvent('GitVaultExtensionDetected', { detail: { version: '1.0.0' } }));
+
+  // Listen for sync messages from git-vault.onrender.com
+  window.addEventListener('message', (event) => {
+    if (event.origin !== window.location.origin) return;
+    if (event.data && event.data.type === 'GITVAULT_SYNC_CONFIG_TO_EXTENSION') {
+      const payload = event.data.payload || {};
+      try {
+        if (chrome && chrome.storage && chrome.storage.local) {
+          chrome.storage.local.set({
+            gitpass_user: payload.username || '',
+            gitpass_repo: payload.repo || '',
+            gitpass_token: payload.token || '',
+            gitpass_filename: payload.filename || 'passwords.txt',
+            gitvault_web_url: window.location.origin
+          }, () => {
+            window.postMessage({ type: 'GITVAULT_CONFIG_SYNCED_ACK', success: true }, window.location.origin);
+          });
+        }
+      } catch (err) {
+        window.postMessage({ type: 'GITVAULT_CONFIG_SYNCED_ACK', success: false, error: err.message }, window.location.origin);
+      }
+    } else if (event.data && event.data.type === 'GITVAULT_CHECK_EXTENSION_STATUS') {
+      window.postMessage({ type: 'GITVAULT_EXTENSION_STATUS_RESP', installed: true, version: '1.0.0' }, window.location.origin);
+    }
+  });
+}
+
+// 3. Intelligent Auto-Capture Engine
 document.addEventListener('submit', handleFormSubmit, true);
 
 function handleFormSubmit(event) {
+  // Never auto-capture Git-Vault master password or GitHub token on Git-Vault itself
+  if (isGitVaultSite) return;
+
   const form = event.target;
   if (!form || !form.querySelector) return;
 
@@ -84,6 +122,7 @@ function handleFormSubmit(event) {
     });
   }
 }
+
 
 function showAutoCaptureBanner(cred) {
   // Prevent duplicate banners

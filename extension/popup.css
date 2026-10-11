@@ -128,6 +128,56 @@ body {
   color: #ffffff;
 }
 
+/* Cloud Status Badge */
+.popup-cloud-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  border-radius: 9999px;
+  padding: 0.18rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #34d399;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.popup-cloud-badge:hover {
+  background: rgba(52, 211, 153, 0.16);
+  border-color: rgba(52, 211, 153, 0.5);
+  transform: translateY(-1px);
+}
+
+.cloud-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.cloud-dot.online {
+  background-color: #34d399;
+  box-shadow: 0 0 8px #34d399;
+  animation: pulseCloud 2s infinite ease-in-out;
+}
+
+.cloud-dot.checking {
+  background-color: #fbbf24;
+  box-shadow: 0 0 6px #fbbf24;
+}
+
+.cloud-dot.offline {
+  background-color: #f87171;
+  box-shadow: 0 0 6px #f87171;
+}
+
+@keyframes pulseCloud {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
 /* Toast Message */
 .popup-toast {
   position: absolute;
