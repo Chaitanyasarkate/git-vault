@@ -5,6 +5,7 @@ and written directly to the user's personal GitHub repository.
 """
 
 import base64
+import time
 import requests
 from typing import Tuple, Optional
 
@@ -42,6 +43,8 @@ def _headers(token: str) -> dict:
         "Authorization": f"Bearer {token.strip()}",
         "Accept": "application/vnd.github.v3+json",
         "User-Agent": "Git-Vault-App",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
     }
 
 
@@ -77,8 +80,9 @@ def get_repo_file(token: str, owner: str, repo: str, file_path: str) -> Tuple[st
     """
     clean_path = file_path.strip().lstrip("/")
     url = f"{GITHUB_API_BASE}/repos/{owner.strip()}/{repo.strip()}/contents/{clean_path}"
+    params = {"_t": int(time.time() * 1000)}
     try:
-        resp = requests.get(url, headers=_headers(token), timeout=10)
+        resp = requests.get(url, params=params, headers=_headers(token), timeout=10)
     except requests.RequestException as e:
         raise GitHubError(f"Network error fetching vault file: {e}")
 

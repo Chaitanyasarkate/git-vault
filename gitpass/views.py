@@ -463,6 +463,7 @@ def vault_view(request):
         "github_username": request.session.get("github_username"),
         "github_repo": request.session.get("github_repo"),
         "github_filename": request.session.get("github_filename"),
+        "github_token": request.session.get("github_token", ""),
         "is_demo": request.session.get("is_demo", False),
     }
     return render(request, "gitpass/vault.html", context)
@@ -750,7 +751,7 @@ def api_cloud_sync(request):
             # Remote repository has newer changes
             latest_items = decrypt_vault(raw_content, master_pwd)
             request.session["file_sha"] = remote_sha
-            return JsonResponse({
+            res = JsonResponse({
                 "success": True,
                 "synced": True,
                 "updated": True,
@@ -759,8 +760,10 @@ def api_cloud_sync(request):
                 "message": f"Successfully synced with GitHub cloud! Updated to commit {remote_sha[:7]}.",
                 "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             })
+            res["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            return res
         else:
-            return JsonResponse({
+            res = JsonResponse({
                 "success": True,
                 "synced": True,
                 "updated": False,
@@ -768,8 +771,12 @@ def api_cloud_sync(request):
                 "message": "Vault is 100% in sync with GitHub cloud storage.",
                 "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             })
+            res["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            return res
     except Exception as e:
-        return JsonResponse({"success": False, "synced": False, "error": str(e)}, status=500)
+        res = JsonResponse({"success": False, "synced": False, "error": str(e)}, status=500)
+        res["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        return res
 
 
 @require_session

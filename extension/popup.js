@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const headerRepoTag = document.getElementById('headerRepoTag');
   const btnToggleBiometrics = document.getElementById('btnToggleBiometrics');
   const btnLockVault = document.getElementById('btnLockVault');
+  const btnSyncExt = document.getElementById('btnSyncExt');
   const btnOpenWeb = document.getElementById('btnOpenWeb');
   const renderCloudBadge = document.getElementById('renderCloudBadge');
   const footerWebLink = document.getElementById('footerWebLink');
@@ -516,6 +517,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  // 1-Click Cloud Sync in Extension
+  btnSyncExt?.addEventListener('click', async () => {
+    if (!activeSession.isUnlocked) return;
+    if (activeSession.isDemo) {
+      showToast('Demo vault is in-sync with memory.');
+      return;
+    }
+
+    showToast('Syncing with GitHub cloud...', false);
+    const syncSvg = btnSyncExt.querySelector('svg');
+    if (syncSvg) syncSvg.style.animation = 'spin 0.8s linear infinite';
+
+    try {
+      const fileData = await window.GitVaultGitHub.fetchRepoFile(
+        activeSession.token,
+        activeSession.username,
+        activeSession.repo,
+        activeSession.filename
+      );
+
+      if (fileData.sha !== activeSession.fileSha && fileData.content) {
+        const freshItems = await window.GitVaultCrypto.decryptVault(
+          fileData.content,
+          activeSession.masterPassword
+        );
+        activeSession.fileSha = fileData.sha;
+        activeSession.items = freshItems;
+        await renderVaultItems();
+        showToast(`Cloud Sync Complete: Updated to commit ${(fileData.sha || '').slice(0, 7)} (${freshItems.length} items)!`);
+      } else {
+        showToast('Vault is 100% in sync with GitHub cloud storage.');
+      }
+    } catch (err) {
+      showToast(`Cloud Sync Error: ${err.message}`, true);
+    } finally {
+      if (syncSvg) syncSvg.style.animation = '';
+    }
+  });
+
   // =========================================================================
   // Check Pending Auto-Captures
   // =========================================================================
@@ -546,7 +586,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!activeSession.isDemo) {
         try {
           const encrypted = await window.GitVaultCrypto.encryptVault(activeSession.items, activeSession.masterPassword);
-          await window.GitVaultGitHub.commitRepoFile(
+          const newSha = await window.GitVaultGitHub.commitRepoFile(
             activeSession.token,
             activeSession.username,
             activeSession.repo,
@@ -555,6 +595,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             `Auto-capture credential for ${newItem.title}`,
             activeSession.fileSha
           );
+          activeSession.fileSha = newSha;
           showToast(`Saved & committed ${newItem.title} to GitHub!`);
         } catch (e) {
           showToast(`Commit failed: ${e.message}`, true);

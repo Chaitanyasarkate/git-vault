@@ -734,13 +734,20 @@ function updateSortFilter(sortVal) {
 }
 
 async function triggerCloudSync() {
-  const btn = document.getElementById('btnCloudSync');
-  const icon = document.getElementById('cloudSyncIcon');
-  if (icon) icon.classList.add('animate-spin');
-  if (btn) btn.disabled = true;
+  const btnDesktop = document.getElementById('btnCloudSync');
+  const btnMobile = document.getElementById('btnMobileSync');
+  const iconDesktop = document.getElementById('cloudSyncIcon');
+  const iconMobile = document.getElementById('mobileSyncIcon');
+
+  [iconDesktop, iconMobile].forEach(ic => {
+    if (ic) ic.classList.add('animate-spin');
+  });
+  [btnDesktop, btnMobile].forEach(btn => {
+    if (btn) btn.disabled = true;
+  });
 
   try {
-    const res = await fetch('/api/cloud-sync/');
+    const res = await fetch('/api/cloud-sync/?_t=' + Date.now(), { cache: 'no-store' });
     const data = await res.json();
     if (data.synced) {
       showToast(data.message || 'Synced with GitHub cloud!');
@@ -753,9 +760,67 @@ async function triggerCloudSync() {
   } catch (err) {
     showToast('Sync network error: ' + err.message, 'error');
   } finally {
-    if (icon) icon.classList.remove('animate-spin');
-    if (btn) btn.disabled = false;
+    [iconDesktop, iconMobile].forEach(ic => {
+      if (ic) ic.classList.remove('animate-spin');
+    });
+    [btnDesktop, btnMobile].forEach(btn => {
+      if (btn) btn.disabled = false;
+    });
   }
+}
+
+// Background Auto-Sync across Extension, Web, and Mobile
+(function initMultiDeviceAutoSync() {
+  let lastSyncCheck = Date.now();
+
+  async function performBackgroundSyncCheck() {
+    // Only check if user is authenticated and at least 12 seconds have passed since last check
+    const isAuth = !!document.querySelector('.user-repo-badge, .apple-repo-badge');
+    if (!isAuth) return;
+    if (Date.now() - lastSyncCheck < 12000) return;
+    lastSyncCheck = Date.now();
+
+    try {
+      const res = await fetch('/api/cloud-sync/?_t=' + Date.now(), { cache: 'no-store' });
+      const data = await res.json();
+      if (data.synced && data.updated) {
+        showToast('☁️ New changes detected on GitHub. Refreshing vault...');
+        setTimeout(() => window.location.reload(), 800);
+      }
+    } catch (e) {
+      // Background check fails silently
+    }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      performBackgroundSyncCheck();
+    }
+  });
+
+  window.addEventListener('focus', performBackgroundSyncCheck);
+})();
+
+// Web-to-Extension Configuration Bridge
+function syncConfigToExtension(customPayload) {
+  const metaUser = document.querySelector('meta[name="gitvault-user"]')?.content || '';
+  const metaRepo = document.querySelector('meta[name="gitvault-repo"]')?.content || '';
+  const metaFile = document.querySelector('meta[name="gitvault-filename"]')?.content || 'passwords.txt';
+  const metaToken = document.querySelector('meta[name="gitvault-token"]')?.content || '';
+
+  const payload = customPayload || {
+    username: metaUser,
+    repo: metaRepo,
+    filename: metaFile,
+    token: metaToken
+  };
+
+  window.postMessage({
+    type: 'GITVAULT_SYNC_CONFIG_TO_EXTENSION',
+    payload
+  }, window.location.origin);
+
+  showToast('🧩 Configuration sent to Git-Vault Extension! Open extension to unlock.');
 }
 
 function showWifiQrModal(ssid, password) {
@@ -778,9 +843,42 @@ function showWifiQrModal(ssid, password) {
 function updateThemeToggleIcons(theme) {
   const icons = document.querySelectorAll('#themeToggleIcon, .theme-toggle-icon');
   icons.forEach(el => {
-    // When in light mode, show 🌙 to switch to dark. In dark mode, show ☀️ to switch to light.
+    // When in light mode, show 🌙 (click to go to dark). In dark mode, show ☀️ (click to go to light).
     el.textContent = theme === 'light' ? '🌙' : '☀️';
   });
+}
+
+function applyTheme(theme) {
+  const html = document.documentElement;
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+
+  if (theme === 'light') {
+    html.classList.remove('dark');
+    html.classList.add('theme-light');
+    html.setAttribute('data-theme', 'light');
+    if (document.body) {
+      document.body.classList.remove('dark');
+      document.body.classList.add('theme-light');
+      document.body.setAttribute('data-theme', 'light');
+    }
+    if (metaTheme) metaTheme.setAttribute('content', '#f2f2f7');
+    updateThemeToggleIcons('light');
+  } else {
+    html.classList.remove('theme-light');
+    html.classList.add('dark');
+    html.setAttribute('data-theme', 'dark');
+    if (document.body) {
+      document.body.classList.remove('theme-light');
+      document.body.classList.add('dark');
+      document.body.setAttribute('data-theme', 'dark');
+    }
+    if (metaTheme) metaTheme.setAttribute('content', '#000000');
+    updateThemeToggleIcons('dark');
+  }
+
+  try {
+    window.dispatchEvent(new CustomEvent('GitVaultThemeChanged', { detail: { theme } }));
+  } catch (e) {}
 }
 
 function toggleAppleTheme() {
@@ -788,25 +886,7 @@ function toggleAppleTheme() {
   const isLight = html.classList.contains('theme-light') || html.getAttribute('data-theme') === 'light';
   const newTheme = isLight ? 'dark' : 'light';
 
-  if (newTheme === 'light') {
-    html.classList.remove('dark');
-    html.classList.add('theme-light');
-    if (document.body) {
-      document.body.classList.remove('dark');
-      document.body.classList.add('theme-light');
-    }
-    html.setAttribute('data-theme', 'light');
-    updateThemeToggleIcons('light');
-  } else {
-    html.classList.remove('theme-light');
-    html.classList.add('dark');
-    if (document.body) {
-      document.body.classList.remove('theme-light');
-      document.body.classList.add('dark');
-    }
-    html.setAttribute('data-theme', 'dark');
-    updateThemeToggleIcons('dark');
-  }
+  applyTheme(newTheme);
   try {
     localStorage.setItem('gitvault_theme', newTheme);
   } catch (e) {}
@@ -817,23 +897,10 @@ function toggleAppleTheme() {
 (function initAppleTheme() {
   try {
     const saved = localStorage.getItem('gitvault_theme') || 'dark';
-    if (saved === 'light') {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.classList.add('theme-light');
-      document.documentElement.setAttribute('data-theme', 'light');
-      if (document.body) {
-        document.body.classList.remove('dark');
-        document.body.classList.add('theme-light');
-      }
-    } else {
-      document.documentElement.classList.remove('theme-light');
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
+    applyTheme(saved);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => applyTheme(saved));
     }
-    window.addEventListener('DOMContentLoaded', () => {
-      const current = document.documentElement.getAttribute('data-theme') || saved;
-      updateThemeToggleIcons(current);
-    });
   } catch (e) {}
 })();
 

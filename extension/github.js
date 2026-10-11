@@ -38,12 +38,14 @@ async function verifyAccess(token, owner, repo) {
 }
 
 async function fetchRepoFile(token, owner, repo, filePath = 'passwords.txt') {
-  const url = `${GITHUB_API_BASE}/repos/${owner}/${repo}/contents/${filePath}`;
+  const url = `${GITHUB_API_BASE}/repos/${owner}/${repo}/contents/${filePath}?_t=${Date.now()}`;
   const resp = await fetch(url, {
+    cache: 'no-store',
     headers: {
       'Authorization': `Bearer ${token}`,
       'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'GitVault-WebExtension'
+      'User-Agent': 'GitVault-WebExtension',
+      'Cache-Control': 'no-cache, no-store, must-revalidate'
     }
   });
 
