@@ -3,318 +3,338 @@
 {% block title %}Password Vault — Git-Vault{% endblock %}
 
 {% block content %}
-<div class="vault-container-fluid">
+<div class="apple-container">
 
-  <!-- Top Controls & Status Bar -->
-  <div class="vault-header-row">
-    
-    <!-- Left: Vault Status & Heading -->
-    <div>
-      <div class="vault-status-meta">
-        <span class="status-synced-pill">
-          <span class="status-dot-pulse"></span>
-          Active & Synced
-        </span>
-        {% if is_demo %}
-          <span class="status-demo-pill">
-            Demo Mode (In-Memory)
-          </span>
-        {% endif %}
-        <span>•</span>
-        <span class="vault-repo-label">{{ github_username }}/{{ github_repo }} <span class="text-slate-500">({{ github_filename }})</span></span>
+  <!-- Responsive Dual-Pane Layout: Hub on Left/Top + Workspace on Right/Bottom -->
+  <div class="apple-layout">
+
+    <!-- ================= 1. THE APPLE PASSWORDS HUB (Sidebar on Desktop, Top Grid on Mobile) ================= -->
+    <aside class="apple-hub">
+
+      <!-- Top Header Row: Passwords Title & Header Actions -->
+      <div class="apple-header">
+        <div>
+          <h1 class="apple-title">
+            <span>Passwords</span>
+            <span class="sr-only">Password Vault</span>
+          </h1>
+          <div class="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+            <span class="status-dot-pulse"></span>
+            <span class="font-mono text-slate-300 truncate max-w-[180px] sm:max-w-[240px]">{{ github_username }}/{{ github_repo }}</span>
+            {% if is_demo %}<span class="text-amber-400 font-semibold">• Demo</span>{% endif %}
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Light/Dark Mode Switcher -->
+          <button type="button" onclick="toggleAppleTheme()" class="btn-vault-secondary" style="padding: 0.4rem 0.65rem; border-radius: 9999px;" title="Toggle Light / Dark Mode">
+            <span id="themeToggleIcon">☀️</span>
+          </button>
+
+          <!-- Vault Operations Dropdown -->
+          <div class="dropdown">
+            <button type="button" class="btn-vault-secondary" style="padding: 0.4rem 0.65rem; border-radius: 9999px;" title="Vault Operations">
+              <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
+            </button>
+            <div class="dropdown-menu">
+              <a href="{% url 'gitpass:export_vault' %}?format=json" class="dropdown-item"><span>📄</span> <span>Export JSON</span></a>
+              <a href="{% url 'gitpass:export_vault' %}?format=csv" class="dropdown-item"><span>📊</span> <span>Export CSV</span></a>
+              <button type="button" onclick="openModal('importModal')" class="dropdown-item"><span>📥</span> <span>Import (CSV / JSON)</span></button>
+              <a href="{% url 'gitpass:raw_vault' %}" target="_blank" rel="noopener noreferrer" class="dropdown-item"><span>🔍</span> <span>Raw GitHub Payload</span></a>
+              <div class="dropdown-divider"></div>
+              <button type="button" onclick="openModal('deleteRepoModal')" class="dropdown-item dropdown-item-danger"><span>🗑️</span> <span>Delete GitHub Repo</span></button>
+            </div>
+          </div>
+        </div>
       </div>
-      <h1 class="vault-main-title">
-        Password Vault
-        <span class="vault-count-badge">
-          {{ total_count }} saved
-        </span>
-      </h1>
-    </div>
 
-    <!-- Right: Single Primary Action & Options -->
-    <div class="vault-actions-bar">
-      
-      <!-- Primary: Add Password Button -->
-      <button type="button" onclick="openModal('addModal')" class="btn-vault-primary" id="addPasswordBtn">
-        <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+      <!-- Search Bar (Styled exactly like iOS 18 Passwords Search) -->
+      <div class="apple-search-box">
+        <svg width="16" height="16" class="text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
-        <span>Add Password</span>
-      </button>
-
-      <!-- Vault Options Dropdown -->
-      <div class="dropdown">
-        <button type="button" class="btn-vault-secondary" title="Export & Vault Operations">
-          <svg width="16" height="16" class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
-          </svg>
-          <span>Options</span>
-          <svg width="14" height="14" class="w-3.5 h-3.5 text-slate-400 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-          </svg>
+        <input type="text" id="vaultSearchInput" placeholder="Search" value="{{ search_q }}" class="apple-search-input" autocomplete="off">
+        <span class="text-[10px] text-slate-500 font-mono hidden md:inline px-1 py-0.5 rounded bg-white/10">/</span>
+        <button type="button" id="clearSearchBtn" onclick="clearSearchFilter()" class="hidden text-slate-400 hover:text-white text-base px-1 leading-none" title="Clear">
+          &times;
         </button>
-        <div class="dropdown-menu">
-          <a href="{% url 'gitpass:export_vault' %}?format=json" class="dropdown-item">
-            <span>📄</span>
-            <span>Export JSON Backup</span>
-          </a>
-          <a href="{% url 'gitpass:export_vault' %}?format=csv" class="dropdown-item">
-            <span>📊</span>
-            <span>Export CSV Spreadsheet</span>
-          </a>
-          <button type="button" onclick="openModal('importModal')" class="dropdown-item">
-            <span>📥</span>
-            <span>Import Passwords (CSV / JSON)</span>
-          </button>
-          <a href="{% url 'gitpass:raw_vault' %}" target="_blank" rel="noopener noreferrer" class="dropdown-item">
-            <span>🔍</span>
-            <span>Raw GitHub Payload</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <button type="button" onclick="openModal('deleteRepoModal')" class="dropdown-item dropdown-item-danger">
-            <span>🗑️</span>
-            <span>Delete GitHub Repo</span>
-          </button>
-        </div>
+        <!-- iOS Mic Icon -->
+        <svg width="15" height="15" class="text-slate-400 shrink-0 cursor-pointer hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" onclick="document.getElementById('vaultSearchInput').focus();" title="Voice / Focus Search">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+        </svg>
       </div>
 
-    </div>
-
-  </div>
-
-  <div class="pro-vault-layout mt-6">
-
-    <!-- 1. Executive Telemetry HUD Strip -->
-    <div class="pro-hud-grid">
-      
-      <!-- Card 1: Vault Health (Clickable to open Breach Audit) -->
-      <div class="pro-hud-card cursor-pointer" onclick="openSecurityAuditModal()" title="Run Breach Health Audit">
-        <div class="pro-hud-icon-wrap text-emerald-400">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-          </svg>
-        </div>
-        <div>
-          <div class="pro-hud-card-label">Security Health</div>
-          <div class="pro-hud-card-val">
-            <span id="auditScorePill">{{ audit_summary.health_score|default:"100" }}%</span>
-            <span class="text-xs font-semibold text-emerald-400 px-1.5 py-0.5 rounded-full bg-emerald-500/10">{{ audit_summary.grade|default:"A+" }}</span>
-          </div>
-          <div class="pro-hud-card-sub text-emerald-400">Click to run audit &rarr;</div>
-        </div>
-      </div>
-
-      <!-- Card 2: Encrypted Credentials -->
-      <div class="pro-hud-card">
-        <div class="pro-hud-icon-wrap text-cyan-400">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-          </svg>
-        </div>
-        <div>
-          <div class="pro-hud-card-label">Saved Accounts</div>
-          <div class="pro-hud-card-val">{{ total_count }}</div>
-          <div class="pro-hud-card-sub">Zero Server Storage</div>
-        </div>
-      </div>
-
-      <!-- Card 3: Security Engine -->
-      <div class="pro-hud-card">
-        <div class="pro-hud-icon-wrap text-teal-400">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
-        </div>
-        <div>
-          <div class="pro-hud-card-label">Cipher Engine</div>
-          <div class="pro-hud-card-val text-sm font-mono tracking-tight">AES-256-GCM</div>
-          <div class="pro-hud-card-sub">PBKDF2 (120k rounds)</div>
-        </div>
-      </div>
-
-      <!-- Card 4: Version Control Engine (Clickable to open Time-Machine) -->
-      <div class="pro-hud-card cursor-pointer" onclick="openTimeMachineModal()" title="Browse Git Snapshots & Rollback">
-        <div class="pro-hud-icon-wrap text-sky-400">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <div>
-          <div class="pro-hud-card-label">Git Time-Machine</div>
-          <div class="pro-hud-card-val text-sm">Commit Logs</div>
-          <div class="pro-hud-card-sub text-cyan-400">Click to view history &rarr;</div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- 2. Dual-Pane Pro Workspace -->
-    <div class="pro-vault-workspace">
-      
-      <!-- Left Sidebar: Vault Navigation & Tools -->
-      <aside class="pro-vault-sidebar">
+      <!-- ================= THE 6-TILE CATEGORY GRID (iOS 18 Passwords Grid) ================= -->
+      <div class="apple-grid">
         
-        <!-- Connected Repository Meta Tile -->
-        <div>
-          <div class="pro-sidebar-section-title">Connected Vault</div>
-          <div class="p-3 rounded-xl bg-white/[0.03] border border-white/[0.07] flex flex-col gap-1.5">
-            <div class="flex items-center gap-2 text-xs font-bold text-white">
-              <span class="status-dot-pulse"></span>
-              <span class="truncate font-mono">{{ github_username }}/{{ github_repo }}</span>
-            </div>
-            <div class="text-[11px] text-slate-400 flex items-center justify-between">
-              <span class="font-mono text-slate-300">{{ github_filename }}</span>
-              <span class="text-emerald-400 text-[10px] font-semibold">Synced</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Category Filters -->
-        <div>
-          <div class="pro-sidebar-section-title">Categories</div>
-          <nav class="pro-sidebar-list">
-            <a href="?category=All" class="pro-sidebar-link {% if selected_cat == 'All' and active_tab != 'trash' %}active{% endif %}">
-              <span class="flex items-center gap-2">
-                <svg width="14" height="14" class="text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
-                <span>All Passwords</span>
-              </span>
-              <span class="pro-sidebar-badge">{{ total_count }}</span>
-            </a>
-            {% for cat in categories %}
-              <a href="?category={{ cat }}" class="pro-sidebar-link {% if selected_cat == cat and active_tab != 'trash' %}active{% endif %}">
-                <span class="flex items-center gap-2 truncate">
-                  <svg width="14" height="14" class="text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                  <span class="truncate">{{ cat }}</span>
-                </span>
-              </a>
-            {% endfor %}
-          </nav>
-        </div>
-
-        {% if groups %}
-        <!-- Shared Groups / Folders -->
-        <div>
-          <div class="pro-sidebar-section-title">Shared Groups</div>
-          <nav class="pro-sidebar-list">
-            <a href="?group=All" class="pro-sidebar-link {% if selected_group == 'All' and active_tab != 'trash' %}active{% endif %}">
-              <span class="flex items-center gap-2">
-                <span>📁</span>
-                <span>All Groups</span>
-              </span>
-            </a>
-            {% for grp in groups %}
-              <a href="?group={{ grp }}" class="pro-sidebar-link {% if selected_group == grp and active_tab != 'trash' %}active{% endif %}">
-                <span class="flex items-center gap-2 truncate">
-                  <span>📂</span>
-                  <span class="truncate">{{ grp }}</span>
-                </span>
-              </a>
-            {% endfor %}
-          </nav>
-        </div>
-        {% endif %}
-
-        <!-- Vault Tools Hub -->
-        <div>
-          <div class="pro-sidebar-section-title">Vault Tools</div>
-          <nav class="pro-sidebar-list">
-            <button type="button" onclick="openModal('generatorModal')" class="pro-sidebar-link text-left" id="openGeneratorBtn">
-              <span class="flex items-center gap-2">
-                <span class="text-emerald-400">⚡</span>
-                <span>Password Generator</span>
-              </span>
-            </button>
-            <a href="{% url 'gitpass:instructions' %}" class="pro-sidebar-link">
-              <span class="flex items-center gap-2">
-                <span class="text-slate-400">🔌</span>
-                <span>Browser Extension</span>
-              </span>
-            </a>
-            <button type="button" onclick="openModal('importModal')" class="pro-sidebar-link text-left">
-              <span class="flex items-center gap-2">
-                <span class="text-teal-400">📥</span>
-                <span>Import Passwords</span>
-              </span>
-            </button>
-            <a href="?tab=trash" class="pro-sidebar-link {% if active_tab == 'trash' %}active text-red-400{% endif %}">
-              <span class="flex items-center gap-2">
-                <span>🗑️</span>
-                <span>Trash Recovery</span>
-              </span>
-              {% if trash_count %}
-                <span class="pro-sidebar-badge" style="background: rgba(239, 68, 68, 0.2); color: #f87171;">{{ trash_count }}</span>
-              {% endif %}
-            </a>
-          </nav>
-        </div>
-
-        <!-- Master Vault Controls -->
-        <div>
-          <div class="pro-sidebar-section-title">Security Settings</div>
-          <nav class="pro-sidebar-list">
-            <button type="button" onclick="openModal('pwChangeModal')" class="pro-sidebar-link text-left">
-              <span class="flex items-center gap-2">
-                <svg width="14" height="14" class="text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-                <span>Change Master Password</span>
-              </span>
-            </button>
-            <a href="{% url 'gitpass:logout' %}" class="pro-sidebar-link text-red-400 hover:text-red-300">
-              <span class="flex items-center gap-2">
-                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                <span>Lock Vault</span>
-              </span>
-            </a>
-          </nav>
-        </div>
-
-      </aside>
-
-      <!-- Right Main Content: Command Bar & Cards Grid -->
-      <main class="pro-vault-main">
-        
-        <!-- Command Bar with Search, Sort, and Cloud Sync -->
-        <div class="pro-command-bar flex items-center justify-between gap-3 flex-wrap">
-          <div class="pro-search-box flex-1 min-w-[240px]">
-            <div class="vault-search-icon">
-              <svg width="16" height="16" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        <!-- Tile 1: All -->
+        <a href="{% url 'gitpass:vault' %}?filter=all" class="apple-tile {% if filter_type == 'all' and active_tab != 'trash' and not selected_group or selected_group == 'All' and not filter_type %}is-active{% endif %}">
+          <div class="apple-tile-top">
+            <div class="apple-icon-circle icon-bg-all">
+              <!-- Apple Key Icon -->
+              <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12.65 10C11.7 7.66 9.17 6.2 6.7 6.88c-2.47.69-4.04 3.06-3.65 5.56.39 2.5 2.57 4.26 5.09 4.09.81-.05 1.58-.33 2.23-.78l4.98 4.98c.39.39 1.02.39 1.41 0l1.41-1.41c.2-.2.31-.47.31-.75s-.11-.55-.31-.75l-1.42-1.41 1.42-1.42c.39-.39.39-1.02 0-1.41l-1.42-1.42 1.42-1.41c.39-.39.39-1.02 0-1.41L12.65 10zM8 12c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
               </svg>
             </div>
-            <input type="text" id="vaultSearchInput" placeholder="Filter passwords, accounts, or notes..." value="{{ search_q }}" class="vault-search-input">
-            <span class="pro-shortcut-badge">/</span>
-            <button type="button" id="clearSearchBtn" onclick="clearSearchFilter()" class="vault-search-clear hidden" title="Clear Search">
-              &times;
-            </button>
+            <div class="apple-tile-badge">
+              <span>{{ all_count }}</span>
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </div>
           </div>
+          <div class="apple-tile-label">All</div>
+        </a>
 
-          <div class="flex items-center gap-2 shrink-0">
-            <!-- Sort Dropdown -->
-            <select id="vaultSortSelect" class="form-control" style="padding: 0.5rem 0.85rem; font-size: 0.75rem; border-radius: 9999px; background: rgba(255,255,255,0.04); color: #cbd5e1; border-color: rgba(255,255,255,0.12);" onchange="updateSortFilter(this.value)">
-              <option value="title_asc" {% if sort_by == 'title_asc' %}selected{% endif %}>Sort: A → Z</option>
-              <option value="title_desc" {% if sort_by == 'title_desc' %}selected{% endif %}>Sort: Z → A</option>
-              <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Sort: Recently Updated</option>
-              <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Sort: Oldest First</option>
-              <option value="category" {% if sort_by == 'category' %}selected{% endif %}>Sort: Category</option>
-              <option value="group" {% if sort_by == 'group' %}selected{% endif %}>Sort: Group</option>
-              <option value="weakest" {% if sort_by == 'weakest' %}selected{% endif %}>Sort: Weakest Passwords</option>
-            </select>
-
-            <!-- 1-Click Cloud Sync Button -->
-            <button type="button" onclick="triggerCloudSync()" id="btnCloudSync" class="btn-dark-pill" style="padding: 0.5rem 0.95rem; font-size: 0.75rem; display: flex; align-items: center; gap: 0.35rem;" title="1-Click Secure Cloud Sync with GitHub">
-              <svg id="cloudSyncIcon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-              <span>Cloud Sync</span>
-            </button>
-
-            {% if active_tab == 'trash' and trash_count > 0 %}
-              <form method="post" action="{% url 'gitpass:empty_trash' %}" onsubmit="return confirm('Empty Trash and permanently destroy all deleted items?');" style="margin: 0;">
-                {% csrf_token %}
-                <button type="submit" class="btn-danger-sm" style="padding: 0.5rem 0.85rem; font-size: 0.75rem; border-radius: 9999px;">
-                  Empty Trash ({{ trash_count }})
-                </button>
-              </form>
-            {% endif %}
+        <!-- Tile 2: Passkeys -->
+        <a href="{% url 'gitpass:vault' %}?filter=passkeys" class="apple-tile {% if filter_type == 'passkeys' %}is-active{% endif %}">
+          <div class="apple-tile-top">
+            <div class="apple-icon-circle icon-bg-passkeys">
+              <!-- Person with Key Icon -->
+              <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+            </div>
+            <div class="apple-tile-badge">
+              <span>{{ passkeys_count }}</span>
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </div>
           </div>
+          <div class="apple-tile-label">Passkeys</div>
+        </a>
+
+        <!-- Tile 3: Codes -->
+        <a href="{% url 'gitpass:vault' %}?filter=codes" class="apple-tile {% if filter_type == 'codes' %}is-active{% endif %}">
+          <div class="apple-tile-top">
+            <div class="apple-icon-circle icon-bg-codes">
+              <!-- Clock/Code Lock Icon -->
+              <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+              </svg>
+            </div>
+            <div class="apple-tile-badge">
+              <span>{{ codes_count }}</span>
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+          <div class="apple-tile-label">Codes</div>
+        </a>
+
+        <!-- Tile 4: Wi-Fi -->
+        <a href="{% url 'gitpass:vault' %}?filter=wifi" class="apple-tile {% if filter_type == 'wifi' %}is-active{% endif %}">
+          <div class="apple-tile-top">
+            <div class="apple-icon-circle icon-bg-wifi">
+              <!-- Wi-Fi Icon -->
+              <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4zm0 3.5c3.78 0 7.21 1.5 9.73 3.94L12 19.34 2.27 11.44C4.79 9 8.22 7.5 12 7.5zm0 4c2.56 0 4.88 1.02 6.58 2.68L12 17.68 5.42 14.18C7.12 12.52 9.44 11.5 12 11.5z"/>
+              </svg>
+            </div>
+            <div class="apple-tile-badge">
+              <span>{{ wifi_count }}</span>
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+          <div class="apple-tile-label">Wi-Fi</div>
+        </a>
+
+        <!-- Tile 5: Security -->
+        <a href="{% url 'gitpass:vault' %}?filter=security" class="apple-tile {% if filter_type == 'security' %}is-active{% endif %}">
+          <div class="apple-tile-top">
+            <div class="apple-icon-circle icon-bg-security">
+              <!-- Red Exclamation Badge -->
+              <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+              </svg>
+            </div>
+            <div class="apple-tile-badge">
+              <span>{{ security_count }}</span>
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+          <div class="apple-tile-label">Security</div>
+        </a>
+
+        <!-- Tile 6: Deleted -->
+        <a href="{% url 'gitpass:vault' %}?filter=deleted&tab=trash" class="apple-tile {% if active_tab == 'trash' or filter_type == 'deleted' %}is-active{% endif %}">
+          <div class="apple-tile-top">
+            <div class="apple-icon-circle icon-bg-deleted">
+              <!-- Trash Icon -->
+              <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+              </svg>
+            </div>
+            <div class="apple-tile-badge">
+              <span>{{ trash_count }}</span>
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+          <div class="apple-tile-label">Deleted</div>
+        </a>
+
+      </div>
+
+      <!-- ================= SHARED GROUPS SECTION (iOS 18 Passwords List) ================= -->
+      <div>
+        <div class="apple-section-title">Shared Groups</div>
+        <div class="apple-grouped-list">
+          {% if shared_groups_list %}
+            {% for grp in shared_groups_list %}
+              <a href="{% url 'gitpass:vault' %}?group={{ grp.name }}" class="apple-group-row {% if selected_group == grp.name %}is-active{% endif %}">
+                <div class="flex items-center gap-3">
+                  <div class="apple-icon-circle icon-bg-group" style="width: 32px; height: 32px;">
+                    <!-- Two People Icon -->
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                    </svg>
+                  </div>
+                  <span class="font-medium text-sm text-[var(--apple-text-primary)]">{{ grp.name }}</span>
+                </div>
+                <div class="apple-tile-badge text-xs">
+                  <span>{{ grp.count }}</span>
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </div>
+              </a>
+            {% endfor %}
+          {% else %}
+            <div class="p-3.5 text-xs text-slate-400">
+              No shared groups yet. Assign credentials to groups like <em>Pedersen Family</em> or <em>Work Passwords</em>.
+            </div>
+          {% endif %}
+          <a href="javascript:void(0)" onclick="openModal('addModal')" class="apple-group-row text-xs text-sky-400 font-medium">
+            <span class="flex items-center gap-2">
+              <span>➕</span>
+              <span>New Credential / Shared Group</span>
+            </span>
+            <span>&rarr;</span>
+          </a>
         </div>
+      </div>
+
+      <!-- Quick Vault Utilities Card (Desktop & Tablet) -->
+      <div class="hidden lg:block p-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.07] space-y-2 text-xs">
+        <div class="text-[11px] uppercase font-semibold text-slate-400 tracking-wider">Vault Controls</div>
+        <div class="space-y-1">
+          <button type="button" onclick="openModal('generatorModal')" class="w-full flex items-center justify-between p-2 rounded-xl hover:bg-white/5 text-left text-slate-300">
+            <span class="flex items-center gap-2">⚡ <span>Password Generator</span></span>
+            <span class="text-slate-500">&rarr;</span>
+          </button>
+          <button type="button" onclick="openTimeMachineModal()" class="w-full flex items-center justify-between p-2 rounded-xl hover:bg-white/5 text-left text-slate-300">
+            <span class="flex items-center gap-2">🕒 <span>Git Time-Machine</span></span>
+            <span class="text-slate-500">&rarr;</span>
+          </button>
+          <button type="button" onclick="openSecurityAuditModal()" class="w-full flex items-center justify-between p-2 rounded-xl hover:bg-white/5 text-left text-slate-300">
+            <span class="flex items-center gap-2">🛡️ <span>Security Audit & Breaches</span></span>
+            <span class="text-emerald-400 font-mono">{{ audit_summary.health_score|default:"100" }}%</span>
+          </button>
+          <button type="button" onclick="openModal('pwChangeModal')" class="w-full flex items-center justify-between p-2 rounded-xl hover:bg-white/5 text-left text-slate-300">
+            <span class="flex items-center gap-2">🔑 <span>Change Master Password</span></span>
+            <span class="text-slate-500">&rarr;</span>
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ================= 2. THE MAIN WORKSPACE (Spacious on Desktop, Flowing on Mobile) ================= -->
+    <main class="apple-workspace">
+
+      <!-- Top Workspace Toolbar: Active Category Title, Sort, Cloud Sync, and Add Password -->
+      <div class="apple-toolbar">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg sm:text-xl font-bold text-[var(--apple-text-primary)]">
+              {% if filter_type == 'passkeys' %}
+                Passkeys
+              {% elif filter_type == 'codes' %}
+                Verification Codes (2FA)
+              {% elif filter_type == 'wifi' %}
+                Wi-Fi Networks
+              {% elif filter_type == 'security' %}
+                Security Recommendations
+              {% elif active_tab == 'trash' or filter_type == 'deleted' %}
+                Deleted Items (Trash Bin)
+              {% elif selected_group and selected_group != 'All' %}
+                Group: {{ selected_group }}
+              {% elif selected_cat and selected_cat != 'All' %}
+                Category: {{ selected_cat }}
+              {% else %}
+                All Passwords
+              {% endif %}
+            </h2>
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-white/10 text-[var(--apple-text-primary)]">
+              {{ items|length }}
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Zero Server Storage • Encrypted with AES-256-GCM on your GitHub repository
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <!-- Sort Dropdown -->
+          <select id="vaultSortSelect" class="form-control" style="padding: 0.45rem 0.85rem; font-size: 0.75rem; border-radius: 9999px; background: var(--apple-search-bg); color: var(--apple-text-primary); border-color: var(--apple-border);" onchange="updateSortFilter(this.value)">
+            <option value="title_asc" {% if sort_by == 'title_asc' %}selected{% endif %}>Sort: A → Z</option>
+            <option value="title_desc" {% if sort_by == 'title_desc' %}selected{% endif %}>Sort: Z → A</option>
+            <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Sort: Recently Updated</option>
+            <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Sort: Oldest First</option>
+            <option value="category" {% if sort_by == 'category' %}selected{% endif %}>Sort: Category</option>
+            <option value="group" {% if sort_by == 'group' %}selected{% endif %}>Sort: Group</option>
+            <option value="weakest" {% if sort_by == 'weakest' %}selected{% endif %}>Sort: Weakest Passwords</option>
+          </select>
+
+          <!-- 1-Click Cloud Sync Button -->
+          <button type="button" onclick="triggerCloudSync()" id="btnCloudSync" class="btn-vault-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.75rem; border-radius: 9999px;" title="1-Click Secure Cloud Sync with GitHub">
+            <svg id="cloudSyncIcon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span class="hidden sm:inline">Sync</span>
+          </button>
+
+          {% if active_tab == 'trash' and trash_count > 0 %}
+            <form method="post" action="{% url 'gitpass:empty_trash' %}" onsubmit="return confirm('Empty Trash and permanently destroy all deleted items?');" style="margin: 0;">
+              {% csrf_token %}
+              <button type="submit" class="btn-danger-sm" style="padding: 0.45rem 0.85rem; font-size: 0.75rem; border-radius: 9999px;">
+                Empty Trash ({{ trash_count }})
+              </button>
+            </form>
+          {% endif %}
+
+          <!-- Primary Add Password Button -->
+          <button type="button" onclick="openModal('addModal')" class="btn-vault-primary" id="addPasswordBtn" style="background: var(--apple-blue); color: #ffffff; padding: 0.45rem 1rem; border-radius: 9999px; font-size: 0.8125rem;">
+            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+            <span>Add Password</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Specific Context Notification Banners -->
+      {% if filter_type == 'security' %}
+        <div class="p-4 rounded-2xl bg-red-950/40 border border-red-800/50 flex items-center justify-between gap-4 flex-wrap">
+          <div class="flex items-center gap-3">
+            <div class="apple-icon-circle icon-bg-security" style="width: 38px; height: 38px;">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            </div>
+            <div>
+              <div class="text-sm font-bold text-red-200">Security Audit Recommendations</div>
+              <div class="text-xs text-red-300/80">These accounts have weak (under 12 chars), reused, or compromised passwords. Update them to strong unique passwords.</div>
+            </div>
+          </div>
+          <button type="button" onclick="openSecurityAuditModal()" class="btn-sm-white text-xs px-3 py-1.5 shrink-0">
+            Run Breach Audit &rarr;
+          </button>
+        </div>
+      {% elif active_tab == 'trash' or filter_type == 'deleted' %}
+        <div class="p-4 rounded-2xl bg-amber-950/40 border border-amber-800/50 flex items-center justify-between gap-4 flex-wrap">
+          <div class="flex items-center gap-3">
+            <div class="apple-icon-circle icon-bg-deleted" style="width: 38px; height: 38px;">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            </div>
+            <div>
+              <div class="text-sm font-bold text-amber-200">Deleted Items Recovery (Trash Bin)</div>
+              <div class="text-xs text-amber-300/80">Items in the Trash can be restored back to your vault anytime or permanently purged from your GitHub repository.</div>
+            </div>
+          </div>
+          <a href="{% url 'gitpass:vault' %}?filter=all" class="btn-sm-white text-xs px-3 py-1.5 shrink-0">
+            Back to Active Vault &rarr;
+          </a>
+        </div>
+      {% endif %}
 
         <!-- Items List Grid -->
         <div>
@@ -581,8 +601,22 @@
 
       </main>
 
-    </div>
+  </div>
 
+  <!-- Mobile Fixed Bottom Action Bar (Matches iPhone Passwords Bar) -->
+  <div class="apple-mobile-bottom-bar">
+    <button type="button" onclick="triggerCloudSync()" class="p-2 text-sky-400 hover:text-sky-300" title="Cloud Sync">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+    </button>
+
+    <button type="button" onclick="openModal('generatorModal')" class="p-2 text-amber-400 hover:text-amber-300" title="Password Generator">
+      <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+    </button>
+
+    <!-- Prominent Apple Blue Plus Button -->
+    <button type="button" onclick="openModal('addModal')" class="flex items-center justify-center w-11 h-11 rounded-full shadow-lg" style="background: var(--apple-blue); color: #ffffff;" title="Add Credential">
+      <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+    </button>
   </div>
 
 </div>

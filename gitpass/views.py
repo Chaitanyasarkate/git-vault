@@ -137,6 +137,7 @@ def login_view(request):
                     "totp_secret": "JBSWY3DPEHPK3PXP",
                     "url": "https://github.com",
                     "category": "Work",
+                    "group": "Work Passwords",
                     "notes": "Primary work development account",
                     "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                     "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -149,6 +150,7 @@ def login_view(request):
                     "totp_secret": "",
                     "url": "https://accounts.google.com",
                     "category": "Work",
+                    "group": "Work Passwords",
                     "notes": "2FA backup codes stored offline",
                     "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                     "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -161,7 +163,61 @@ def login_view(request):
                     "totp_secret": "HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ",
                     "url": "https://mail.proton.me",
                     "category": "Personal",
+                    "group": "Pedersen Family",
                     "notes": "Encrypted personal email",
+                    "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                    "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "title": "Apple ID (Passkey)",
+                    "username": "chaitanya@icloud.com",
+                    "password": "",
+                    "totp_secret": "",
+                    "url": "https://appleid.apple.com",
+                    "category": "Passkeys",
+                    "group": "Pedersen Family",
+                    "notes": "FIDO2 / WebAuthn resident credential across iPhone & MacBook",
+                    "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                    "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "title": "Home Wi-Fi",
+                    "username": "Pedersen-Home-5G",
+                    "password": "galaxy-nebula-99#",
+                    "totp_secret": "",
+                    "url": "",
+                    "category": "WiFi",
+                    "group": "Pedersen Family",
+                    "notes": "WPA3 Personal - 5GHz mesh router",
+                    "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                    "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "title": "Legacy Forum",
+                    "username": "old_user",
+                    "password": "12345",
+                    "totp_secret": "",
+                    "url": "https://forum.example.com",
+                    "category": "Social",
+                    "group": "Pedersen Family",
+                    "notes": "Weak password flagged by Security auditor",
+                    "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                    "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                },
+                {
+                    "id": str(uuid.uuid4()),
+                    "title": "Netflix (Archive)",
+                    "username": "pedersen@netflix.com",
+                    "password": "oldPassword123!",
+                    "totp_secret": "",
+                    "url": "https://netflix.com",
+                    "category": "Personal",
+                    "group": "Pedersen Family",
+                    "notes": "Cancelled subscription - in Trash bin",
+                    "deleted_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                     "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                     "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
                 }
@@ -286,7 +342,27 @@ def vault_view(request):
     trash_count = len(trash_items)
 
     tab = request.GET.get("tab", "vault").strip().lower()
-    display_items = trash_items if tab == "trash" else active_items
+    filter_type = request.GET.get("filter", "").strip().lower()
+
+    if tab == "trash" or filter_type == "deleted":
+        tab = "trash"
+        filter_type = "deleted"
+        display_items = trash_items
+    else:
+        tab = "vault"
+        display_items = active_items
+
+    # Apple Passwords quick tile filtering
+    if filter_type == "passkeys":
+        display_items = [i for i in display_items if i.get("category") == "Passkeys"]
+    elif filter_type == "codes":
+        display_items = [i for i in display_items if i.get("totp_secret")]
+    elif filter_type == "wifi":
+        display_items = [i for i in display_items if i.get("category") == "WiFi"]
+    elif filter_type == "security":
+        display_items = [i for i in display_items if (len(i.get("password", "")) < 12 and i.get("category") != "Notes") or i.get("is_compromised")]
+    elif not filter_type and tab != "trash":
+        filter_type = "all"
 
     # Filter by search query, category, and shared group
     search_q = request.GET.get("q", "").strip().lower()
@@ -324,11 +400,22 @@ def vault_view(request):
     else:  # title_asc default
         display_items.sort(key=lambda x: x.get("title", "").lower())
 
-    # Analytics / Security stats & TOTP computation
+    # Analytics / Security stats & Apple Passwords Tile Counters
     categories = sorted(list(set(i.get("category", "Logins") for i in active_items)))
     groups = sorted(list(set(i.get("group") for i in active_items if i.get("group"))))
     total_count = len(active_items)
+    all_count = len(active_items)
+    passkeys_count = sum(1 for i in active_items if i.get("category") == "Passkeys")
+    codes_count = sum(1 for i in active_items if i.get("totp_secret"))
+    wifi_count = sum(1 for i in active_items if i.get("category") == "WiFi")
     weak_count = sum(1 for i in active_items if len(i.get("password", "")) < 12 and i.get("category") != "Notes")
+    security_count = weak_count
+    trash_count = len(trash_items)
+
+    shared_groups_list = []
+    for grp in groups:
+        grp_cnt = sum(1 for i in active_items if i.get("group") == grp)
+        shared_groups_list.append({"name": grp, "count": grp_cnt})
 
     # Attach live TOTP generation for items with 2FA secret
     for item in display_items:
@@ -353,7 +440,14 @@ def vault_view(request):
     context = {
         "items": display_items,
         "total_count": total_count,
+        "all_count": all_count,
+        "passkeys_count": passkeys_count,
+        "codes_count": codes_count,
+        "wifi_count": wifi_count,
+        "security_count": security_count,
         "trash_count": trash_count,
+        "shared_groups_list": shared_groups_list,
+        "filter_type": filter_type,
         "active_tab": tab,
         "weak_count": weak_count,
         "audit_summary": audit_summary,

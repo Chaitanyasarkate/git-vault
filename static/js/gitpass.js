@@ -774,4 +774,48 @@ function showWifiQrModal(ssid, password) {
   openModal('wifiModal');
 }
 
+// 12. Apple Passwords Theme Switcher & Persistence
+function toggleAppleTheme() {
+  const html = document.documentElement;
+  const icon = document.getElementById('themeToggleIcon');
+  const isLight = html.classList.contains('theme-light') || html.getAttribute('data-theme') === 'light';
+  const newTheme = isLight ? 'dark' : 'light';
+
+  if (newTheme === 'light') {
+    html.classList.remove('dark');
+    html.classList.add('theme-light');
+    if (document.body) document.body.classList.add('theme-light');
+    html.setAttribute('data-theme', 'light');
+    if (icon) icon.textContent = '🌙';
+  } else {
+    html.classList.remove('theme-light');
+    html.classList.add('dark');
+    if (document.body) document.body.classList.remove('theme-light');
+    html.setAttribute('data-theme', 'dark');
+    if (icon) icon.textContent = '☀️';
+  }
+  try {
+    localStorage.setItem('gitvault_theme', newTheme);
+  } catch (e) {}
+  showToast(`Switched to Apple ${newTheme === 'light' ? 'Light' : 'Midnight'} Mode`);
+}
+
+// Restore saved theme on load
+(function initAppleTheme() {
+  try {
+    const saved = localStorage.getItem('gitvault_theme');
+    if (saved === 'light') {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('theme-light');
+      document.documentElement.setAttribute('data-theme', 'light');
+      window.addEventListener('DOMContentLoaded', () => {
+        if (document.body) document.body.classList.add('theme-light');
+        const icon = document.getElementById('themeToggleIcon');
+        if (icon) icon.textContent = '🌙';
+      });
+    }
+  } catch (e) {}
+})();
+
+
 
