@@ -13,28 +13,25 @@
 
       <!-- Top Header Row: Passwords Title & Header Actions -->
       <div class="apple-header">
-        <div>
-          <h1 class="apple-title">
-            <span>Passwords</span>
-            <span class="sr-only">Password Vault</span>
-          </h1>
-          <div class="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+        <div class="apple-header-title-col">
+          <h1 class="apple-title">Passwords</h1>
+          <div class="apple-repo-badge">
             <span class="status-dot-pulse"></span>
-            <span class="font-mono text-slate-300 truncate max-w-[180px] sm:max-w-[240px]">{{ github_username }}/{{ github_repo }}</span>
-            {% if is_demo %}<span class="text-amber-400 font-semibold">• Demo</span>{% endif %}
+            <span class="font-mono truncate max-w-[190px] sm:max-w-[240px]">{{ github_username }}/{{ github_repo }}</span>
+            {% if is_demo %}<span class="apple-demo-tag">• Demo</span>{% endif %}
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="apple-header-actions">
           <!-- Light/Dark Mode Switcher -->
-          <button type="button" onclick="toggleAppleTheme()" class="btn-vault-secondary" style="padding: 0.4rem 0.65rem; border-radius: 9999px;" title="Toggle Light / Dark Mode">
+          <button type="button" onclick="toggleAppleTheme()" id="themeToggleBtn" class="apple-btn-icon" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
             <span id="themeToggleIcon">☀️</span>
           </button>
 
           <!-- Vault Operations Dropdown -->
           <div class="dropdown">
-            <button type="button" class="btn-vault-secondary" style="padding: 0.4rem 0.65rem; border-radius: 9999px;" title="Vault Operations">
-              <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
+            <button type="button" class="apple-btn-icon" title="Vault Operations" aria-label="Vault Operations">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
             </button>
             <div class="dropdown-menu">
               <a href="{% url 'gitpass:export_vault' %}?format=json" class="dropdown-item"><span>📄</span> <span>Export JSON</span></a>
@@ -194,16 +191,16 @@
               </a>
             {% endfor %}
           {% else %}
-            <div class="p-3.5 text-xs text-slate-400">
+            <div class="apple-empty-group-hint">
               No shared groups yet. Assign credentials to groups like <em>Pedersen Family</em> or <em>Work Passwords</em>.
             </div>
           {% endif %}
-          <a href="javascript:void(0)" onclick="openModal('addModal')" class="apple-group-row text-xs text-sky-400 font-medium">
+          <a href="javascript:void(0)" onclick="openModal('addModal')" class="apple-group-row apple-group-add-btn">
             <span class="flex items-center gap-2">
-              <span>➕</span>
+              <span class="apple-add-circle">＋</span>
               <span>New Credential / Shared Group</span>
             </span>
-            <span>&rarr;</span>
+            <span class="apple-arrow">&rarr;</span>
           </a>
         </div>
       </div>
@@ -268,9 +265,9 @@
           </p>
         </div>
 
-        <div class="flex items-center gap-2.5 flex-wrap">
+        <div class="apple-toolbar-actions">
           <!-- Sort Dropdown -->
-          <select id="vaultSortSelect" class="form-control" style="padding: 0.45rem 0.85rem; font-size: 0.75rem; border-radius: 9999px; background: var(--apple-search-bg); color: var(--apple-text-primary); border-color: var(--apple-border);" onchange="updateSortFilter(this.value)">
+          <select id="vaultSortSelect" class="apple-select-control" onchange="updateSortFilter(this.value)">
             <option value="title_asc" {% if sort_by == 'title_asc' %}selected{% endif %}>Sort: A → Z</option>
             <option value="title_desc" {% if sort_by == 'title_desc' %}selected{% endif %}>Sort: Z → A</option>
             <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Sort: Recently Updated</option>
@@ -281,7 +278,7 @@
           </select>
 
           <!-- 1-Click Cloud Sync Button -->
-          <button type="button" onclick="triggerCloudSync()" id="btnCloudSync" class="btn-vault-secondary" style="padding: 0.45rem 0.85rem; font-size: 0.75rem; border-radius: 9999px;" title="1-Click Secure Cloud Sync with GitHub">
+          <button type="button" onclick="triggerCloudSync()" id="btnCloudSync" class="apple-btn-secondary" title="1-Click Secure Cloud Sync with GitHub">
             <svg id="cloudSyncIcon" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             <span class="hidden sm:inline">Sync</span>
           </button>
@@ -289,14 +286,14 @@
           {% if active_tab == 'trash' and trash_count > 0 %}
             <form method="post" action="{% url 'gitpass:empty_trash' %}" onsubmit="return confirm('Empty Trash and permanently destroy all deleted items?');" style="margin: 0;">
               {% csrf_token %}
-              <button type="submit" class="btn-danger-sm" style="padding: 0.45rem 0.85rem; font-size: 0.75rem; border-radius: 9999px;">
+              <button type="submit" class="apple-btn-sm-danger">
                 Empty Trash ({{ trash_count }})
               </button>
             </form>
           {% endif %}
 
           <!-- Primary Add Password Button -->
-          <button type="button" onclick="openModal('addModal')" class="btn-vault-primary" id="addPasswordBtn" style="background: var(--apple-blue); color: #ffffff; padding: 0.45rem 1rem; border-radius: 9999px; font-size: 0.8125rem;">
+          <button type="button" onclick="openModal('addModal')" class="apple-btn-primary" id="addPasswordBtn">
             <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
             <span>Add Password</span>
           </button>
@@ -507,35 +504,35 @@
                   <!-- Card Bottom Bar: Edit & Delete / Restore Actions -->
                   <div class="vault-card-bottom">
                     {% if active_tab == 'trash' %}
-                      <span class="text-red-400 text-xs flex items-center gap-1">
+                      <span class="text-red-400 text-xs flex items-center gap-1 font-medium">
                         <span>🗑️ Deleted:</span>
                         <span>{{ item.deleted_at|slice:":10" }}</span>
                       </span>
                       <div class="flex items-center gap-2">
                         <form method="post" action="{% url 'gitpass:restore_item' item.id %}" style="margin: 0;">
                           {% csrf_token %}
-                          <button type="submit" class="btn-sm-white" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
+                          <button type="submit" class="apple-btn-sm">
                             Restore
                           </button>
                         </form>
                         <form method="post" action="{% url 'gitpass:permanent_delete_item' item.id %}" onsubmit="return confirm('Permanently destroy {{ item.title }}? This cannot be recovered.');" style="margin: 0;">
                           {% csrf_token %}
-                          <button type="submit" class="dropdown-item-danger" style="padding: 0.25rem 0.65rem; border-radius: 0.5rem; font-size: 0.75rem; border: 1px solid rgba(153, 27, 27, 0.4); background: rgba(69, 10, 10, 0.2); cursor: pointer;">
+                          <button type="submit" class="apple-btn-sm-danger">
                             Purge
                           </button>
                         </form>
                       </div>
                     {% else %}
-                      <span class="text-slate-500 text-xs">
+                      <span class="vault-card-updated-date">
                         Updated {{ item.updated_at|slice:":10" }}
                       </span>
                       <div class="flex items-center gap-2">
-                        <a href="{% url 'gitpass:edit_item' item.id %}" class="btn-vault-secondary" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
+                        <a href="{% url 'gitpass:edit_item' item.id %}" class="apple-btn-sm">
                           Edit
                         </a>
                         <form method="post" action="{% url 'gitpass:delete_item' item.id %}" onsubmit="return confirm('Move credential for {{ item.title }} to Trash?');" style="margin: 0;">
                           {% csrf_token %}
-                          <button type="submit" class="dropdown-item-danger" style="padding: 0.25rem 0.65rem; border-radius: 0.5rem; font-size: 0.75rem; border: 1px solid rgba(153, 27, 27, 0.4); background: rgba(69, 10, 10, 0.2); cursor: pointer;">
+                          <button type="submit" class="apple-btn-sm-danger">
                             Delete
                           </button>
                         </form>

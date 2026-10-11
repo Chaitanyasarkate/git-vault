@@ -12,7 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Custom Self-Contained CSS (Zero CDN Dependencies) -->
-  <link rel="stylesheet" href="{% static 'css/gitpass.css' %}?v=12.0">
+  <link rel="stylesheet" href="{% static 'css/gitpass.css' %}?v=13.0">
   
   <!-- Progressive Web App (PWA) Manifest & Icons -->
   <link rel="manifest" href="{% url 'gitpass:manifest' %}">
@@ -24,9 +24,25 @@
   <link rel="apple-touch-icon" href="{% static 'icons/icon-192.png' %}">
   <link rel="icon" type="image/png" sizes="192x192" href="{% static 'icons/icon-192.png' %}">
   
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('gitvault_theme') || 'dark';
+        if (theme === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('theme-light');
+          document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+          document.documentElement.classList.remove('theme-light');
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
   {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-black text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-white selection:text-black relative overflow-x-hidden">
+<body class="font-sans antialiased min-h-screen flex flex-col relative overflow-x-hidden">
 
   <!-- Atmospheric Diagonal Spotlight Beam (Top-Right Light Cone from Reference) -->
   <div class="atmospheric-beam" aria-hidden="true"></div>
@@ -156,7 +172,7 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="{% static 'js/gitpass.js' %}?v=12.0"></script>
+  <script src="{% static 'js/gitpass.js' %}?v=13.0"></script>
   <script>
     // PWA Service Worker Registration
     if ('serviceWorker' in navigator) {

@@ -775,24 +775,37 @@ function showWifiQrModal(ssid, password) {
 }
 
 // 12. Apple Passwords Theme Switcher & Persistence
+function updateThemeToggleIcons(theme) {
+  const icons = document.querySelectorAll('#themeToggleIcon, .theme-toggle-icon');
+  icons.forEach(el => {
+    // When in light mode, show 🌙 to switch to dark. In dark mode, show ☀️ to switch to light.
+    el.textContent = theme === 'light' ? '🌙' : '☀️';
+  });
+}
+
 function toggleAppleTheme() {
   const html = document.documentElement;
-  const icon = document.getElementById('themeToggleIcon');
   const isLight = html.classList.contains('theme-light') || html.getAttribute('data-theme') === 'light';
   const newTheme = isLight ? 'dark' : 'light';
 
   if (newTheme === 'light') {
     html.classList.remove('dark');
     html.classList.add('theme-light');
-    if (document.body) document.body.classList.add('theme-light');
+    if (document.body) {
+      document.body.classList.remove('dark');
+      document.body.classList.add('theme-light');
+    }
     html.setAttribute('data-theme', 'light');
-    if (icon) icon.textContent = '🌙';
+    updateThemeToggleIcons('light');
   } else {
     html.classList.remove('theme-light');
     html.classList.add('dark');
-    if (document.body) document.body.classList.remove('theme-light');
+    if (document.body) {
+      document.body.classList.remove('theme-light');
+      document.body.classList.add('dark');
+    }
     html.setAttribute('data-theme', 'dark');
-    if (icon) icon.textContent = '☀️';
+    updateThemeToggleIcons('dark');
   }
   try {
     localStorage.setItem('gitvault_theme', newTheme);
@@ -803,19 +816,27 @@ function toggleAppleTheme() {
 // Restore saved theme on load
 (function initAppleTheme() {
   try {
-    const saved = localStorage.getItem('gitvault_theme');
+    const saved = localStorage.getItem('gitvault_theme') || 'dark';
     if (saved === 'light') {
       document.documentElement.classList.remove('dark');
       document.documentElement.classList.add('theme-light');
       document.documentElement.setAttribute('data-theme', 'light');
-      window.addEventListener('DOMContentLoaded', () => {
-        if (document.body) document.body.classList.add('theme-light');
-        const icon = document.getElementById('themeToggleIcon');
-        if (icon) icon.textContent = '🌙';
-      });
+      if (document.body) {
+        document.body.classList.remove('dark');
+        document.body.classList.add('theme-light');
+      }
+    } else {
+      document.documentElement.classList.remove('theme-light');
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
     }
+    window.addEventListener('DOMContentLoaded', () => {
+      const current = document.documentElement.getAttribute('data-theme') || saved;
+      updateThemeToggleIcons(current);
+    });
   } catch (e) {}
 })();
+
 
 
 

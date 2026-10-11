@@ -1,0 +1,453 @@
+<!DOCTYPE html><html class="dark" lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-tertiary-container": "#00320e", "background": "#121317", "tertiary-container": "#00a741", "on-tertiary-fixed": "#002107", "surface-variant": "#343539", "primary": "#adc6ff", "on-secondary-container": "#e19fff", "on-secondary-fixed-variant": "#7201a2", "on-tertiary-fixed-variant": "#00531c", "primary-container": "#4b8eff", "on-error-container": "#ffdad6", "on-background": "#e3e2e7", "secondary": "#e8b3ff", "inverse-surface": "#e3e2e7", "inverse-primary": "#005bc1", "on-secondary-fixed": "#310048", "on-surface": "#e3e2e7", "surface-bright": "#38393d", "on-error": "#690005", "tertiary-fixed-dim": "#53e16f", "on-surface-variant": "#c1c6d7", "surface-container-low": "#1a1b1f", "error": "#ffb4ab", "on-primary": "#002e69", "surface": "#121317", "inverse-on-surface": "#2f3034", "secondary-fixed": "#f6d9ff", "primary-fixed-dim": "#adc6ff", "on-primary-fixed-variant": "#004493", "primary-fixed": "#d8e2ff", "surface-dim": "#121317", "surface-container-highest": "#343539", "on-primary-container": "#00285c", "on-primary-fixed": "#001a41", "surface-container-lowest": "#0d0e12", "surface-tint": "#adc6ff", "tertiary-fixed": "#72fe88", "outline-variant": "#414755", "error-container": "#93000a", "outline": "#8b90a0", "surface-container": "#1e1f23", "on-secondary": "#510074", "on-tertiary": "#003911", "tertiary": "#53e16f", "secondary-container": "#7508a5", "surface-container-high": "#292a2e", "secondary-fixed-dim": "#e8b3ff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-md": "0.75rem", "space-xs": "0.25rem", "margin": "1rem", "margin-expanded": "1.5rem", "space-sm": "0.5rem", "gutter-compact": "0.75rem", "space-xl": "1.25rem", "gutter": "1rem", "space-lg": "1rem" }, "fontFamily": { "body-md": ["Inter"], "headline-sm": ["Inter"], "headline-xl": ["Inter"], "label-lg": ["Inter"], "headline-lg": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "headline-xl-mobile": ["Inter"], "body-lg": ["Inter"], "body-sm": ["Inter"], "label-md": ["Inter"], "code-display": ["Inter"] }, "fontSize": { "body-md": ["15px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-sm": ["17px", { "lineHeight": "22px", "fontWeight": "600" }], "headline-xl": ["34px", { "lineHeight": "41px", "fontWeight": "700" }], "label-lg": ["15px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-lg": ["22px", { "lineHeight": "28px", "fontWeight": "700" }], "headline-md": ["20px", { "lineHeight": "25px", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "13px", "fontWeight": "500" }], "headline-xl-mobile": ["28px", { "lineHeight": "34px", "fontWeight": "700" }], "body-lg": ["17px", { "lineHeight": "22px", "fontWeight": "400" }], "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }], "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "500" }], "code-display": ["28px", { "lineHeight": "34px", "fontWeight": "600" }] } } } }</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-low/95 backdrop-blur-2xl z-40 flex flex-col pt-4 pb-6 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex items-center justify-between px-space-lg mb-space-lg"><div class="flex items-center gap-space-xs"><div class="w-3 h-3 rounded-full bg-[#ff5f57]/80"></div><div class="w-3 h-3 rounded-full bg-[#febc2e]/80"></div><div class="w-3 h-3 rounded-full bg-[#28c840]/80"></div></div><div class="flex items-center gap-space-xs"><button class="w-7 h-7 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[18px]">dock_to_left</span></button></div></div><div class="px-space-md mb-space-sm"><div class="relative flex items-center bg-surface-container-highest/60 rounded-lg px-space-sm py-1.5 focus-within:bg-surface-container-highest transition-colors"><span class="material-symbols-outlined text-outline text-[18px] mr-space-xs">search</span><input class="w-full bg-transparent text-on-surface placeholder:text-outline text-body-sm font-body-sm focus:outline-none" placeholder="Search Passwords" type="text"><button class="text-outline hover:text-on-surface"><span class="material-symbols-outlined text-[16px]">mic</span></button></div></div><div class="px-space-lg py-space-xs"><span class="text-label-sm font-label-sm uppercase tracking-wider text-outline">Credentials</span></div><nav class="flex-1 px-space-xs space-y-0.5 overflow-y-auto" data-active-classes="bg-surface-container-high text-on-surface font-headline-sm"><a aria-current="page" class="group flex items-center justify-between px-space-md py-2 rounded-lg transition-colors bg-surface-container-high text-on-surface font-headline-sm" data-path="all-passwords" href="#"><div class="flex items-center gap-space-md"><div class="w-6 h-6 rounded-md bg-primary flex items-center justify-center text-on-primary"><span class="material-symbols-outlined text-[15px]">key</span></div><span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface">All</span></div><span class="font-label-sm text-label-sm text-outline">142</span></a><a class="group flex items-center justify-between px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="passkeys" href="#"><div class="flex items-center gap-space-md"><div class="w-6 h-6 rounded-md bg-secondary flex items-center justify-center text-on-secondary"><span class="material-symbols-outlined text-[15px]">passkey</span></div><span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface">Passkeys</span></div><span class="font-label-sm text-label-sm text-outline">18</span></a><a class="group flex items-center justify-between px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="verification-codes" href="#"><div class="flex items-center gap-space-md"><div class="w-6 h-6 rounded-md bg-tertiary flex items-center justify-center text-on-tertiary"><span class="material-symbols-outlined text-[15px]">timer</span></div><span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface">Codes</span></div><span class="font-label-sm text-label-sm text-outline">24</span></a><a class="group flex items-center justify-between px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="wifi" href="#"><div class="flex items-center gap-space-md"><div class="w-6 h-6 rounded-md bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed"><span class="material-symbols-outlined text-[15px]">wifi</span></div><span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface">Wi-Fi</span></div><span class="font-label-sm text-label-sm text-outline">9</span></a><a class="group flex items-center justify-between px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="security-recommendations" href="#"><div class="flex items-center gap-space-md"><div class="w-6 h-6 rounded-md bg-error flex items-center justify-center text-on-error"><span class="material-symbols-outlined text-[15px]">warning</span></div><span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface">Security</span></div><span class="font-label-sm text-label-sm text-error">4</span></a><a class="group flex items-center justify-between px-space-md py-2 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors" data-path="recently-deleted" href="#"><div class="flex items-center gap-space-md"><div class="w-6 h-6 rounded-md bg-surface-variant flex items-center justify-center text-on-surface-variant"><span class="material-symbols-outlined text-[15px]">delete</span></div><span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface">Recently Deleted</span></div><span class="font-label-sm text-label-sm text-outline">6</span></a></nav><div class="px-space-md pt-space-sm"><div class="p-space-sm bg-surface-container/60 rounded-xl flex items-center justify-between"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-tertiary text-[20px]">verified_user</span><div><p class="font-label-sm text-label-sm text-on-surface">iCloud Keychain</p><p class="font-label-sm text-[10px] text-outline">Encrypted &amp; Synced</p></div></div><span class="material-symbols-outlined text-outline text-[16px]">sync</span></div></div></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 h-14 bg-surface-container-lowest/80 backdrop-blur-2xl z-30 flex items-center justify-between px-space-lg shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex items-center gap-space-sm"><button class="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[20px]">arrow_back_ios_new</span></button><button class="w-8 h-8 rounded-lg flex items-center justify-center text-outline cursor-not-allowed"><span class="material-symbols-outlined text-[20px]">arrow_forward_ios</span></button><div class="h-4 w-[1px] bg-outline-variant mx-space-xs"></div><button class="px-space-sm py-1 rounded-lg text-label-md font-label-md text-primary hover:bg-surface-container-high hover:text-on-surface transition-colors">Edit</button></div><div class="flex items-center gap-space-md"><div class="flex items-center bg-surface-container-high rounded-lg p-0.5"><button class="px-space-sm py-0.5 rounded-md text-label-sm font-label-sm text-on-surface bg-surface-bright shadow-[0_1px_8px_rgba(0,0,0,0.04)]">Grid</button><button class="px-space-sm py-0.5 rounded-md text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors">List</button></div><button class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary hover:bg-primary-fixed-dim transition-colors shadow-[0_1px_8px_rgba(0,0,0,0.04)]" title="Add Credential"><span class="material-symbols-outlined text-[20px]">add</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="relative pt-14 bg-background min-h-screen"><div class="flex flex-col w-full">
+<div class="px-space-lg py-space-md flex flex-col gap-space-lg max-w-[1600px] mx-auto w-full">
+<!-- Family / Shared Vault Pill Bar -->
+<div class="flex items-center justify-between bg-surface-container-low px-space-md py-space-sm rounded-xl">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="flex -space-x-1.5 overflow-hidden">
+<div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-on-primary font-label-sm text-[10px]">JA</div>
+<div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-on-secondary font-label-sm text-[10px]">EA</div>
+<div class="w-6 h-6 rounded-full bg-tertiary flex items-center justify-center text-on-tertiary font-label-sm text-[10px]">MA</div>
+<div class="w-6 h-6 rounded-full bg-surface-variant flex items-center justify-center text-on-surface font-label-sm text-[10px]">+1</div>
+</div>
+<div class="flex items-center gap-space-xs truncate">
+<span class="font-headline-sm text-label-md text-on-surface">Family Passwords</span>
+<span class="text-outline text-label-sm">•</span>
+<span class="text-outline text-label-sm">4 Members • 38 shared items</span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-sm py-1 rounded-lg bg-surface-container-high text-primary hover:bg-surface-container-highest transition-colors font-label-sm text-label-sm flex items-center gap-1">
+<span>Manage Group</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- 6-Tile Category Grid (iOS 18 Passwords Characteristic Bento) -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-space-sm">
+<!-- All Credentials -->
+<div class="group relative overflow-hidden bg-surface-container rounded-xl p-space-md flex flex-col justify-between h-28 cursor-pointer hover:bg-surface-container-high transition-all shadow-sm">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-on-primary shadow-sm">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">key</span>
+</div>
+<span class="font-headline-lg text-headline-lg text-on-surface">184</span>
+</div>
+<div>
+<span class="font-headline-sm text-label-md text-on-surface block">All</span>
+<span class="font-label-sm text-label-sm text-outline">Passwords &amp; Logins</span>
+</div>
+</div>
+<!-- Passkeys -->
+<div class="group relative overflow-hidden bg-surface-container rounded-xl p-space-md flex flex-col justify-between h-28 cursor-pointer hover:bg-surface-container-high transition-all shadow-sm">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-on-secondary shadow-sm">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">passkey</span>
+</div>
+<span class="font-headline-lg text-headline-lg text-on-surface">12</span>
+</div>
+<div>
+<span class="font-headline-sm text-label-md text-on-surface block">Passkeys</span>
+<span class="font-label-sm text-label-sm text-outline">FIDO2 &amp; Touch ID</span>
+</div>
+</div>
+<!-- 2FA Codes -->
+<div class="group relative overflow-hidden bg-surface-container rounded-xl p-space-md flex flex-col justify-between h-28 cursor-pointer hover:bg-surface-container-high transition-all shadow-sm">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-xl bg-tertiary flex items-center justify-center text-on-tertiary shadow-sm">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">schedule</span>
+</div>
+<span class="font-headline-lg text-headline-lg text-on-surface">28</span>
+</div>
+<div>
+<span class="font-headline-sm text-label-md text-on-surface block">Codes</span>
+<span class="font-label-sm text-label-sm text-outline">TOTP Auto-Fill</span>
+</div>
+</div>
+<!-- Wi-Fi Networks -->
+<div class="group relative overflow-hidden bg-surface-container rounded-xl p-space-md flex flex-col justify-between h-28 cursor-pointer hover:bg-surface-container-high transition-all shadow-sm">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-xl bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed shadow-sm">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">wifi</span>
+</div>
+<span class="font-headline-lg text-headline-lg text-on-surface">15</span>
+</div>
+<div>
+<span class="font-headline-sm text-label-md text-on-surface block">Wi-Fi</span>
+<span class="font-label-sm text-label-sm text-outline">Known Networks</span>
+</div>
+</div>
+<!-- Security Recommendations -->
+<div class="group relative overflow-hidden bg-surface-container rounded-xl p-space-md flex flex-col justify-between h-28 cursor-pointer hover:bg-surface-container-high transition-all shadow-sm">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-xl bg-error flex items-center justify-center text-on-error shadow-sm">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<span class="font-headline-lg text-headline-lg text-error">3</span>
+</div>
+<div>
+<span class="font-headline-sm text-label-md text-on-surface block">Security</span>
+<span class="font-label-sm text-label-sm text-error">Reused Passwords</span>
+</div>
+</div>
+<!-- Recently Deleted -->
+<div class="group relative overflow-hidden bg-surface-container rounded-xl p-space-md flex flex-col justify-between h-28 cursor-pointer hover:bg-surface-container-high transition-all shadow-sm">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-xl bg-surface-variant flex items-center justify-center text-on-surface-variant shadow-sm">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">delete</span>
+</div>
+<span class="font-headline-lg text-headline-lg text-outline">6</span>
+</div>
+<div>
+<span class="font-headline-sm text-label-md text-on-surface block">Deleted</span>
+<span class="font-label-sm text-label-sm text-outline">Past 30 Days</span>
+</div>
+</div>
+</div>
+<!-- Split Pane Section (Middle List + Right Detail) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- Inset Grouped List Column (5 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-sm">
+<div class="flex items-center justify-between px-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-label-lg text-on-surface">Recently Updated &amp; Pinned</span>
+<span class="w-2 h-2 rounded-full bg-primary inline-block"></span>
+</div>
+<span class="text-label-sm font-label-sm text-outline">Sort by Date</span>
+</div>
+<div class="bg-surface-container rounded-xl overflow-hidden flex flex-col divide-y-0">
+<!-- Item 1: Selected (Apple) -->
+<div class="group px-space-md py-3 flex items-center justify-between bg-surface-container-high cursor-pointer transition-colors relative">
+<div class="w-1 h-8 rounded-r-full bg-primary absolute left-0 top-1/2 -translate-y-1/2"></div>
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-9 h-9 rounded-lg bg-surface-variant flex items-center justify-center text-on-surface shrink-0 overflow-hidden shadow-sm">
+<span class="material-symbols-outlined text-[20px]">cloud</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-md text-on-surface truncate">Apple Account</span>
+<span class="px-1.5 py-0.2 rounded-full bg-secondary/20 text-secondary text-[10px] font-label-sm font-semibold">Passkey</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline truncate">john.appleseed@icloud.com</p>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0 pl-2">
+<span class="text-label-sm font-label-sm text-outline">2m ago</span>
+<span class="material-symbols-outlined text-[16px] text-primary">chevron_right</span>
+</div>
+</div>
+<!-- Indented Hairline Separator -->
+<div class="h-[1px] bg-outline-variant/30 ml-14"></div>
+<!-- Item 2: Google -->
+<div class="group px-space-md py-3 flex items-center justify-between hover:bg-surface-container-high/60 cursor-pointer transition-colors">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-9 h-9 rounded-lg bg-surface-container-highest flex items-center justify-center text-primary shrink-0 overflow-hidden shadow-sm">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-md text-on-surface truncate">Google Account</span>
+<span class="px-1.5 py-0.2 rounded-full bg-tertiary/20 text-tertiary text-[10px] font-label-sm font-semibold">Code</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline truncate">j.appleseed@gmail.com</p>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0 pl-2">
+<span class="text-label-sm font-label-sm text-outline">1h ago</span>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+</div>
+</div>
+<div class="h-[1px] bg-outline-variant/30 ml-14"></div>
+<!-- Item 3: GitHub -->
+<div class="group px-space-md py-3 flex items-center justify-between hover:bg-surface-container-high/60 cursor-pointer transition-colors">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-9 h-9 rounded-lg bg-surface-variant flex items-center justify-center text-on-surface shrink-0 overflow-hidden shadow-sm">
+<span class="material-symbols-outlined text-[20px]">terminal</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-md text-on-surface truncate">GitHub</span>
+<span class="px-1.5 py-0.2 rounded-full bg-secondary/20 text-secondary text-[10px] font-label-sm font-semibold">Security Key</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline truncate">appleseed-dev</p>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0 pl-2">
+<span class="text-label-sm font-label-sm text-outline">Yesterday</span>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+</div>
+</div>
+<div class="h-[1px] bg-outline-variant/30 ml-14"></div>
+<!-- Item 4: Home Wi-Fi -->
+<div class="group px-space-md py-3 flex items-center justify-between hover:bg-surface-container-high/60 cursor-pointer transition-colors">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-9 h-9 rounded-lg bg-secondary-fixed/20 flex items-center justify-center text-secondary-fixed shrink-0 overflow-hidden shadow-sm">
+<span class="material-symbols-outlined text-[20px]">wifi</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-md text-on-surface truncate">Skyline_5GHz</span>
+<span class="px-1.5 py-0.2 rounded-full bg-surface-variant text-outline text-[10px] font-label-sm">WPA3</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline truncate">Wi-Fi Password Saved</p>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0 pl-2">
+<span class="text-label-sm font-label-sm text-outline">3d ago</span>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+</div>
+</div>
+<div class="h-[1px] bg-outline-variant/30 ml-14"></div>
+<!-- Item 5: Netflix (with Security Warning) -->
+<div class="group px-space-md py-3 flex items-center justify-between hover:bg-surface-container-high/60 cursor-pointer transition-colors">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-9 h-9 rounded-lg bg-error-container/30 flex items-center justify-center text-error shrink-0 overflow-hidden shadow-sm">
+<span class="material-symbols-outlined text-[20px]">movie</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-md text-on-surface truncate">Netflix</span>
+<span class="flex items-center gap-0.5 px-1.5 py-0.2 rounded-full bg-error-container text-error text-[10px] font-label-sm font-semibold">
+<span class="material-symbols-outlined text-[12px]">error</span>
+                    Reused
+                  </span>
+</div>
+<p class="font-body-sm text-body-sm text-outline truncate">family@appleseed.com</p>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0 pl-2">
+<span class="text-label-sm font-label-sm text-outline">1w ago</span>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+</div>
+</div>
+<div class="h-[1px] bg-outline-variant/30 ml-14"></div>
+<!-- Item 6: Stripe Dashboard -->
+<div class="group px-space-md py-3 flex items-center justify-between hover:bg-surface-container-high/60 cursor-pointer transition-colors">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-9 h-9 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary-fixed-dim shrink-0 overflow-hidden shadow-sm">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-md text-on-surface truncate">Stripe Dashboard</span>
+<span class="px-1.5 py-0.2 rounded-full bg-secondary/20 text-secondary text-[10px] font-label-sm font-semibold">Passkey</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline truncate">admin@appleseed.io</p>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0 pl-2">
+<span class="text-label-sm font-label-sm text-outline">2w ago</span>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+</div>
+</div>
+<div class="h-[1px] bg-outline-variant/30 ml-14"></div>
+<!-- Item 7: Spotify -->
+<div class="group px-space-md py-3 flex items-center justify-between hover:bg-surface-container-high/60 cursor-pointer transition-colors">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-9 h-9 rounded-lg bg-tertiary-container/30 flex items-center justify-center text-tertiary shrink-0 overflow-hidden shadow-sm">
+<span class="material-symbols-outlined text-[20px]">music_note</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-body-md text-on-surface truncate">Spotify</span>
+<span class="px-1.5 py-0.2 rounded-full bg-surface-variant text-outline text-[10px] font-label-sm">Strong</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline truncate">appleseed</p>
+</div>
+</div>
+<div class="flex flex-col items-end shrink-0 pl-2">
+<span class="text-label-sm font-label-sm text-outline">3w ago</span>
+<span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Detail / Credential Inspector Panel (7 cols) -->
+<div class="lg:col-span-7 flex flex-col gap-space-md">
+<!-- Credential Profile Header Card -->
+<div class="bg-surface-container rounded-2xl p-space-lg flex flex-col items-center text-center relative shadow-sm">
+<div class="w-20 h-20 rounded-2xl bg-surface-container-high flex items-center justify-center text-on-surface mb-space-sm shadow-md ring-0">
+<span class="material-symbols-outlined text-[44px]">cloud</span>
+</div>
+<span class="font-headline-lg text-headline-lg text-on-surface mb-0.5">Apple Account</span>
+<a class="font-label-md text-primary hover:underline flex items-center gap-1" href="#">
+<span>apple.com</span>
+<span class="material-symbols-outlined text-[14px]">open_in_new</span>
+</a>
+<span class="mt-2 px-2.5 py-0.5 rounded-full bg-surface-container-highest text-outline font-label-sm text-label-sm">Synced via iCloud Keychain</span>
+</div>
+<!-- Inset Group 1: Identity & Credentials -->
+<div class="bg-surface-container rounded-2xl overflow-hidden shadow-sm flex flex-col">
+<!-- Username Row -->
+<div class="px-space-lg py-3 flex items-center justify-between hover:bg-surface-container-high/50 transition-colors">
+<div class="min-w-0 pr-space-md">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider block">User Name</span>
+<span class="font-body-md text-body-md text-on-surface truncate block" id="val-user">john.appleseed@icloud.com</span>
+</div>
+<button class="px-space-sm py-1.5 rounded-lg bg-surface-container-high text-primary hover:bg-surface-container-highest transition-colors flex items-center gap-1 font-label-sm text-label-sm" onclick="navigator.clipboard?.writeText('john.appleseed@icloud.com'); showToast('Username Copied');">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+<span>Copy</span>
+</button>
+</div>
+<div class="h-[1px] bg-outline-variant/30 ml-4"></div>
+<!-- Password Row -->
+<div class="px-space-lg py-3 flex items-center justify-between hover:bg-surface-container-high/50 transition-colors">
+<div class="min-w-0 pr-space-md">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider block">Password</span>
+<span class="font-body-md text-body-md text-on-surface tracking-widest block" id="pw-field">••••••••••••••••</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="w-8 h-8 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest flex items-center justify-center transition-colors" onclick="togglePassword()" title="Toggle visibility">
+<span class="material-symbols-outlined text-[18px]" id="pw-icon">visibility</span>
+</button>
+<button class="px-space-sm py-1.5 rounded-lg bg-surface-container-high text-primary hover:bg-surface-container-highest transition-colors flex items-center gap-1 font-label-sm text-label-sm" onclick="navigator.clipboard?.writeText('k9#Wv8$Lm@2pQ!Zx'); showToast('Password Copied');">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+<span>Copy</span>
+</button>
+</div>
+</div>
+<div class="h-[1px] bg-outline-variant/30 ml-4"></div>
+<!-- Passkey Presence -->
+<div class="px-space-lg py-3 flex items-center justify-between">
+<div class="min-w-0">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider block">Passkey</span>
+<span class="font-body-md text-body-md text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[18px]">fingerprint</span>
+<span>Touch ID / Face ID configured</span>
+</span>
+</div>
+<span class="font-label-sm text-label-sm text-outline">Created Jun 2024</span>
+</div>
+</div>
+<!-- Inset Group 2: Two-Factor Verification Code (TOTP) Module -->
+<div class="bg-surface-container rounded-2xl p-space-lg shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary text-[18px]">timer</span>
+<span class="font-headline-sm text-label-md text-on-surface">Verification Code</span>
+</div>
+<!-- Progress indicator -->
+<div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-container-high text-tertiary font-label-sm text-label-sm">
+<div class="relative w-3.5 h-3.5">
+<svg class="w-full h-full -rotate-90" viewBox="0 0 20 20">
+<circle class="stroke-surface-variant" cx="10" cy="10" fill="none" r="8" stroke-width="2.5"></circle>
+<circle class="stroke-tertiary transition-all duration-1000" cx="10" cy="10" fill="none" id="timer-ring" r="8" stroke-dasharray="50.26" stroke-dashoffset="18" stroke-width="2.5" style="stroke-dashoffset: 31.8313;"></circle>
+</svg>
+</div>
+<span id="countdown-text">11s remaining</span>
+</div>
+</div>
+<div class="flex items-center justify-between bg-surface-container-high/60 rounded-xl p-space-md">
+<div>
+<span class="font-code-display text-code-display tracking-widest text-on-surface font-mono" id="totp-code">849 201</span>
+<p class="font-label-sm text-label-sm text-outline mt-0.5">Codes refresh every 30 seconds</p>
+</div>
+<button class="px-space-md py-2 rounded-xl bg-primary text-on-primary hover:bg-primary-fixed-dim transition-colors flex items-center gap-1.5 font-label-md text-label-md shadow-sm" onclick="navigator.clipboard?.writeText('849201'); showToast('Code Copied to Clipboard');">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+<span>Copy Code</span>
+</button>
+</div>
+</div>
+<!-- Inset Group 3: Website, Metadata & Notes -->
+<div class="bg-surface-container rounded-2xl overflow-hidden shadow-sm flex flex-col">
+<!-- Website -->
+<div class="px-space-lg py-3 flex items-center justify-between hover:bg-surface-container-high/50 transition-colors">
+<div>
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider block">Website</span>
+<span class="font-body-md text-body-md text-on-surface">https://appleid.apple.com</span>
+</div>
+<a class="w-8 h-8 rounded-lg bg-surface-container-high text-outline hover:text-on-surface hover:bg-surface-container-highest flex items-center justify-center transition-colors" href="https://appleid.apple.com" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-[18px]">arrow_outward</span>
+</a>
+</div>
+<div class="h-[1px] bg-outline-variant/30 ml-4"></div>
+<!-- Notes -->
+<div class="px-space-lg py-3">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider block mb-1">Notes</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Personal Apple ID linked to iCloud Drive, Family Sharing master plan, and App Store developer profile subscriptions.</p>
+</div>
+</div>
+<!-- Inset Group 4: Security Recommendation Card -->
+<div class="bg-surface-container rounded-2xl p-space-md flex items-start gap-space-md shadow-sm">
+<div class="w-8 h-8 rounded-full bg-tertiary-container/30 flex items-center justify-center text-tertiary shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[18px]">shield</span>
+</div>
+<div class="min-w-0 flex-1">
+<span class="font-headline-sm text-label-md text-on-surface block">Strong Password Configured</span>
+<p class="font-body-sm text-body-sm text-outline mt-0.5">This password has not appeared in known data leaks and meets Apple high-entropy requirements.</p>
+</div>
+<span class="material-symbols-outlined text-outline text-[18px]">check_circle</span>
+</div>
+<!-- Inset Group 5: Secondary Actions -->
+<div class="bg-surface-container rounded-2xl overflow-hidden shadow-sm flex flex-col">
+<button class="w-full px-space-lg py-3 flex items-center justify-between text-primary hover:bg-surface-container-high/50 transition-colors text-left" onclick="showToast('AirDrop Ready: Searching Nearby Devices...')">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[20px]">share</span>
+<span class="font-label-md text-label-md">Share with AirDrop...</span>
+</div>
+<span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+</button>
+<div class="h-[1px] bg-outline-variant/30 ml-4"></div>
+<button class="w-full px-space-lg py-3 flex items-center justify-between text-error hover:bg-error-container/20 transition-colors text-left" onclick="showToast('Item Deleted')">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+<span class="font-label-md text-label-md">Delete Password</span>
+</div>
+<span class="text-label-sm font-label-sm text-outline">Moves to Recently Deleted</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Micro-Interaction Toast Container -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-surface-bright text-on-surface font-label-md text-label-md shadow-2xl flex items-center gap-2 pointer-events-none transition-all duration-300 opacity-0 translate-y-4" id="toast-pill">
+<span class="material-symbols-outlined text-tertiary text-[18px]">check_circle</span>
+<span id="toast-text">Copied to Clipboard</span>
+</div>
+<script>
+    let pwRevealed = false;
+    function togglePassword() {
+      pwRevealed = !pwRevealed;
+      const pwField = document.getElementById('pw-field');
+      const pwIcon = document.getElementById('pw-icon');
+      if (pwRevealed) {
+        pwField.textContent = 'k9#Wv8$Lm@2pQ!Zx';
+        pwField.classList.remove('tracking-widest');
+        pwIcon.textContent = 'visibility_off';
+      } else {
+        pwField.textContent = '••••••••••••••••';
+        pwField.classList.add('tracking-widest');
+        pwIcon.textContent = 'visibility';
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast-pill');
+      const toastText = document.getElementById('toast-text');
+      if (!toast || !toastText) return;
+      toastText.textContent = message;
+      toast.classList.remove('opacity-0', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-4');
+      }, 2200);
+    }
+
+    // Dynamic countdown ring animation
+    let countdown = 18;
+    const ring = document.getElementById('timer-ring');
+    const cdText = document.getElementById('countdown-text');
+    const circumference = 50.26;
+
+    setInterval(() => {
+      countdown = countdown <= 1 ? 30 : countdown - 1;
+      if (cdText) cdText.textContent = `${countdown}s remaining`;
+      if (ring) {
+        const offset = circumference - (countdown / 30) * circumference;
+        ring.style.strokeDashoffset = offset;
+      }
+    }, 1000);
+  </script>
+</div></main></div></body></html>
