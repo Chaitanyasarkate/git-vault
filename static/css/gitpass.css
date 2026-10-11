@@ -3672,10 +3672,160 @@ html.theme-light .status-synced-pill, [data-theme="light"] .status-synced-pill {
   outline: none;
   cursor: pointer;
   transition: all 0.15s ease;
+  color-scheme: dark;
 }
 
 .apple-select-control:focus {
   border-color: var(--apple-blue);
+}
+
+/* Custom Apple Sort Dropdown & Menu */
+.apple-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 140px;
+  user-select: none;
+}
+
+.apple-chevron-down {
+  color: var(--apple-text-muted);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.dropdown:hover .apple-chevron-down,
+.dropdown.active .apple-chevron-down {
+  transform: rotate(180deg);
+}
+
+.apple-sort-menu {
+  min-width: 15rem !important;
+  right: 0 !important;
+  left: auto !important;
+  background: var(--apple-card-bg, rgba(28, 28, 34, 0.96)) !important;
+  border: 1px solid var(--apple-border, rgba(255, 255, 255, 0.12)) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 14px !important;
+  padding: 6px !important;
+  z-index: 60 !important;
+}
+
+.apple-sort-menu .dropdown-item {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--apple-text-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.apple-sort-menu .dropdown-item:hover {
+  background: var(--apple-btn-secondary-hover, rgba(255, 255, 255, 0.08)) !important;
+  color: #ffffff !important;
+}
+
+.apple-sort-menu .dropdown-item.is-selected {
+  color: var(--apple-blue, #0a84ff) !important;
+  font-weight: 600;
+}
+
+.apple-sort-menu .dropdown-item.is-selected:hover {
+  background: rgba(10, 132, 255, 0.12) !important;
+}
+
+.apple-check {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--apple-blue, #0a84ff);
+  margin-left: 8px;
+}
+
+/* Universal Select & Option Rules for all browsers & modals */
+select,
+.apple-select-control,
+.form-control select,
+.modal-dialog select {
+  color-scheme: dark !important;
+  background-color: #1c1c1e !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+select option,
+.apple-select-control option,
+.form-control select option,
+.modal-dialog select option {
+  color-scheme: dark !important;
+  background-color: #1c1c1e !important;
+  color: #ffffff !important;
+  padding: 8px 12px !important;
+}
+
+select option:checked,
+.apple-select-control option:checked {
+  background-color: #0a84ff !important;
+  color: #ffffff !important;
+}
+
+/* Light mode for custom Sort Menu and Selects */
+html.theme-light .apple-sort-menu,
+[data-theme="light"] .apple-sort-menu {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+}
+
+html.theme-light .apple-sort-menu .dropdown-item,
+[data-theme="light"] .apple-sort-menu .dropdown-item {
+  color: #000000 !important;
+}
+
+html.theme-light .apple-sort-menu .dropdown-item:hover,
+[data-theme="light"] .apple-sort-menu .dropdown-item:hover {
+  background: #f2f2f7 !important;
+  color: #000000 !important;
+}
+
+html.theme-light .apple-sort-menu .dropdown-item.is-selected,
+[data-theme="light"] .apple-sort-menu .dropdown-item.is-selected {
+  color: #007aff !important;
+}
+
+html.theme-light select,
+html.theme-light .apple-select-control,
+html.theme-light .form-control select,
+html.theme-light .modal-dialog select,
+[data-theme="light"] select,
+[data-theme="light"] .apple-select-control,
+[data-theme="light"] .form-control select,
+[data-theme="light"] .modal-dialog select {
+  color-scheme: light !important;
+  background-color: #f2f2f7 !important;
+  color: #000000 !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+html.theme-light select option,
+html.theme-light .apple-select-control option,
+html.theme-light .form-control select option,
+html.theme-light .modal-dialog select option,
+[data-theme="light"] select option,
+[data-theme="light"] .apple-select-control option,
+[data-theme="light"] .form-control select option,
+[data-theme="light"] .modal-dialog select option {
+  color-scheme: light !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 
 .apple-btn-secondary {

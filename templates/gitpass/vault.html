@@ -282,8 +282,56 @@
         </div>
 
         <div class="apple-toolbar-actions">
-          <!-- Sort Dropdown -->
-          <select id="vaultSortSelect" class="apple-select-control" onchange="updateSortFilter(this.value)">
+          <!-- Custom Apple Glassmorphic Sort Dropdown -->
+          <div class="dropdown" id="appleSortDropdown">
+            <button type="button" class="apple-select-control apple-sort-btn" id="appleSortBtn" title="Change Sort Order" aria-haspopup="true" aria-expanded="false">
+              <span id="appleSortLabel">
+                {% if sort_by == 'title_desc' %}Sort: Z → A
+                {% elif sort_by == 'newest' %}Sort: Recently Updated
+                {% elif sort_by == 'oldest' %}Sort: Oldest First
+                {% elif sort_by == 'category' %}Sort: Category
+                {% elif sort_by == 'group' %}Sort: Group
+                {% elif sort_by == 'weakest' %}Sort: Weakest Passwords
+                {% else %}Sort: A → Z{% endif %}
+              </span>
+              <svg width="12" height="12" class="apple-chevron-down" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <div class="dropdown-menu apple-sort-menu" id="appleSortMenu" role="menu">
+              <button type="button" onclick="updateSortFilter('title_asc')" class="dropdown-item {% if sort_by == 'title_asc' or not sort_by %}is-selected{% endif %}">
+                <span>Sort: A → Z</span>
+                {% if sort_by == 'title_asc' or not sort_by %}<span class="apple-check">✓</span>{% endif %}
+              </button>
+              <button type="button" onclick="updateSortFilter('title_desc')" class="dropdown-item {% if sort_by == 'title_desc' %}is-selected{% endif %}">
+                <span>Sort: Z → A</span>
+                {% if sort_by == 'title_desc' %}<span class="apple-check">✓</span>{% endif %}
+              </button>
+              <button type="button" onclick="updateSortFilter('newest')" class="dropdown-item {% if sort_by == 'newest' %}is-selected{% endif %}">
+                <span>Sort: Recently Updated</span>
+                {% if sort_by == 'newest' %}<span class="apple-check">✓</span>{% endif %}
+              </button>
+              <button type="button" onclick="updateSortFilter('oldest')" class="dropdown-item {% if sort_by == 'oldest' %}is-selected{% endif %}">
+                <span>Sort: Oldest First</span>
+                {% if sort_by == 'oldest' %}<span class="apple-check">✓</span>{% endif %}
+              </button>
+              <button type="button" onclick="updateSortFilter('category')" class="dropdown-item {% if sort_by == 'category' %}is-selected{% endif %}">
+                <span>Sort: Category</span>
+                {% if sort_by == 'category' %}<span class="apple-check">✓</span>{% endif %}
+              </button>
+              <button type="button" onclick="updateSortFilter('group')" class="dropdown-item {% if sort_by == 'group' %}is-selected{% endif %}">
+                <span>Sort: Group</span>
+                {% if sort_by == 'group' %}<span class="apple-check">✓</span>{% endif %}
+              </button>
+              <button type="button" onclick="updateSortFilter('weakest')" class="dropdown-item {% if sort_by == 'weakest' %}is-selected{% endif %}">
+                <span>Sort: Weakest Passwords</span>
+                {% if sort_by == 'weakest' %}<span class="apple-check">✓</span>{% endif %}
+              </button>
+            </div>
+          </div>
+
+          <!-- Hidden fallback select for programmatic accessibility & tests -->
+          <select id="vaultSortSelect" class="sr-only" aria-hidden="true" tabindex="-1">
             <option value="title_asc" {% if sort_by == 'title_asc' %}selected{% endif %}>Sort: A → Z</option>
             <option value="title_desc" {% if sort_by == 'title_desc' %}selected{% endif %}>Sort: Z → A</option>
             <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Sort: Recently Updated</option>

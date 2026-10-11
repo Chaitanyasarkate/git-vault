@@ -727,6 +727,20 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 // Sorting, Cloud Sync & Wi-Fi QR Helpers
 // ==========================================
+// Dropdown click toggle & outside click dismissal
+document.addEventListener('click', (e) => {
+  const trigger = e.target.closest('.dropdown > button, .dropdown > .apple-select-control');
+  const dropdown = trigger ? trigger.closest('.dropdown') : null;
+
+  document.querySelectorAll('.dropdown.active').forEach(d => {
+    if (d !== dropdown) d.classList.remove('active');
+  });
+
+  if (dropdown) {
+    dropdown.classList.toggle('active');
+  }
+});
+
 function updateSortFilter(sortVal) {
   const url = new URL(window.location.href);
   url.searchParams.set('sort', sortVal);
