@@ -123,16 +123,24 @@ def decrypt_vault(raw_content: str, master_password: str) -> list:
 
 
 def generate_secure_password(length: int = 18, use_symbols: bool = True, use_digits: bool = True) -> str:
-    """Generates a cryptographically strong random password."""
-    chars = string.ascii_letters
-    if use_digits:
-        chars += string.digits
-    if use_symbols:
-        chars += "!@#$%^&*()-_=+[]{}|;:,.<>?"
-
+    """Generates a cryptographically strong random password guaranteeing requested character sets."""
     if length < 8:
         length = 8
     elif length > 128:
         length = 128
 
-    return "".join(secrets.choice(chars) for _ in range(length))
+    required = [secrets.choice(string.ascii_lowercase), secrets.choice(string.ascii_uppercase)]
+    pool = string.ascii_letters
+
+    if use_digits:
+        required.append(secrets.choice(string.digits))
+        pool += string.digits
+    if use_symbols:
+        symbols = "!@#$%^&*()-_=+[]{}|;:,.<>?"
+        required.append(secrets.choice(symbols))
+        pool += symbols
+
+    remaining = max(0, length - len(required))
+    result = required + [secrets.choice(pool) for _ in range(remaining)]
+    secrets.SystemRandom().shuffle(result)
+    return "".join(result)
