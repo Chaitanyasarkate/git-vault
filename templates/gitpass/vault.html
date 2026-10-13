@@ -30,13 +30,6 @@
         </div>
 
         <div class="apple-header-actions">
-          <!-- 1-Click Cloud Sync Button with GitHub -->
-          <button type="button" onclick="triggerCloudSync()" id="btnCloudSync" class="apple-btn-icon" title="Sync with GitHub Cloud" aria-label="Cloud Sync">
-            <svg id="cloudSyncIcon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-            </svg>
-          </button>
-
           <!-- Light/Dark Mode Switcher -->
           <button type="button" onclick="toggleAppleTheme()" id="themeToggleBtn" class="apple-btn-icon" title="Toggle Light / Dark Mode" aria-label="Toggle Theme">
             <span id="themeToggleIcon">☀️</span>
@@ -48,6 +41,7 @@
               <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/></svg>
             </button>
             <div class="dropdown-menu">
+              <button type="button" onclick="triggerCloudSync()" class="dropdown-item"><span>🔄</span> <span>Sync with GitHub</span></button>
               <a href="{% url 'gitpass:export_vault' %}?format=json" class="dropdown-item"><span>📄</span> <span>Export JSON</span></a>
               <a href="{% url 'gitpass:export_vault' %}?format=csv" class="dropdown-item"><span>📊</span> <span>Export CSV</span></a>
               <button type="button" onclick="openModal('importModal')" class="dropdown-item"><span>📥</span> <span>Import (CSV / JSON)</span></button>
