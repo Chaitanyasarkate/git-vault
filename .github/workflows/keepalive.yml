@@ -1,4 +1,4 @@
-name: Git-Pass Keep-Alive Heartbeat
+name: Git-Vault Keep-Alive Heartbeat
 
 on:
   schedule:
@@ -8,10 +8,13 @@ on:
 
 jobs:
   keep-alive:
-    name: Ping Git-Pass Service
+    name: Ping Git-Vault Services
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Git-Pass Health Endpoint
+      - name: Ping Keep-Alive Endpoints
         run: |
-          echo "Sending keep-alive ping to Git-Pass..."
-          curl -s -f -m 30 https://git-pass.onrender.com/health/ || echo "Git-Pass ping returned status code $?"
+          echo "Pinging Git-Vault endpoints..."
+          curl -s -f -m 25 https://git-vault-theta.vercel.app/ping.txt || echo "Vercel ping returned $?"
+          curl -s -f -m 25 https://git-vault.onrender.com/ping.txt || echo "Render ping returned $?"
+          curl -s -f -m 25 https://git-pass.onrender.com/health/ || echo "Git-Pass ping returned $?"
+

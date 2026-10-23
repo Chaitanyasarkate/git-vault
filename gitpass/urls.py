@@ -28,6 +28,10 @@ urlpatterns = [
     path("api/time-machine/rollback/", views.api_time_machine_rollback, name="api_time_machine_rollback"),
     path("logout/", views.logout_view, name="logout"),
     path("health/", views.health_view, name="health"),
+    path("health", views.health_view),
+    path("ping.txt", views.ping_view, name="ping_txt"),
+    path("ping/", views.ping_view, name="ping"),
+    path("ping", views.ping_view),
     path("sw.js", views.service_worker_view, name="service_worker"),
     path("manifest.webmanifest", views.manifest_view, name="manifest"),
 ]

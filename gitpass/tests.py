@@ -435,6 +435,18 @@ class AdvancedFeatureTests(TestCase):
         resp_health = self.client.get(reverse("gitpass:health"))
         self.assertEqual(resp_health.status_code, 200)
 
+        # Test ultralight 2-byte ping endpoints for cron jobs
+        resp_ping = self.client.get("/ping.txt")
+        self.assertEqual(resp_ping.status_code, 200)
+        self.assertEqual(resp_ping.content, b"ok")
+        self.assertEqual(len(resp_ping.content), 2)
+
+        resp_ping_head = self.client.head("/ping.txt")
+        self.assertEqual(resp_ping_head.status_code, 200)
+
+        resp_health_head = self.client.head(reverse("gitpass:health"))
+        self.assertEqual(resp_health_head.status_code, 200)
+
     def test_csv_formula_injection_prevention(self):
         # Add credential with formula characters via client.post
         post_resp = self.client.post(reverse("gitpass:add_item"), {

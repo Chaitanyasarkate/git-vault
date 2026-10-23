@@ -1095,8 +1095,23 @@ def logout_view(request):
 
 
 def health_view(request):
-    """Health check endpoint for Render."""
+    """Health check endpoint for Render, Vercel, and uptime monitoring."""
+    if request.method == "HEAD":
+        return HttpResponse("", content_type="application/json")
     return JsonResponse({"status": "healthy", "service": "Git-Vault", "zero_server_storage": True})
+
+
+def ping_view(request):
+    """
+    Ultralight 2-byte ping endpoint specifically designed for cron-job.org and free-tier monitors.
+    Returns 'ok' (2 bytes) for GET and 0 bytes for HEAD requests.
+    Prevents 'response larger than allowed limit' errors on cron-job.org.
+    """
+    if request.method == "HEAD":
+        response = HttpResponse("", content_type="text/plain")
+        response["Content-Length"] = "2"
+        return response
+    return HttpResponse("ok", content_type="text/plain")
 
 
 @require_session
