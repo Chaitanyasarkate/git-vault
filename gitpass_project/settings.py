@@ -23,6 +23,10 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "t", "yes")
 
+if not DEBUG and SECRET_KEY == "gitpass-secure-default-dev-secret-key-change-in-production":
+    import secrets
+    SECRET_KEY = secrets.token_urlsafe(50)
+
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
 
 # Application definition
@@ -81,11 +85,17 @@ DATABASES = {
 # Zero Server Storage: Session data is cryptographically signed and stored in the user's browser cookie
 # ensuring zero password retention in any server database.
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
-SESSION_COOKIE_AGE = 1800  # 30 minutes auto-lock
+SESSION_COOKIE_AGE = 900  # 15 minutes auto-lock
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SECURE = not DEBUG
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# CSRF Cookie Protection
+CSRF_COOKIE_HTTPONLY = False  # Allows AJAX client to read csrftoken cookie safely
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SECURE = not DEBUG
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -113,8 +123,10 @@ else:
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# CSRF Trusted Origins for Render.com
+# CSRF Trusted Origins for Vercel, Render.com, and local development
 CSRF_TRUSTED_ORIGINS = [
+    "https://*.vercel.app",
+    "https://git-vault-theta.vercel.app",
     "https://*.onrender.com",
     "https://*.render.com",
     "https://git-vault.onrender.com",
@@ -122,9 +134,21 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
 ]
+_extra_csrf = os.environ.get("CSRF_TRUSTED_ORIGINS")
+if _extra_csrf:
+    CSRF_TRUSTED_ORIGINS.extend([origin.strip() for origin in _extra_csrf.split(",") if origin.strip()])
 
-# Security: Automatic Lock & Session Inactivity Timeout (15 minutes)
-SESSION_COOKIE_AGE = 900  # 15 minutes in seconds
-SESSION_SAVE_EVERY_REQUEST = True
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# Reverse Proxy SSL Header (Vercel, Render, AWS, Nginx)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# HTTP Security Headers
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "True").lower() in ("true", "1", "yes")
+    SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", "31536000"))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 

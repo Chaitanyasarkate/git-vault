@@ -428,7 +428,7 @@ function renderAuditResults(data) {
       return `
         <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-xs gap-3">
           <div class="overflow-hidden">
-            <div class="font-bold text-white truncate">${item.title} <span class="text-slate-400 font-normal">(${item.username})</span></div>
+            <div class="font-bold text-white truncate">${escapeHtml(item.title)} <span class="text-slate-400 font-normal">(${escapeHtml(item.username)})</span></div>
             <div class="mt-1 flex flex-wrap gap-1">${badgeHtml}</div>
           </div>
           <a href="/vault/edit/${item.id}/" class="btn-vault-secondary shrink-0 px-2.5 py-1 text-[11px] font-semibold text-emerald-400">
@@ -463,7 +463,7 @@ function loadTimeMachineCommits() {
     .then(res => res.json())
     .then(data => {
       if (data.error) {
-        container.innerHTML = `<div class="text-center text-red-400 py-4 text-xs">${data.error}</div>`;
+        container.innerHTML = `<div class="text-center text-red-400 py-4 text-xs">${escapeHtml(data.error)}</div>`;
         return;
       }
       const commits = data.commits || [];
@@ -477,10 +477,10 @@ function loadTimeMachineCommits() {
           <div class="overflow-hidden">
             <div class="text-xs font-bold text-white truncate flex items-center gap-1.5">
               <span class="font-mono text-cyan-400 text-[11px] px-1.5 py-0.5 rounded bg-cyan-950/70 border border-cyan-800/50">${c.short_sha}</span>
-              <span class="truncate">${c.message}</span>
+              <span class="truncate">${escapeHtml(c.message)}</span>
             </div>
             <div class="text-[10px] text-slate-400 mt-1">
-              By ${c.author} • ${formatCommitDate(c.date)}
+              By ${escapeHtml(c.author)} • ${formatCommitDate(c.date)}
             </div>
           </div>
           <button type="button" class="btn-vault-secondary px-2 py-1 text-[11px] text-cyan-300">
@@ -511,7 +511,7 @@ function selectCommitSnapshot(sha, shortSha, message) {
   const restoreBtn = document.getElementById('restoreCommitBtn');
 
   if (previewBox) previewBox.classList.remove('hidden');
-  if (previewMeta) previewMeta.innerText = `Commit ${shortSha}: "${message}"`;
+  if (previewMeta) previewMeta.textContent = `Commit ${shortSha}: "${message}"`;
   if (previewItemsList) previewItemsList.innerHTML = '<div class="text-slate-400 text-xs py-2">Decrypting snapshot ciphertext...</div>';
   if (restoreBtn) {
     restoreBtn.disabled = false;
@@ -522,7 +522,7 @@ function selectCommitSnapshot(sha, shortSha, message) {
     .then(res => res.json())
     .then(data => {
       if (!data.success) {
-        if (previewItemsList) previewItemsList.innerHTML = `<div class="text-red-400 text-xs py-2">${data.error || 'Failed to decrypt.'}</div>`;
+        if (previewItemsList) previewItemsList.innerHTML = `<div class="text-red-400 text-xs py-2">${escapeHtml(data.error || 'Failed to decrypt.')}</div>`;
         return;
       }
       const items = data.items || [];
@@ -536,8 +536,8 @@ function selectCommitSnapshot(sha, shortSha, message) {
           <div class="space-y-1">
             ${items.map(it => `
               <div class="flex items-center justify-between text-xs py-1 border-b border-slate-800/80">
-                <span class="font-semibold text-white">${it.title}</span>
-                <span class="text-slate-400 font-mono text-[11px]">${it.username || '-'}</span>
+                <span class="font-semibold text-white">${escapeHtml(it.title)}</span>
+                <span class="text-slate-400 font-mono text-[11px]">${escapeHtml(it.username || '-')}</span>
               </div>
             `).join('')}
           </div>

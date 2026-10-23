@@ -3,6 +3,7 @@ import datetime
 import json
 import csv
 import base64
+import re
 from functools import wraps
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
@@ -717,8 +718,10 @@ def download_attachment_view(request, item_id: str, att_idx: int):
 
         att = attachments[att_idx]
         file_bytes = base64.b64decode(att["data"])
+        raw_name = att.get("name", "attachment")
+        safe_name = re.sub(r'[\r\n"\\/]', '_', os.path.basename(raw_name)).strip() or "attachment"
         response = HttpResponse(file_bytes, content_type=att.get("type", "application/octet-stream"))
-        response["Content-Disposition"] = f'attachment; filename="{att.get("name", "attachment")}"'
+        response["Content-Disposition"] = f'attachment; filename="{safe_name}"'
         return response
     except Exception as e:
         messages.error(request, f"Failed to download attachment: {e}")
@@ -857,6 +860,13 @@ def export_vault_view(request):
 
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
+    def _sanitize_csv_cell(val) -> str:
+        s = str(val or "")
+        # Neutralize spreadsheet formula injection characters (=, +, -, @, tab, cr)
+        if s.startswith(("=", "+", "-", "@", "\t", "\r")):
+            return f"'{s}"
+        return s
+
     if export_format == "csv":
         response = HttpResponse(content_type="text/csv")
         response["Content-Disposition"] = f'attachment; filename="gitpass_vault_{timestamp}.csv"'
@@ -864,13 +874,13 @@ def export_vault_view(request):
         writer.writerow(["Title", "Username", "Password", "URL", "Category", "Notes", "Updated At"])
         for item in items:
             writer.writerow([
-                item.get("title", ""),
-                item.get("username", ""),
-                item.get("password", ""),
-                item.get("url", ""),
-                item.get("category", ""),
-                item.get("notes", ""),
-                item.get("updated_at", ""),
+                _sanitize_csv_cell(item.get("title", "")),
+                _sanitize_csv_cell(item.get("username", "")),
+                _sanitize_csv_cell(item.get("password", "")),
+                _sanitize_csv_cell(item.get("url", "")),
+                _sanitize_csv_cell(item.get("category", "")),
+                _sanitize_csv_cell(item.get("notes", "")),
+                _sanitize_csv_cell(item.get("updated_at", "")),
             ])
         return response
     else:

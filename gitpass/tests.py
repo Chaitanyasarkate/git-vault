@@ -435,5 +435,57 @@ class AdvancedFeatureTests(TestCase):
         resp_health = self.client.get(reverse("gitpass:health"))
         self.assertEqual(resp_health.status_code, 200)
 
+    def test_csv_formula_injection_prevention(self):
+        # Add credential with formula characters via client.post
+        post_resp = self.client.post(reverse("gitpass:add_item"), {
+            "title": "=cmd|' /C calc'!A0",
+            "username": "+234567890",
+            "password": "@SUM(1+1)",
+            "url": "https://evil.com",
+            "category": "Logins",
+            "notes": "-dangerous_formula",
+        }, follow=True)
+        self.assertEqual(post_resp.status_code, 200)
+
+        resp_csv = self.client.get(reverse("gitpass:export_vault") + "?format=csv")
+        self.assertEqual(resp_csv.status_code, 200)
+        csv_text = resp_csv.content.decode("utf-8")
+        # Ensure formula trigger characters are prefixed with single quote
+        self.assertIn("'=cmd|' /C calc'!A0", csv_text)
+        self.assertIn("'+234567890", csv_text)
+        self.assertIn("'@SUM(1+1)", csv_text)
+        self.assertIn("'-dangerous_formula", csv_text)
+
+    def test_attachment_download_filename_sanitization(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        att_file = SimpleUploadedFile('malicious\r\nheader"injection.txt', b"Hello World", content_type="text/plain")
+        self.client.post(reverse("gitpass:add_item"), {
+            "title": "Item With Attachment",
+            "username": "user",
+            "password": "pass",
+            "category": "Logins",
+            "attachment": att_file,
+        })
+
+        items = self.client.session.get("demo_vault", [])
+        att_item = next((i for i in items if i.get("title") == "Item With Attachment"), None)
+        self.assertIsNotNone(att_item)
+
+        resp = self.client.get(reverse("gitpass:download_attachment", args=[att_item["id"], 0]))
+        self.assertEqual(resp.status_code, 200)
+        # Verify header injection chars (\r, \n, ") were stripped from Content-Disposition
+        content_disp = resp["Content-Disposition"]
+        self.assertNotIn("\r", content_disp)
+        self.assertNotIn("\n", content_disp)
+        self.assertEqual(resp.content, b"Hello World")
+
+    def test_unauthenticated_attachment_download_blocked(self):
+        unauth_client = Client()
+        resp = unauth_client.get(reverse("gitpass:download_attachment", args=["any-id", 0]))
+        # Should be safely redirected to login
+        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(resp.url, reverse("gitpass:login"))
+
+
 
 
