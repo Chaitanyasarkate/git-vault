@@ -51,10 +51,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   const addUsername = document.getElementById('addUsername');
   const addPassword = document.getElementById('addPassword');
   const addUrl = document.getElementById('addUrl');
+  const addCategory = document.getElementById('addCategory');
   const addTotp = document.getElementById('addTotp');
   const addNotes = document.getElementById('addNotes');
   const btnBackFromAdd = document.getElementById('btnBackFromAdd');
   const btnQuickGenInAdd = document.getElementById('btnQuickGenInAdd');
+  const categoryChips = document.getElementById('categoryChips');
   
   const btnBackFromGen = document.getElementById('btnBackFromGen');
   const genResultText = document.getElementById('genResultText');
@@ -69,6 +71,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   const toastMessage = document.getElementById('toastMessage');
 
+  // Active Category Filter State (Apple Passwords style)
+  let activeCategoryFilter = 'all';
+
   // Active Session in memory
   let activeSession = {
     isUnlocked: false,
@@ -78,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     token: '',
     filename: 'passwords.txt',
     masterPassword: '',
-    webUrl: 'https://git-vault.onrender.com',
+    webUrl: 'https://git-vault-theta.vercel.app',
     fileSha: null,
     items: []
   };
@@ -123,13 +128,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupWebUrl.value = activeSession.webUrl;
   }
 
-  // Asynchronously verify live connectivity with Render Cloud
+  // Asynchronously verify live connectivity with Vercel Cloud
   checkCloudConnectivity();
 
   async function checkCloudConnectivity() {
-    const webUrl = (activeSession.webUrl || 'https://git-vault.onrender.com').replace(/\/$/, '');
-    if (renderCloudBadge) renderCloudBadge.href = `${webUrl}/`;
-    if (footerWebLink) footerWebLink.href = `${webUrl}/`;
+    const webUrl = (activeSession.webUrl || 'https://git-vault-theta.vercel.app').replace(/\/$/, '');
+    const vaultUrl = `${webUrl}/vault/`;
+    if (renderCloudBadge) renderCloudBadge.href = vaultUrl;
+    if (footerWebLink) footerWebLink.href = vaultUrl;
 
     try {
       const controller = new AbortController();
@@ -145,8 +151,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const data = await resp.json().catch(() => ({}));
         if (data.status === 'healthy') {
           if (renderCloudBadge) {
-            renderCloudBadge.innerHTML = `<span class="cloud-dot online"></span><span class="cloud-text">Render Live</span>`;
-            renderCloudBadge.title = `Connected to ${webUrl} (Healthy). Click to open dashboard.`;
+            renderCloudBadge.innerHTML = `<span class="cloud-dot online"></span><span class="cloud-text">Vercel Live</span>`;
+            renderCloudBadge.title = `Connected to ${webUrl} (Healthy). Click to open vault.`;
           }
           return;
         }
@@ -155,8 +161,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Offline, connecting, or network timeout
     }
     if (renderCloudBadge) {
-      renderCloudBadge.innerHTML = `<span class="cloud-dot checking"></span><span class="cloud-text">Render Standby</span>`;
-      renderCloudBadge.title = `Connecting to ${webUrl}... Click to open.`;
+      renderCloudBadge.innerHTML = `<span class="cloud-dot checking"></span><span class="cloud-text">Vercel Standby</span>`;
+      renderCloudBadge.title = `Connecting to ${webUrl}... Click to open vault.`;
     }
   }
 
@@ -273,7 +279,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         items = await window.GitVaultCrypto.decryptVault(fileData.content, masterPass);
       }
 
-      const webUrl = setupWebUrl ? (setupWebUrl.value.trim() || 'https://git-vault.onrender.com') : 'https://git-vault.onrender.com';
+      const webUrl = setupWebUrl ? (setupWebUrl.value.trim() || 'https://git-vault-theta.vercel.app') : 'https://git-vault-theta.vercel.app';
       activeSession.webUrl = webUrl;
 
       // 4. Save session config
@@ -507,9 +513,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     showToast('Vault locked.');
   });
 
-  // Open Full Web App (git-vault.onrender.com or configured dashboard)
+  // Open Full Web App (git-vault-theta.vercel.app/vault/ or configured dashboard)
   btnOpenWeb.addEventListener('click', () => {
-    const webUrl = (activeSession.webUrl || 'https://git-vault.onrender.com').replace(/\/$/, '') + '/';
+    const baseUrl = (activeSession.webUrl || 'https://git-vault-theta.vercel.app').replace(/\/$/, '');
+    const webUrl = `${baseUrl}/vault/`;
     if (chrome && chrome.tabs) {
       chrome.tabs.create({ url: webUrl });
     } else {
@@ -627,11 +634,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const filtered = sortedItems.filter(item => {
+      // 1. Category Filter Check (Apple Passwords style)
+      if (activeCategoryFilter === 'current') {
+        const isCurrent = currentTabDomain && (
+          (item.url && item.url.includes(currentTabDomain)) ||
+          item.title.toLowerCase().includes(currentTabDomain)
+        );
+        if (!isCurrent) return false;
+      } else if (activeCategoryFilter === '2FA') {
+        if (!item.totp_secret) return false;
+      } else if (activeCategoryFilter !== 'all') {
+        const itemCat = (item.category || '').toLowerCase();
+        const targetCat = activeCategoryFilter.toLowerCase();
+        if (itemCat !== targetCat && !itemCat.includes(targetCat)) return false;
+      }
+
+      // 2. Text Search Query Check
       if (!q) return true;
       return (
         (item.title && item.title.toLowerCase().includes(q)) ||
         (item.username && item.username.toLowerCase().includes(q)) ||
         (item.url && item.url.toLowerCase().includes(q)) ||
+        (item.category && item.category.toLowerCase().includes(q)) ||
         (item.notes && item.notes.toLowerCase().includes(q))
       );
     });
@@ -639,7 +663,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (filtered.length === 0) {
       vaultList.innerHTML = `
         <div style="text-align: center; padding: 2rem 1rem; color: var(--text-dim); font-size: 0.8rem;">
-          ${q ? 'No credentials match your filter.' : 'Vault is empty. Click "+ Add Password" above.'}
+          ${q || activeCategoryFilter !== 'all' ? 'No credentials match your filter.' : 'Vault is empty. Click "+ Add Password" above.'}
         </div>
       `;
       return;
@@ -696,6 +720,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="item-data-row">
           <span class="item-cred-text pwd-masked" id="pwd-${item.id}">••••••••••••</span>
           <div class="item-actions-group">
+            <button type="button" class="action-chip-btn btn-autofill" title="Autofill username & password into active web page">⚡ Autofill</button>
             <button type="button" class="action-chip-btn btn-toggle-pwd" title="Reveal / Hide">👁</button>
             <button type="button" class="action-chip-btn btn-copy-pwd" title="Copy Password">Copy</button>
           </div>
@@ -703,6 +728,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         ${totpHtml}
       `;
+
+      // 1-Click Autofill into current webpage
+      card.querySelector('.btn-autofill')?.addEventListener('click', async () => {
+        try {
+          if (chrome && chrome.tabs && chrome.tabs.query) {
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (!tab || !tab.id || (tab.url && (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://')))) {
+              showToast('Cannot autofill on system or extension tabs', true);
+              return;
+            }
+            chrome.tabs.sendMessage(tab.id, {
+              action: 'FILL_CREDENTIALS',
+              username: item.username,
+              password: item.password
+            }, (response) => {
+              if (chrome.runtime.lastError) {
+                showToast('Unable to autofill. Reload the webpage first.', true);
+              } else {
+                showToast(`⚡ Autofilled ${item.title} into page!`);
+              }
+            });
+          } else {
+            showToast('Autofill requires active browser tab', true);
+          }
+        } catch (err) {
+          showToast(`Autofill error: ${err.message}`, true);
+        }
+      });
 
       // Copy username
       card.querySelector('.btn-copy-user')?.addEventListener('click', () => {
@@ -738,6 +791,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   vaultSearch.addEventListener('input', (e) => {
     renderVaultItems(e.target.value);
   });
+
+  // Category chips filter click handler (Apple Passwords style)
+  if (categoryChips) {
+    categoryChips.addEventListener('click', (e) => {
+      const chip = e.target.closest('.cat-chip');
+      if (!chip) return;
+      categoryChips.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeCategoryFilter = chip.getAttribute('data-cat') || 'all';
+      renderVaultItems(vaultSearch.value);
+    });
+  }
 
   // Start live rolling TOTP loop
   function startTotpLoop() {
@@ -804,8 +869,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       username: addUsername.value.trim(),
       password: addPassword.value,
       url: addUrl.value.trim(),
+      category: (addCategory && addCategory.value) ? addCategory.value : 'Logins',
       totp_secret: addTotp.value.trim(),
-      category: 'Logins',
       notes: addNotes.value.trim(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()

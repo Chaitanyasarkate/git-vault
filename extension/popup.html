@@ -29,9 +29,9 @@
       </div>
 
       <!-- Cloud Status Badge -->
-      <a href="https://git-vault.onrender.com/" target="_blank" id="renderCloudBadge" class="popup-cloud-badge" title="git-vault.onrender.com connectivity status">
+      <a href="https://git-vault-theta.vercel.app/vault/" target="_blank" id="renderCloudBadge" class="popup-cloud-badge" title="git-vault-theta.vercel.app connectivity status">
         <span class="cloud-dot online"></span>
-        <span class="cloud-text">Render Live</span>
+        <span class="cloud-text">Vercel Live</span>
       </a>
 
       <div class="popup-header-actions" id="headerActions" style="display: none;">
@@ -42,7 +42,7 @@
         <button type="button" id="btnSyncExt" class="popup-icon-btn" title="1-Click Cloud Sync with GitHub">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
-        <button type="button" id="btnOpenWeb" class="popup-icon-btn" title="Open git-vault.onrender.com">
+        <button type="button" id="btnOpenWeb" class="popup-icon-btn" title="Open Web Vault (git-vault-theta.vercel.app/vault/)">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
         </button>
         <button type="button" id="btnLockVault" class="popup-icon-btn" title="Lock Vault">
@@ -78,7 +78,7 @@
             <input type="password" id="setupToken" placeholder="GitHub PAT (ghp_...)" class="popup-pill-input">
             <button type="button" class="eye-toggle-btn" data-target="setupToken">👁</button>
           </div>
-          <input type="url" id="setupWebUrl" placeholder="Web Dashboard URL (default: https://git-vault.onrender.com)" class="popup-pill-input mt-2" value="https://git-vault.onrender.com">
+          <input type="url" id="setupWebUrl" placeholder="Web Dashboard URL (default: https://git-vault-theta.vercel.app)" class="popup-pill-input mt-2" value="https://git-vault-theta.vercel.app">
         </div>
 
         <!-- Master Password (Always Required to Decrypt) -->
@@ -105,8 +105,8 @@
           <button type="button" id="btnToggleSettings" class="text-link-subtle">
             Change GitHub Repo Settings
           </button>
-          <a href="https://git-vault.onrender.com/" target="_blank" id="footerWebLink" class="text-link-subtle" title="Open hosted web application">
-            Open git-vault.onrender.com ↗
+          <a href="https://git-vault-theta.vercel.app/vault/" target="_blank" id="footerWebLink" class="text-link-subtle" title="Open hosted web application">
+            Open git-vault-theta.vercel.app/vault/ ↗
           </a>
         </div>
       </form>
@@ -130,6 +130,17 @@
       <div class="popup-search-box">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="search-icon"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         <input type="text" id="vaultSearch" placeholder="Filter passwords or accounts..." class="popup-pill-input search-input">
+      </div>
+
+      <!-- Category Filter Chips (Apple Passwords style) -->
+      <div class="category-chips-row" id="categoryChips">
+        <button type="button" class="cat-chip active" data-cat="all">All</button>
+        <button type="button" class="cat-chip" data-cat="current">⚡ Current Site</button>
+        <button type="button" class="cat-chip" data-cat="Logins">🌐 Logins</button>
+        <button type="button" class="cat-chip" data-cat="Passkeys">🔑 Passkeys</button>
+        <button type="button" class="cat-chip" data-cat="2FA">🛡️ 2FA</button>
+        <button type="button" class="cat-chip" data-cat="WiFi">📶 Wi-Fi</button>
+        <button type="button" class="cat-chip" data-cat="Notes">📝 Notes</button>
       </div>
 
       <!-- Action Buttons Row -->
@@ -173,6 +184,18 @@
         </div>
         <div class="form-group mt-2">
           <input type="text" id="addUrl" placeholder="Website URL (e.g. https://...)" class="popup-pill-input">
+        </div>
+        <div class="form-group mt-2">
+          <select id="addCategory" class="popup-pill-input">
+            <option value="Logins" selected>🌐 Category: Logins</option>
+            <option value="Passkeys">🔑 Category: Passkeys</option>
+            <option value="WiFi">📶 Category: Wi-Fi</option>
+            <option value="Notes">📝 Category: Secure Notes</option>
+            <option value="Finance">💳 Category: Finance & Cards</option>
+            <option value="Work">💼 Category: Work</option>
+            <option value="Personal">🏠 Category: Personal</option>
+            <option value="Other">📁 Category: Other</option>
+          </select>
         </div>
         <div class="form-group mt-2">
           <input type="text" id="addTotp" placeholder="2FA / TOTP Secret (Base32 or otpauth://)" class="popup-pill-input">

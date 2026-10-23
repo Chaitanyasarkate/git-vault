@@ -10,12 +10,16 @@
   ],
   "host_permissions": [
     "https://api.github.com/*",
+    "https://git-vault-theta.vercel.app/*",
+    "https://*.vercel.app/*",
     "https://git-vault.onrender.com/*",
     "http://127.0.0.1:8000/*",
     "http://localhost:8000/*"
   ],
   "externally_connectable": {
     "matches": [
+      "https://git-vault-theta.vercel.app/*",
+      "https://*.vercel.app/*",
       "https://git-vault.onrender.com/*",
       "http://127.0.0.1:8000/*",
       "http://localhost:8000/*"

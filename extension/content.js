@@ -6,45 +6,74 @@
 
 // 1. Autofill Listener
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'FILL_CREDENTIALS') {
+  if (request.action === 'FILL_CREDENTIALS' || request.action === 'AUTOFILL_CREDENTIAL') {
     const { username, password } = request;
-    fillForm(username, password);
-    sendResponse({ success: true });
+    const success = fillForm(username, password);
+    sendResponse({ success: success !== false });
   }
   return true;
 });
 
+function setInputValue(element, value) {
+  if (!element) return;
+  element.focus();
+  const valueSetter = Object.getOwnPropertyDescriptor(element, 'value')?.set;
+  const prototype = Object.getPrototypeOf(element);
+  const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value')?.set;
+  if (prototypeValueSetter && valueSetter !== prototypeValueSetter) {
+    prototypeValueSetter.call(element, value);
+  } else if (valueSetter) {
+    valueSetter.call(element, value);
+  } else {
+    element.value = value;
+  }
+  element.dispatchEvent(new Event('input', { bubbles: true }));
+  element.dispatchEvent(new Event('change', { bubbles: true }));
+  element.dispatchEvent(new Event('blur', { bubbles: true }));
+}
+
 function fillForm(username, password) {
-  const passwordInputs = Array.from(document.querySelectorAll('input[type="password"]'));
-  
+  const passwordInputs = Array.from(document.querySelectorAll('input[type="password"]')).filter(el => {
+    return el.offsetParent !== null && !el.disabled && !el.readOnly;
+  });
+
+  const usernameSelector = 'input[type="email"], input[autocomplete="username"], input[name*="user" i], input[name*="email" i], input[name*="login" i], input[id*="user" i], input[id*="email" i], input[id*="login" i], input[type="text"]';
+
   if (passwordInputs.length > 0) {
     const pwdInput = passwordInputs[0];
-    pwdInput.value = password;
-    pwdInput.dispatchEvent(new Event('input', { bubbles: true }));
-    pwdInput.dispatchEvent(new Event('change', { bubbles: true }));
+    if (password) setInputValue(pwdInput, password);
 
-    // Find corresponding username input
+    // Find corresponding username input in same form or document
     const form = pwdInput.closest('form');
     let userInput = null;
-
     if (form) {
-      userInput = form.querySelector('input[type="email"], input[type="text"][name*="user"], input[type="text"][name*="email"], input[type="text"][name*="login"], input[type="text"][autocomplete*="username"]');
+      userInput = form.querySelector(usernameSelector);
     }
     if (!userInput) {
-      userInput = document.querySelector('input[type="email"], input[autocomplete="username"], input[name*="user"], input[name*="login"]');
+      const allUsers = Array.from(document.querySelectorAll(usernameSelector)).filter(el => el.offsetParent !== null && !el.disabled && !el.readOnly);
+      if (allUsers.length > 0) userInput = allUsers[0];
     }
 
     if (userInput && username) {
-      userInput.value = username;
-      userInput.dispatchEvent(new Event('input', { bubbles: true }));
-      userInput.dispatchEvent(new Event('change', { bubbles: true }));
+      setInputValue(userInput, username);
+    }
+    return true;
+  } else {
+    // Check if there is a standalone username input (e.g. step 1 of 2-step login)
+    const allUsers = Array.from(document.querySelectorAll(usernameSelector)).filter(el => el.offsetParent !== null && !el.disabled && !el.readOnly);
+    if (allUsers.length > 0 && username) {
+      setInputValue(allUsers[0], username);
+      return true;
     }
   }
+  return false;
 }
 
-// 2. Git-Vault Web App Bridge (for git-vault.onrender.com & localhost)
+// 2. Git-Vault Web App Bridge (for git-vault-theta.vercel.app, git-vault.onrender.com & localhost)
 const currentHost = window.location.hostname.toLowerCase();
-const isGitVaultSite = currentHost.includes('git-vault.onrender.com') ||
+const isGitVaultSite = currentHost.includes('git-vault-theta.vercel.app') ||
+  currentHost.includes('git-vault.onrender.com') ||
+  (currentHost.includes('vercel.app') && (document.title.includes('Git-Vault') || document.title.includes('Password Vault') || document.querySelector('meta[name="apple-mobile-web-app-title"]'))) ||
   (currentHost === 'localhost' || currentHost === '127.0.0.1') && (document.title.includes('Git-Vault') || document.querySelector('meta[name="apple-mobile-web-app-title"]'));
 
 if (isGitVaultSite) {

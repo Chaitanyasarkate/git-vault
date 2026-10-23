@@ -1,6 +1,6 @@
 # Git-Vault Browser WebExtension (Manifest V3)
 
-A privacy-focused browser extension for **Git-Vault** that enables you to save, view, and generate passwords with zero server retention, directly synced with your private GitHub repository and hosted on [git-vault.onrender.com](https://git-vault.onrender.com/).
+A privacy-focused browser extension for **Git-Vault** that enables you to save, view, and generate passwords with zero server retention, directly synced with your private GitHub repository and hosted on [git-vault-theta.vercel.app](https://git-vault-theta.vercel.app/vault/).
 
 ---
 
@@ -8,12 +8,14 @@ A privacy-focused browser extension for **Git-Vault** that enables you to save, 
 
 1. **Zero Server Storage**: Directly communicates with GitHub's REST API (`api.github.com`) using your Personal Access Token (PAT).
 2. **Client-Side AES-256-GCM Encryption**: Data is encrypted using PBKDF2HMAC-SHA256 (120,000 rounds) and AES-256-GCM via the native Web Crypto API. Fully interoperable with the Git-Vault web dashboard.
-3. **Current Site Detection**: Automatically detects the domain of the active tab (e.g. `github.com`, `google.com`) and pins matching credentials to the top.
-4. **1-Click Quick Save**: Auto-fills the current site domain and URL with a single click.
-5. **Cryptographic Password Generator**: Built-in high-entropy password generator with customizable length, symbols, and character sets.
-6. **Autofill Integration**: Supports 1-click credential filling on web forms.
-7. **Instant Demo Mode**: Test the extension UI and workflow instantly without entering GitHub credentials.
-8. **Render Cloud Connectivity**: Real-time connectivity monitor and 1-click navigation to [git-vault.onrender.com](https://git-vault.onrender.com/).
+3. **Apple Passwords Category Filtering**: One-tap category chips (`All`, `⚡ Current Site`, `🌐 Logins`, `🔑 Passkeys`, `🛡️ 2FA Codes`, `📶 Wi-Fi`, `📝 Notes`) matching the modern web vault UX.
+4. **1-Click Form Autofill**: Dedicated `⚡ Autofill` button on each credential card that injects username and password directly into active web pages (supporting React, Vue, and Angular inputs).
+5. **Built-in 2FA / TOTP Authenticator**: Live countdown timer (30s) and rolling 6-digit authentication codes computed on-device with zero cloud leakage.
+6. **Current Site Detection**: Automatically detects the domain of the active tab (e.g. `github.com`, `google.com`) and pins matching credentials to the top.
+7. **1-Click Quick Save**: Auto-fills the current site domain and URL with a single click.
+8. **Cryptographic Password Generator**: Built-in high-entropy password generator with customizable length, symbols, and character sets.
+9. **Instant Demo Mode**: Test the extension UI and workflow instantly without entering GitHub credentials.
+10. **Vercel Cloud Connectivity**: Real-time connectivity monitor and 1-click navigation directly to [git-vault-theta.vercel.app/vault/](https://git-vault-theta.vercel.app/vault/).
 
 ---
 
@@ -48,16 +50,18 @@ This extension uses **Manifest V3** and works on all Chromium-based browsers (**
 2. Enter your **GitHub Username**, **Repository Name**, **Personal Access Token (PAT)**, and **Master Password**.
    - Or click **⚡ Quick Instant Demo** to test immediately.
 3. Once unlocked:
-   - Browse your saved credentials with 1-click **Copy Username** and **Copy Password**.
-   - Click **+ Add Password** to save a new credential (current tab URL is automatically detected).
+   - Browse your saved credentials with 1-click **⚡ Autofill**, **Copy Username**, and **Copy Password**.
+   - Filter by category chips (`All`, `⚡ Current Site`, `Logins`, `Passkeys`, `2FA`, `Wi-Fi`, `Notes`).
+   - Click **+ Add Password** to save a new credential with category tags.
    - Use the **⚡ Generator** tab to create strong passwords.
-   - Click the link icon in the top header or the **Render Live** status badge to open your hosted dashboard at `https://git-vault.onrender.com/`.
+   - Click the link icon in the top header or the **Vercel Live** status badge to open your hosted dashboard at `https://git-vault-theta.vercel.app/vault/`.
 4. When finished, click the **Lock** button in the top header. Your master password is removed from memory.
 
 ---
 
-## Connectivity with git-vault.onrender.com
+## Connectivity with git-vault-theta.vercel.app
 
-- **Shared GitHub Cloud Storage**: Both the extension and [git-vault.onrender.com](https://git-vault.onrender.com/) use identical Zero-Knowledge AES-256-GCM + PBKDF2 encryption. Any credential saved in the extension is committed to your GitHub repository and immediately accessible in the Render web app (and vice-versa via 1-Click Cloud Sync).
-- **Live Cloud Health Ping**: The extension actively checks and displays the live health status of `git-vault.onrender.com`.
+- **Shared GitHub Cloud Storage**: Both the extension and [git-vault-theta.vercel.app](https://git-vault-theta.vercel.app/vault/) use identical Zero-Knowledge AES-256-GCM + PBKDF2 encryption. Any credential saved in the extension is committed to your GitHub repository and immediately accessible in the Vercel web app (and vice-versa via 1-Click Cloud Sync).
+- **Live Cloud Health Ping**: The extension actively checks and displays the live health status of `git-vault-theta.vercel.app`.
 - **Intelligent Protection**: Form auto-capture automatically avoids capturing master passphrases when interacting with Git-Vault itself.
+- **Web App Bridge**: Seamless 1-click sync from the web vault dashboard to your extension configuration.

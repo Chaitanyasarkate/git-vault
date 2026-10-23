@@ -642,3 +642,64 @@ body {
 .mt-2 { margin-top: 0.5rem; }
 .mt-3 { margin-top: 0.75rem; }
 .flex-1 { flex: 1; }
+
+/* Category Filter Chips Row (Apple Passwords Style) */
+.category-chips-row {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  margin-bottom: 0.65rem;
+  scrollbar-width: none;
+}
+.category-chips-row::-webkit-scrollbar {
+  display: none;
+}
+.cat-chip {
+  flex-shrink: 0;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-glass);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+.cat-chip:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+.cat-chip.is-active {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  font-weight: 700;
+}
+
+.action-chip-btn.btn-autofill {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #34d399;
+  font-weight: 700;
+}
+.action-chip-btn.btn-autofill:hover {
+  background: #34d399;
+  color: #000000;
+  border-color: #34d399;
+}
+select.popup-pill-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2214%22%20height%3D%2214%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.2rem;
+  color: var(--text-main);
+}
+select.popup-pill-input option {
+  background: #111116;
+  color: #ffffff;
+}
+
