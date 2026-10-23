@@ -31,6 +31,7 @@ body {
   font-family: var(--font-sans);
   overflow-x: hidden;
   position: relative;
+  -webkit-user-select: none;
   user-select: none;
   -webkit-font-smoothing: antialiased;
 }
@@ -90,9 +91,14 @@ body {
 }
 
 .popup-header-actions {
-  display: flex;
+  display: none;
   align-items: center;
   gap: 0.4rem;
+}
+
+.btn-biometric-styled {
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  color: #38bdf8 !important;
 }
 
 .popup-repo-tag {
@@ -507,6 +513,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  -webkit-user-select: all;
   user-select: all;
 }
 
@@ -578,6 +585,7 @@ body {
   font-weight: 700;
   color: var(--emerald-accent);
   word-break: break-all;
+  -webkit-user-select: all;
   user-select: all;
 }
 
@@ -650,7 +658,7 @@ body {
   overflow-x: auto;
   padding-bottom: 0.35rem;
   margin-bottom: 0.65rem;
-  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 .category-chips-row::-webkit-scrollbar {
   display: none;
@@ -666,6 +674,7 @@ body {
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.15s ease;
+  -webkit-user-select: none;
   user-select: none;
 }
 .cat-chip:hover {

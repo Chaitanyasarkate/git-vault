@@ -165,6 +165,7 @@ function showAutoCaptureBanner(cred) {
     right: 18px;
     z-index: 2147483647;
     background: rgba(15, 17, 23, 0.95);
+    -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(52, 211, 153, 0.4);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(52, 211, 153, 0.15);

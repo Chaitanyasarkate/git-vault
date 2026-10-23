@@ -29,12 +29,12 @@
       </div>
 
       <!-- Cloud Status Badge -->
-      <a href="https://git-vault-theta.vercel.app/vault/" target="_blank" id="renderCloudBadge" class="popup-cloud-badge" title="git-vault-theta.vercel.app connectivity status">
+      <a href="https://git-vault-theta.vercel.app/vault/" target="_blank" rel="noopener noreferrer" id="renderCloudBadge" class="popup-cloud-badge" title="git-vault-theta.vercel.app connectivity status">
         <span class="cloud-dot online"></span>
         <span class="cloud-text">Vercel Live</span>
       </a>
 
-      <div class="popup-header-actions" id="headerActions" style="display: none;">
+      <div class="popup-header-actions" id="headerActions">
         <span class="popup-repo-tag" id="headerRepoTag" title="Connected Repository">repo</span>
         <button type="button" id="btnToggleBiometrics" class="popup-icon-btn" title="Toggle Biometric Unlock">
           <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004 11m0 0a8 8 0 00.126 1.411m2.775 5.568A9.972 9.972 0 0012 21c2.14 0 4.135-.672 5.776-1.816"/></svg>
@@ -92,7 +92,7 @@
         </button>
 
         <!-- Biometric Unlock Button (WebAuthn Touch ID / Windows Hello) -->
-        <button type="button" id="btnBiometricUnlock" class="btn-dark-pill mt-2 hidden" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8;">
+        <button type="button" id="btnBiometricUnlock" class="btn-dark-pill mt-2 hidden btn-biometric-styled">
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 004 11m0 0a8 8 0 00.126 1.411m2.775 5.568A9.972 9.972 0 0012 21c2.14 0 4.135-.672 5.776-1.816"/></svg>
           <span>Unlock with Biometrics</span>
         </button>
@@ -105,7 +105,7 @@
           <button type="button" id="btnToggleSettings" class="text-link-subtle">
             Change GitHub Repo Settings
           </button>
-          <a href="https://git-vault-theta.vercel.app/vault/" target="_blank" id="footerWebLink" class="text-link-subtle" title="Open hosted web application">
+          <a href="https://git-vault-theta.vercel.app/vault/" target="_blank" rel="noopener noreferrer" id="footerWebLink" class="text-link-subtle" title="Open hosted web application">
             Open git-vault-theta.vercel.app/vault/ ↗
           </a>
         </div>
@@ -186,7 +186,7 @@
           <input type="text" id="addUrl" placeholder="Website URL (e.g. https://...)" class="popup-pill-input">
         </div>
         <div class="form-group mt-2">
-          <select id="addCategory" class="popup-pill-input">
+          <select id="addCategory" class="popup-pill-input" title="Credential Category" aria-label="Credential Category">
             <option value="Logins" selected>🌐 Category: Logins</option>
             <option value="Passkeys">🔑 Category: Passkeys</option>
             <option value="WiFi">📶 Category: Wi-Fi</option>
@@ -229,7 +229,7 @@
       <div class="gen-controls-box">
         <div class="gen-slider-row">
           <span>Length: <strong id="genLengthVal">20</strong></span>
-          <input type="range" id="genLength" min="10" max="40" value="20" class="slider-accent">
+          <input type="range" id="genLength" min="10" max="40" value="20" class="slider-accent" title="Password Length" aria-label="Password Length">
         </div>
 
         <div class="gen-check-grid">

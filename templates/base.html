@@ -1,7 +1,7 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
+  {% load static %}
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Git-Vault — Privacy-Focused Password Manager{% endblock %}</title>
@@ -15,8 +15,7 @@
   <link rel="stylesheet" href="{% static 'css/gitpass.css' %}?v=13.0">
   
   <!-- Progressive Web App (PWA) Manifest & Icons -->
-  <link rel="manifest" href="{% url 'gitpass:manifest' %}">
-  <meta name="theme-color" content="#000000">
+  <link rel="manifest" href="/manifest.webmanifest">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -37,6 +36,10 @@
           document.documentElement.classList.add('dark');
           document.documentElement.setAttribute('data-theme', 'dark');
         }
+        var m = document.createElement('meta');
+        m.name = 'theme-color';
+        m.content = theme === 'light' ? '#f2f2f7' : '#000000';
+        document.head.appendChild(m);
       } catch (e) {}
     })();
   </script>
@@ -54,7 +57,7 @@
       
       <!-- Brand Logo with Geometric Segmented Cipher Emblem -->
       <a href="{% url 'gitpass:login' %}" class="brand-link">
-        <div class="brand-emblem-wrap" style="width: 2.25rem; height: 2.25rem; display: flex; align-items: center; justify-content: center; margin-bottom: 0;">
+        <div class="brand-emblem-wrap brand-emblem-wrap-nav">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="auth-emblem-svg">
             <circle cx="12" cy="12" r="9" stroke="rgba(255, 255, 255, 0.8)" stroke-width="1.75" stroke-dasharray="3.2 3.2" stroke-linecap="round"/>
             <circle cx="12" cy="12" r="3.5" fill="#ffffff"/>
@@ -76,7 +79,7 @@
       <!-- Right Navigation Links / User State -->
       <div class="nav-actions">
         <!-- PWA Install Button (Dynamic) -->
-        <button type="button" id="pwaInstallBtn" class="nav-btn-secondary" style="display: none;" title="Install Git-Vault as Native App">
+        <button type="button" id="pwaInstallBtn" class="nav-btn-secondary" title="Install Git-Vault as Native App">
           <svg width="15" height="15" class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
           </svg>
@@ -156,12 +159,12 @@
     <div class="max-w-[1440px] mx-auto px-4 sm:px-8 space-y-3">
       <div class="flex flex-wrap items-center justify-center gap-4 text-slate-400 text-xs">
         <span class="inline-flex items-center gap-1.5">
-          <svg width="16" height="16" style="width: 16px; height: 16px; min-width: 16px; min-height: 16px;" class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <svg width="16" height="16" class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
           <span>AES-256-GCM Zero-Knowledge</span>
         </span>
         <span>•</span>
         <span class="inline-flex items-center gap-1.5">
-          <svg width="16" height="16" style="width: 16px; height: 16px; min-width: 16px; min-height: 16px;" class="w-4 h-4 text-teal-400 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          <svg width="16" height="16" class="w-4 h-4 text-teal-400 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
           <span>Stored in your GitHub Repository</span>
         </span>
         <span>•</span>
